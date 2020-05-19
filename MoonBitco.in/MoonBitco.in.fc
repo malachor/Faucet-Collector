@@ -1,7 +1,7 @@
 using System;
 using FaucetCollector.Script;
 using OpenQA.Selenium;
-
+//css_ref FaucetCollector.Utilities
 public class MoonBitcoinScript : FaucetScript
 {
     /// <summary>
@@ -17,6 +17,7 @@ public class MoonBitcoinScript : FaucetScript
             {
                 //We have a setting to get the email address used for the coinpot account
                 new FaucetSetting() { Name = "Email", Display = "Coinpot email addres", Type = EditorType.TextBox, Required = true },
+                new FaucetSetting(){Name="Adblock",Display="Use code adblock",Type=EditorType.CheckBox,Default=true},
                 //Option to use SolveMedia or reCAPTCHA
                    new FaucetSetting(){Name="SwitchC",Display="SwitchCaptcha if the other is not visible",Type=EditorType.CheckBox,Default=true},
                     new FaucetSetting(){Name="SolveMediaRetry", Display="Do three SolveMedia attempts when failed to answer",Type=EditorType.CheckBox,Default=true},
@@ -25,7 +26,14 @@ public class MoonBitcoinScript : FaucetScript
             };
         }
     }
-
+    public FaucetCollector.Utilities.Adblock Adblock { get; set; }
+    private void DoBlock( )
+    {
+        if ( GetBoolSetting("Adblock") )
+        {
+            Adblock.DestroyAds( );
+        }
+    }
 
     /// <summary>
     /// This method gets called when the faucet is enabled and the GO button is clicked
@@ -60,12 +68,10 @@ public class MoonBitcoinScript : FaucetScript
 
 
     }
-    public override int DoInit()
+    public override int DoInit( )
     {
-     
-    
-
-        return base.DoInit();
+        Adblock=new FaucetCollector.Utilities.Adblock(this);
+        return base.DoInit( );
     }
     /// <summary>
     /// This method gets called after the Start method, here you need to return if we are logged in or not.
@@ -85,6 +91,7 @@ public class MoonBitcoinScript : FaucetScript
     /// </summary>
     public override int BeforeLogin()
     {
+        DoBlock( );
         CheckForPopup();
         //This faucet has nothing to do here. We will let Faucet Collector handle it.
         return base.BeforeLogin();
@@ -234,6 +241,7 @@ public class MoonBitcoinScript : FaucetScript
     /// </summary>
     public override int GetFaucetWaitTime()
     {
+        DoBlock( );
         Wait();
         var TimerLoader = ElementByXPath("//img[@id='TimerLoader']");
         DateTime Timeout = DateTime.Now.AddSeconds(15);
@@ -341,6 +349,7 @@ public class MoonBitcoinScript : FaucetScript
     /// </summary>
     public override int BeforeSolveFaucet()
     {
+        DoBlock( );
         CheckForPopup();
         bool IsNotInCloudFlare = CheckForCloudFlare();
         if (!IsNotInCloudFlare)

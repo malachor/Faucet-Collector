@@ -2,7 +2,7 @@ using System;
 using System.Text.RegularExpressions;
 using FaucetCollector.Script;
 using OpenQA.Selenium;
-
+//css_ref FaucetCollector.Utilities
 public class MoonCashScript : FaucetScript
 {
     /// <summary>
@@ -17,6 +17,7 @@ public class MoonCashScript : FaucetScript
             {
                 //We have a setting to get the email address used for the coinpot account
                 new FaucetSetting() { Name = "Email", Display = "Coinpot email addres", Type = EditorType.TextBox, Required = true },
+                  new FaucetSetting(){Name="Adblock",Display="Use code adblock",Type=EditorType.CheckBox,Default=true},
                 new FaucetSetting(){Name="SwitchC",Display="SwitchCaptcha if the other is not visible",Type=EditorType.CheckBox,Default=true},
                  new FaucetSetting(){Name="SolveMediaRetry", Display="Do three SolveMedia attempts when failed to answer",Type=EditorType.CheckBox,Default=true},
                 //Option to use SolveMedia or reCAPTCHA
@@ -28,6 +29,15 @@ public class MoonCashScript : FaucetScript
     /// <summary>
     /// This method gets called when the faucet is enabled and the GO button is clicked
     /// </summary>
+    /// 
+    public FaucetCollector.Utilities.Adblock Adblock { get; set; }
+    private void DoBlock( )
+    {
+        if ( GetBoolSetting("Adblock") )
+        {
+            Adblock.DestroyAds( );
+        }
+    }
     public override void Start()
     {
  
@@ -94,6 +104,7 @@ public class MoonCashScript : FaucetScript
     /// </summary>
     public override int BeforeLogin()
     {
+        DoBlock( );
         CheckForPopup();
         //Find the signin button to open the login popup
         var signInButton = ElementByXPath("//button[@data-target='#SignInModal']");
@@ -164,12 +175,10 @@ public class MoonCashScript : FaucetScript
         return DoSolveCaptcha ( );
     }
     private bool OverriteSolvemedia { get; set; }
-    public override int DoInit()
+    public override int DoInit( )
     {
-
-     
-
-        return base.DoInit();
+        Adblock=new FaucetCollector.Utilities.Adblock(this);
+        return base.DoInit( );
     }
     /// <summary>
     /// This method gets called after BeforeLogin if IsLoggedIn returned false.
@@ -232,6 +241,7 @@ public class MoonCashScript : FaucetScript
     /// </summary>
     public override int GetFaucetWaitTime()
     {
+        DoBlock( );
         Wait(4, 5);
         var TimerLoader = ElementByXPath("//img[@id='TimerLoader']");
         DateTime Timeout = DateTime.Now.AddSeconds(15);
@@ -360,7 +370,9 @@ public class MoonCashScript : FaucetScript
     /// </summary>
     public override int BeforeSolveFaucet()
     {
+       
         Wait(3);
+        DoBlock( );
         CheckForPopup();
         bool IsNotInCloudFlare = CheckForCloudFlare();
         if (!IsNotInCloudFlare)

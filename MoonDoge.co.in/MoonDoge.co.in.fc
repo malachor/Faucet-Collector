@@ -2,7 +2,7 @@ using System;
 using System.Text.RegularExpressions;
 using FaucetCollector.Script;
 using OpenQA.Selenium;
-
+//css_ref FaucetCollector.Utilities
 
 public class MoonDogeScript_ : FaucetScript
 {
@@ -19,10 +19,19 @@ public class MoonDogeScript_ : FaucetScript
             {
                 //We have a setting to get the email address used for the coinpot account
                 new FaucetSetting() { Name = "Email", Display = "Coinpot email addres", Type = EditorType.TextBox, Required = true },
+                new FaucetSetting(){Name="Adblock",Display="Use code adblock",Type=EditorType.CheckBox,Default=true},
                  new FaucetSetting(){Name="SwitchC",Display="SwitchCaptcha if the other is not visible",Type=EditorType.CheckBox,Default=true},
                   new FaucetSetting(){Name="SolveMediaRetry", Display="Do three SolveMedia attempts when failed to answer",Type=EditorType.CheckBox,Default=true},
                 new FaucetSetting() { Name = "UseSolveMedia", Display = "Use SolveMedia", Type = EditorType.CheckBox, Default = true }
             };
+        }
+    }
+    public FaucetCollector.Utilities.Adblock Adblock { get; set; }
+    private void DoBlock( )
+    {
+        if ( GetBoolSetting("Adblock") )
+        {
+            Adblock.DestroyAds( );
         }
     }
     public void CheckForPopup()
@@ -80,6 +89,7 @@ public class MoonDogeScript_ : FaucetScript
     /// </summary>
     public override int BeforeLogin()
     {
+        DoBlock( );
         CheckForPopup();
         //This faucet has nothing to do here. We will let Faucet Collector handle it.
         return base.BeforeLogin();
@@ -141,10 +151,10 @@ public class MoonDogeScript_ : FaucetScript
     }
 
     private bool OverriteSolvemedia { get; set; }
-    public override int DoInit()
+    public override int DoInit( )
     {
-
-        return base.DoInit();
+        Adblock=new FaucetCollector.Utilities.Adblock(this);
+        return base.DoInit( );
     }
     public override int DoLogin()
     {
@@ -237,6 +247,7 @@ public class MoonDogeScript_ : FaucetScript
     public override int GetFaucetWaitTime()
     {
         Wait();
+        DoBlock( );
         var TimerLoader = ElementByXPath("//img[@id='TimerLoader']");
         DateTime Timeout = DateTime.Now.AddSeconds(15);
         while (IsVisible(TimerLoader))
@@ -348,6 +359,7 @@ public class MoonDogeScript_ : FaucetScript
     public override int BeforeSolveFaucet()
     {
         Wait(3);
+        DoBlock( );
         CheckForPopup();
         bool IsNotInCloudFlare = CheckForCloudFlare();
         if (!IsNotInCloudFlare)

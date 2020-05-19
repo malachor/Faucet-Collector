@@ -2,7 +2,7 @@ using System;
 using System.Text.RegularExpressions;
 using FaucetCollector.Script;
 using OpenQA.Selenium;
-
+//css_ref FaucetCollector.Utilities
 
 public class MoonDashScript : FaucetScript
 {
@@ -19,7 +19,7 @@ public class MoonDashScript : FaucetScript
                 //We have a setting to get the email address used for the coinpot account
                 new FaucetSetting() { Name = "Email", Display = "Coinpot email addres", Type = EditorType.TextBox, Required = true },
                 //Option to use SolveMedia or reCAPTCHA
-
+                  new FaucetSetting(){Name="Adblock",Display="Use code adblock",Type=EditorType.CheckBox,Default=true},
                  new FaucetSetting(){Name="SwitchC",Display="SwitchCaptcha if the other is not visible",Type=EditorType.CheckBox,Default=true},
                   new FaucetSetting(){Name="SolveMediaRetry", Display="Do three SolveMedia attempts when failed to answer",Type=EditorType.CheckBox,Default=true},
 
@@ -43,11 +43,12 @@ public class MoonDashScript : FaucetScript
 
 
     }
+    public FaucetCollector.Utilities.Adblock Adblock { get; set; }
     public override void Start()
     {
         //Title that shows in the browser. Is used to close popups
         Title = "moon dash";
-
+        
         //After we did try to claim on the faucet we search for these elements to determine if it was a success or a fail
         SuccessXPath = "//*[@id='FaucetClaimModal']";
         OverriteSolvemedia = false;
@@ -58,6 +59,13 @@ public class MoonDashScript : FaucetScript
         base.Start();
     }
 
+    private void DoBlock( )
+    {
+        if(GetBoolSetting("Adblock") )
+        {
+            Adblock.DestroyAds( );
+        }
+    }
     public bool CloseModal()
     {
         var Close = ElementByXPath("//div[@id='MessageModal']//button[@class='btn btn-coin'][contains(text(),'Close')]");
@@ -162,6 +170,7 @@ public class MoonDashScript : FaucetScript
     /// </summary>
     public override int BeforeLogin()
     {
+        DoBlock( );
         CheckForPopup();
         //Find the signin button to open the login popup
         var signInButton = ElementByXPath("//button[@data-target='#SignInModal']");
@@ -243,6 +252,7 @@ public class MoonDashScript : FaucetScript
     public override int GetFaucetWaitTime()
     {
         Wait(4, 5);
+        DoBlock( );
         var TimerLoader = ElementByXPath("//img[@id='TimerLoader']");
         DateTime Timeout = DateTime.Now.AddSeconds(15);
         while (IsVisible(TimerLoader))
@@ -281,9 +291,10 @@ public class MoonDashScript : FaucetScript
     private bool OverriteSolvemedia { get; set; }
     public override int DoInit()
     {
-
+        Adblock=new FaucetCollector.Utilities.Adblock(this);
         return base.DoInit();
     }
+    
     /// <summary><
     /// <summary>
     /// This method gets called after BeforeSolveCaptcha and it does the actual captcha solving
@@ -359,6 +370,7 @@ public class MoonDashScript : FaucetScript
     /// </summary>
     public override int BeforeSolveFaucet()
     {
+        DoBlock( );
         Wait(3);
         CheckForPopup();
         bool IsNotInCloudFlare = CheckForCloudFlare();
@@ -494,7 +506,7 @@ public class MoonDashScript : FaucetScript
             //Now get the "Processing" window again.
             processing = ElementById("ProgressModal");
         }
-
+        DoBlock( );
         //We are ready. The "Processing" window is gone or we did 30 attempts.
         //Either way we return this is a success.
         //Let Faucet Collector continue
