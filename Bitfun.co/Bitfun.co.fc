@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using FaucetCollector.Script;
 using OpenQA.Selenium;
-
+//css_ref FaucetCollector.Utilities
 public class BitfunScript : FaucetScript
 {
     /// <summary>
@@ -17,6 +17,7 @@ public class BitfunScript : FaucetScript
             {
                 //We have a setting to get the email address used for bitfun
                 new FaucetSetting() { Name = "Email", Display = "Email", Type = EditorType.TextBox, Required = true },
+                new FaucetSetting(){Name="Adblock",Display="Use code adblock",Type=EditorType.CheckBox,Default=true},
                 //And we also need the password
                 new FaucetSetting() { Name = "Password", Display = "Password", Type = EditorType.Password, Required = true },
                 //Option to use SolveMedia or reCAPTCHA
@@ -46,7 +47,14 @@ public class BitfunScript : FaucetScript
         //Let Faucet Collector start up everything
         base.Start();
     }
-
+    public FaucetCollector.Utilities.Adblock Adblock { get; set; }
+    private void DoBlock( )
+    {
+        if ( GetBoolSetting("Adblock") )
+        {
+            Adblock.DestroyAds( );
+        }
+    }
     public void RefreshSolvemedia ( )
     {
         ExecuteScript ( "ACPuzzle.reload();" );
@@ -99,11 +107,10 @@ public class BitfunScript : FaucetScript
     }
 
     private bool OverriteSolvemedia { get; set; }
-    public override int DoInit()
+    public override int DoInit( )
     {
-
-       
-        return base.DoInit();
+        Adblock=new FaucetCollector.Utilities.Adblock(this);
+        return base.DoInit( );
     }
     public void CheckForPopup()
     {
@@ -133,6 +140,7 @@ public class BitfunScript : FaucetScript
     /// </summary>
     public override int BeforeLogin()
     {
+        DoBlock( );
         CheckForPopup();
         //Look for the signin button
         var signInButton = ElementByXPath("//div/button[@type='button' and @data-target='#SignInModal']");
@@ -212,6 +220,7 @@ public class BitfunScript : FaucetScript
     /// </summary>
     public override int GetFaucetWaitTime()
     {
+        DoBlock( );
         System.Threading.Thread.Sleep(5000);
         if (IsVisible(ElementByXPath(SuccessXPath)))
         {
@@ -339,6 +348,7 @@ public class BitfunScript : FaucetScript
     /// </summary>
     public override int BeforeSolveFaucet()
     {
+        DoBlock( );
         CheckForPopup();
         Wait(3);
         //Find the button to open the popup window where we can solve the captcha and claim on the faucet.
