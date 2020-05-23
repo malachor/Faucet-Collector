@@ -1,7 +1,9 @@
 using FaucetCollector.Script;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
-//css_inc RecaptchaUtilities
+//css_inc FaucetCollectorUtilities
 public class FreeDogeonScript : FaucetScript
 {
     public override int DoLogin ( )
@@ -48,10 +50,37 @@ public class FreeDogeonScript : FaucetScript
         {
             new FaucetSetting() {Name = "Email", Display = "Email", Type = EditorType.TextBox, Required = true},
 
-            new FaucetSetting() { Name = "Password", Display = "Password", Type = EditorType.Password, Required = true }
+            new FaucetSetting() { Name = "Password", Display = "Password", Type = EditorType.Password, Required = true },
+
+            new FaucetSetting(){Name="Coin",Display="Coin to claim",Type=EditorType.ComboBox,Items=AvailableCoins,Default=AvailableCoins.FirstOrDefault()}
         };
         }
     }
+
+    private readonly List<string> AvailableCoins =new List<string>()
+    {
+        "DOGE",
+        "BTC",
+        "ETH",
+        "USDT",
+        "USDC",
+        "HT",
+        "LEO",
+        "BNB"
+    }; 
+
+   private string SelectedCoin { get {
+
+            return GetSetting("Coin");
+        
+        }  
+    }
+
+    private string CoinXPath { get
+        {
+            return "//a[contains(text(),'"+SelectedCoin+"') and @class='older_newer_button_a tab-btn']";
+
+        } }
     public override int DoSolveFaucet ( )
     {
 
@@ -60,9 +89,16 @@ public class FreeDogeonScript : FaucetScript
             GoToUrl ( FaucetUrl );
             Wait ( 2 );
         }
-        //OpenQA.Selenium.IWebElement submitButton = ElementByXPath("//*[@id='free_play_tab']/div[4]/div/p/button");
-        // Better to use small xpath
-        var submitButton=ElementByXPath("//button[@class='button free_play_element']");
+
+        // Select Coin
+        var CoinSelect=ElementByXPath(CoinXPath);
+        if ( IsVisible(CoinSelect) )
+        {
+            Click(CoinSelect);
+            Wait(1);
+        }
+
+        var submitButton=ElementByXPath("//button[@class='button free_play_element']|//button[contains(text(),'ROLL')]");
 
         OpenQA.Selenium.IWebElement captcha = ElementByXPath("//div[@id='free_play_tab']//iframe[contains(@src, 'recaptcha/api2')]");
         if ( !IsVisible ( submitButton ) )
@@ -94,7 +130,7 @@ public class FreeDogeonScript : FaucetScript
             return result;
         }
         // If the captcha is solved correctly call the callback of the recaptcha
-        RecaptchaUtility recaptchaUtility=new RecaptchaUtility(this);
+        FaucetCollector.Captcha.RecaptchaUtility recaptchaUtility=new FaucetCollector.Captcha.RecaptchaUtility(this);
         recaptchaUtility.DoSolve ( );
 
         return result;
