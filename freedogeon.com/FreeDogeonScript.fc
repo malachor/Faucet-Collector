@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-//css_inc FaucetCollectorUtilities
+//css_ref FaucetCollector.Utilities
 public class FreeDogeonScript : FaucetScript
 {
     public override int DoLogin ( )
