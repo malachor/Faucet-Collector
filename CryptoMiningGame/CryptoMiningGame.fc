@@ -3,8 +3,8 @@ using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-//css_inc Shortlinkutilities
-//css_ref HumanActions
+//css_ref FaucetCollector.Captcha
+//css_ref FaucetCollector.Utilities
 class CryptoMiningGameScript : FaucetScript
 {
     public override FaucetSettings Settings
@@ -82,7 +82,7 @@ class CryptoMiningGameScript : FaucetScript
 
 
 
-    HumanActions.DriverHumanActions driver { get; set; }
+    FaucetCollector.Utilities.HumanActions.DriverHumanActions driver { get; set; }
 
     public List<string> ListMiningCoins=new List<string>
     {
@@ -116,7 +116,7 @@ class CryptoMiningGameScript : FaucetScript
     }
     public override int DoInit ( )
     {
-        driver=new HumanActions.DriverHumanActions ( Driver );
+        driver=new FaucetCollector.Utilities.HumanActions.DriverHumanActions ( Driver );
         return base.DoInit ( );
     }
     public override int BeforeLogin ( )
@@ -304,7 +304,7 @@ class CryptoMiningGameScript : FaucetScript
 
             if ( LastAntibotUsed==AntibotOption.Shortlink )
             {
-                ShortLinkBypasser shortLinkBypasser =new ShortLinkBypasser(this);
+                FaucetCollector.Utilities.ShortLinkBypasser shortLinkBypasser =new FaucetCollector.Utilities.ShortLinkBypasser(this);
                 Click ( AntibotOpt );
                 Wait ( );
                 if ( shortLinkBypasser.IsValidShortLink ( ) )
@@ -324,7 +324,7 @@ class CryptoMiningGameScript : FaucetScript
             else
             {
                 Click ( AntibotOpt );
-                Wait ( 2 );
+                Wait ( 4 );
 
                 if ( IsValidAntibot ( ) )
                 {
@@ -398,33 +398,34 @@ class CryptoMiningGameScript : FaucetScript
 
     public bool IsValidAntibot ( )
     {
+        Wait(2);
         return ElementByXPath ( "//div[@id='antispyware_block']" )!=null;
     }
 
     public bool SolveAntibot ( )
     {
 
-        driver=new HumanActions.DriverHumanActions(Driver);
+        driver=new FaucetCollector.Utilities.HumanActions.DriverHumanActions(Driver);
         var Timer =ElementByXPath("//span[@id='beattime']");
         var Block=ElementByXPath("//div[@id='antispyware_block']");
         DateTime Timeout=DateTime.Now.AddSeconds(65);
         while ( IsVisible ( Timer )&&IsVisible ( Block ) && DateTime.Now<Timeout )
         {
             Wait ( );
-            driver.GotoElement ( Block );
+
             Block=ElementByXPath ( "//div[@id='antispyware_block']" );
             Timer=ElementByXPath ( "//span[@id='beattime']" );
 
         }
         Wait (3 );
-        var ButtonGo=ElementByXPath("//div[@id='btn_validate_antibotrefill']");
+        var ButtonGo=ElementByXPath("//form//div[@id='btn_validate_antibotrefill']");
         if ( !IsVisible ( ButtonGo ) )
         {
             return false;
         }
         driver.Click ( ButtonGo );
-        Wait ( 1 );
-        ButtonGo=ElementByXPath ( "//div[@id='btn_validate_antibotrefill']" );
+        Wait ( 2,3 );
+        ButtonGo=ElementByXPath ( "//form//div[@id='btn_validate_antibotrefill']" );
         if ( IsVisible(ButtonGo ))
         {
             Click ( ButtonGo );
