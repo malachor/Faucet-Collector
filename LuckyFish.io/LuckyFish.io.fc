@@ -1,7 +1,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 26/05/2019 04:00PM - Version 1
-//Last Update: 06/03/2020 17:04PM - Version 21
+//Last Update: 25/05/2020 17:04PM - Version 22
 //==================//
 
 using System;
@@ -776,7 +776,7 @@ public class luckyfishorg : FaucetScript
       public int Login_General_Function()
       {
 
-        var StartOpenLogin = ElementByXPath("//div[@class='left' and contains(text(),'LOGIN')] | //button[@class='LogIn'] ");
+        var StartOpenLogin = ElementByXPath("//div[@class='left' and contains(text(),'LOGIN')] | //li[@class='left' and contains(text(),'LOGIN')] | //li[@class='left' and contains(text(),'LOG')] | //button[@class='LogIn'] ");
 	    if (IsVisible(StartOpenLogin))
 	    { 
         Click(StartOpenLogin);
