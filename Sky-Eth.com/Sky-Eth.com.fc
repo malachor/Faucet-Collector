@@ -1,8 +1,8 @@
-﻿
+
 
 //==================//
 //script Written by: ••AviramDayan•• 04/05/2019 10:30AM
-//Last Update: 03/10/2019 10:30AM - Version 1
+//Last Update: 26/05/2020 10:30AM - Version 4
 //==================//
 
 using System;
@@ -229,6 +229,12 @@ public class btcsamsity : FaucetScript
 
         } // end WaitTimerText
 
+
+        if (!IsVisible(WaitTimerText))
+        {
+         return GetWaitSetting();
+		}
+		
 		
     }	//end ad
 		
@@ -339,12 +345,13 @@ public class btcsamsity : FaucetScript
 		Log("FaucetClaim - Success_Claim ");  
         ad = true; //call to timer / and do success
 		}
-	
-        ad = true; //call to timer / and do success
-		
+
       } //end FaucetClaim
 
-	 
+
+         return GetWaitSetting(); //Backup
+
+	
         //This faucet has nothing to do here. We will let Faucet Collector handle it.
         return base.DoSolveFaucet();
     }
