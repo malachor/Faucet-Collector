@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FaucetCollector.Script;
-//css_inc RecaptchaUtilities
+//css_ref FaucetCollector.Utilities
 public class SkyFaucetScript : FaucetScript
 {
-    private Dictionary<string, string> AvailableFaucets=new Dictionary<string, string>
+    private readonly Dictionary<string, string> AvailableFaucets=new Dictionary<string, string>
     {
         {"BCH","https://sky-bch.com/" },
         {"ETH","https://sky-eth.com/" },
-        {"DOGE","https://sky-doge.com/"}
+        {"DOGE","https://sky-doge.com/"},
+        {"LTC","https://sky-ltc.com/" },
+        {"ZEC","https://sky-zec.com/" },
     };
     
     // Specific Coin selected for the user
@@ -84,9 +86,10 @@ public class SkyFaucetScript : FaucetScript
         FailXPath="//span[@class='error']";
 
         Title="SKY";
+        Url=BaseUrl;
         base.Start ( );
 
-        Url=BaseUrl;
+     
     }
     public override int DoLogin ( )
     {
@@ -157,7 +160,7 @@ public class SkyFaucetScript : FaucetScript
         {
             return result;
         }
-        RecaptchaUtility bypasser =new RecaptchaUtility(this);      
+        FaucetCollector.Captcha.RecaptchaUtility bypasser =new FaucetCollector.Captcha.RecaptchaUtility(this);      
         bypasser.DoSolve ( );
         return result;      
     }
