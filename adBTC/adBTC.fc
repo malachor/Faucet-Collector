@@ -587,44 +587,20 @@ namespace Adbtc
         {
             try
             {
-             var capt = ElementsByXPath("//img[contains(@src,'/icons/')]");
+             var capt = ElementsByXPath("//a[@class='res']");
 
-                Wait();
-                Bitmap[] icons = new Bitmap[capt.Count];
-
-                for (int i = 0; i < capt.Count; i++)
+                if ( capt.Count==0 )
                 {
-                    icons[i] = TakeScreenshot(Base.Captcha.CaptchaService.Manual, capt[i]);               
+                    return false;
+                }
 
-                }
-                Wait();
-                int result = 0;
-                bool enc = false;
-                for (int i = 0; i < 3 && !enc; i++)
-                {
-                    for (int j = i + 1; j < 4 && !enc; j++)
-                    {
-                        bool result_ = CompareImage(icons[i], icons[j]);
-                        if (result_)
-                        {
-                            result = i;
-                        }
-                    }
+                return GetSolutionAndClickCaptcha(capt);
 
-                }
-                Click(capt[result]);
-                foreach ( Bitmap icon in icons )
-                {
-                    if ( icon!=null )
-                    {
-                        icon.Dispose ( );
-                    }
-                }
-                return true;
+               
             }
             catch (Exception ex)
             {
-                Log(ex.ToString());
+                Log("There is a problem solving icon captcha: "+ex.ToString());
             }
             return false;
         }
@@ -642,6 +618,52 @@ namespace Adbtc
                 }
             }
             return true;
+        }
+
+        public bool GetSolutionAndClickCaptcha( List<IWebElement> capt )
+        {
+
+            Bitmap[] icons = new Bitmap[capt.Count];
+            try
+            {
+                for ( int i = 0 ; i<capt.Count ; i++ )
+                {
+                    icons[i]=TakeScreenshot(Base.Captcha.CaptchaService.Manual , capt[i]);
+
+                }
+                Wait( );
+                int result = 0;
+                bool enc = false;
+                for ( int i = 0 ; i<capt.Count-1 && !enc ; i++ )
+                {
+                    for ( int j = i+1 ; j<capt.Count && !enc ; j++ )
+                    {
+                        bool result_ = CompareImage(icons[i], icons[j]);
+                        if ( result_ )
+                        {
+                            result=i;
+                            enc=true;
+                        }
+                    }
+
+                }
+                Click(capt[result]);
+            }
+            finally
+            {
+                DisposeIEnumerable( icons);
+            }
+         
+            return true;
+        }
+        public void DisposeIEnumerable(IEnumerable<IDisposable> DisposableElements)
+        {
+
+           foreach(var disposable in DisposableElements )
+            {
+                disposable.Dispose( );    
+            }
+
         }
         private bool SameColor(Color c1, Color c2, double thre)
         {
