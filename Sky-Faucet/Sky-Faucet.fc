@@ -86,9 +86,10 @@ public class SkyFaucetScript : FaucetScript
         FailXPath="//span[@class='error']";
 
         Title="SKY";
+        Url=BaseUrl;
         base.Start ( );
 
-        Url=BaseUrl;
+     
     }
     public override int DoLogin ( )
     {
