@@ -395,7 +395,7 @@ class CryptoMiningGameScript : FaucetScript
         }
     }
 
-
+  
     public bool IsValidAntibot ( )
     {
         Wait(2);
@@ -418,14 +418,14 @@ class CryptoMiningGameScript : FaucetScript
 
         }
         Wait (3 );
-        var ButtonGo=ElementByXPath("//form//div[@id='btn_validate_antibotrefill']");
+        var ButtonGo=ElementByXPath("//form[contains(@action,'antibot')]//button[@class='btn btn-scifi mining']");
         if ( !IsVisible ( ButtonGo ) )
         {
             return false;
         }
         driver.Click ( ButtonGo );
         Wait ( 2,3 );
-        ButtonGo=ElementByXPath ( "//form//div[@id='btn_validate_antibotrefill']" );
+        ButtonGo=ElementByXPath ("//form[contains(@action,'antibot')]//button[@class='btn btn-scifi mining']");
         if ( IsVisible(ButtonGo ))
         {
             Click ( ButtonGo );
