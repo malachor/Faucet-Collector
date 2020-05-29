@@ -1,6 +1,8 @@
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Base.Captcha;
 using FaucetCollector.Script;
 
 public class AllCoinsPWScript : FaucetScript
@@ -19,7 +21,7 @@ public class AllCoinsPWScript : FaucetScript
           };
         }
     }
-
+    public const string BaseUrl="https://allcoins.pw/";
     private readonly Dictionary<string,string> Faucets=new Dictionary<string, string>
     {
         {"Bitcoin","https://allcoins.pw/faucet.php?coin=BTC" },
@@ -67,123 +69,99 @@ public class AllCoinsPWScript : FaucetScript
         
         SuccessXPath = "//p[starts-with(text(),'Your actual Balance')]";
         FailXPath = "//div[contains(@class,'alert-warning')]";
-
+        Url=Url_;   
         base.Start();
-        Url=Url_;
-    }
-	
-	
-    public override int DoInit()
-    {
 
-        //Let Faucet Collector continue.
-        return base.DoInit();
-      
     }
-	
-	
-	
-//==================//
-//save Login Cookies 
-//==================//
-    public override bool IsLoggedIn()
+    public override bool IsLoggedIn( )
     {
 
         return IsVisible(ElementByXPath("//a[contains(@href, '/logout.php')]"));
     }
-//==================//
-//save Login Cookies 
-//==================//
-
-
-
-
-
-    public override int BeforeLogin()
+    public bool IsVisibleSite( )
     {
-	
-
-        return base.BeforeLogin();
+        return IsVisible(ElementByXPath("//div[@class='navbar-brand font-weight-bold']") );        
     }
 
-	
-	
-	
-	
-//==========//
-//start DoLogin 
-//==========//
+    public void WaitForSiteLoad( )
+    {
+        DateTime Timeout=DateTime.Now.AddSeconds(20);
+        while ( !IsVisibleSite( )&&DateTime.Now<Timeout )
+        {
+            Wait( );
+        }
+
+        Wait(1);
+        // Wait for login modal
+        Timeout=DateTime.Now.AddSeconds(5);
+        while ( !IsVisible(ElementByXPath("//div[@id='login']"))&&DateTime.Now<Timeout )
+        {
+            Wait( );
+        }
+
+       
+    }
     public override int DoLogin()
     {
 		//go to "BTC" faucet page
-        GoToUrl("https://allcoins.pw/faucet.php?coin=BTC");
-		
-        Wait(5);
+        GoToUrl(BaseUrl);
 
-		 var loginPanelBtn = ElementByXPath("//a[@href='#'][contains(text(),'Login')]");
-        if (!IsVisible(ElementByXPath("//*[@id='lem']")) && !IsVisible(ElementByXPath("//*[@id='lpw']")) && IsVisible(loginPanelBtn))
+        WaitForSiteLoad( );
+
+        var loginPanelBtn = ElementByXPath("//a[contains(@data-target,'login')]");
+        if ( IsVisible(loginPanelBtn)  && !IsVisible(ElementByXPath("//div[@id='login']")))
         {
             Click(loginPanelBtn);
         }
         Wait(2);
 
-        var c = ElementByXPath("//div[@id='register']//div[@class='modal-dialog modal-dialog-centered']//div[@class='modal-content']//div[@class='modal-footer']//button[@id='swlogin']");
-        if (IsVisible(c) && !IsVisible(ElementByXPath("//*[@id='lem']")) && !IsVisible(ElementByXPath("//*[@id='lpw']")))
-        {
-            Click(c);
-        }
-		Wait();
-		var c2=ElementByXPath("//div[@id='register']//button[@id='swlogin']");
-		if(IsVisible(c2) && !IsVisible(ElementByXPath("//*[@id='lem']")) && !IsVisible(ElementByXPath("//*[@id='lpw']")))
-        {
-		
-		Click(c2);
-		
-		}
-        Wait(2);
-		
-		//now enter the data of - email and password
-		
-        var EmailVar = ElementByXPath("//input[@placeholder='Email']");
-        if (!IsVisible(EmailVar))
-        {
-        return Fail("Email not found.");
-        }
-       
-		
-        var PasswordVar = ElementByXPath("//input[@placeholder='Password']");
-        if (!IsVisible(PasswordVar))
-        {
-        return Fail("Password not found.");
-        }
-        SetText(PasswordVar, GetPassword("Pass"));
-		
-        Wait(5);
-		
-		//solve Captcha
-        var captc = ElementByXPath("//label[@for='captchal']");
-        var box = ElementByXPath("//input[@id='captchal']");
-        var result = DoSolveImageCaptcha(captc, box);
 
-        if (result > 0)
+        var UserBox=ElementByXPath("//input[@id='lem']");
+        if ( !IsVisible(UserBox) )
         {
-            return Fail("Captcha failed");
+            return Fail("User box not visible");
         }
-		
-        Wait(5);
+        SetText(UserBox , GetSetting("User"));
 
-		//login button data
-		 SetText(EmailVar, GetSetting("User"));
-        var loginButton = ElementByXPath("//*[@id='login']//button[@class='btn btn-primary']");
-        if (IsVisible(loginButton))
+        var PassBox=ElementByXPath("//input[@id='lpw'");
+        if ( !IsVisible(PassBox) )
         {
-         Click(loginButton);
+            return Fail("Password box is not visible");
         }
-		
-		//click on login button
-      
+        SetText(PassBox , GetPassword("Pass"));
 
-        return base.DoLogin();
+        var result=DoSolveCaptcha();
+        if ( result>0 )
+        {
+            return result;
+        }
+
+        if ( !LoginCaptchaSolved )
+        {
+            return Fail("Login captcha not solved");
+        }
+
+        string CaptchaResult=Context.CaptchaResult.Result;
+        if ( !CaptchaResult.All(x=>char.IsDigit(x)) )
+        {
+            return Fail("Captcha result is not a digit");
+        }
+
+        var LoginBtn=ElementByXPath("//button[@class='btn btn-primary'][contains(text(),'Login')]");
+        if ( !IsVisible(LoginBtn) )
+        {
+            return Fail("Login btn not visible");
+        }
+
+        Click(LoginBtn);
+
+        var ErrorLogin=ElementByXPath("//div[@class='bootstrap-growl alert alert-warning border border-warning alert-dismissible']");
+        if ( IsVisible(ErrorLogin) )
+        {
+            return Fail(ErrorLogin.Text);
+        }
+
+            return base.DoLogin();
 
     }
 
@@ -238,7 +216,7 @@ public class AllCoinsPWScript : FaucetScript
 	 private void CheckAntiBot()
     {
       
-        var AntiBotButton = ElementByXPath("//a[contains(@href,'nobothere=1') or contains(@text,'I AM NOT A BOT')]");
+        var AntiBotButton = ElementByXPath("//a[contains(@text,'I AM NOT A BOT')]");
         if (IsVisible(AntiBotButton))
         {
             Click(AntiBotButton);
@@ -247,7 +225,8 @@ public class AllCoinsPWScript : FaucetScript
       
         
     }
-	
+
+	private bool LoginCaptchaSolved { get; set; }
     /// <summary>
     /// This method is called right before a captcha will be solved. 
     /// If you call SolveCaptcha() in other methods it will start this flow and tries to solve the captcha on the page.
@@ -271,7 +250,7 @@ public class AllCoinsPWScript : FaucetScript
 			{
 				return sleep;
 			}
-
+            LoginCaptchaSolved=true;
 			//return we are done.
 			return 0;
 		}
@@ -303,7 +282,7 @@ public override int DoSolveFaucet()
 
 
     
-        var claimBtn = ElementByXPath("//button[@id='claimb']");
+        var claimBtn = ElementByXPath("//button[@id='claimb'][@class='btn btn-primary']");
         if ( IsVisible ( claimBtn ) )
         {
             Click ( claimBtn );
