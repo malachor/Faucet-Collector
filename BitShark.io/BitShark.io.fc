@@ -2,7 +2,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 10/04/2020 17:30PM - Version 1
-//Last Update: 30/04/2020 18:00PM - Version 2
+//Last Update: 30/05/2020 07:30AM - Version 3
 //==================//
 
 using System;
@@ -316,10 +316,20 @@ public override int DoSolveFaucet()
 	
         if (!IsVisible(MiningTime)) //not visible
 		{
+			  
           var MiningHere = ElementByXPath("//span[contains(@class,'text-success') and strong ]") ;	
           var Time_2_ToWaitForBreak = DateTime.Now.AddSeconds(420);
           while (IsVisible(MiningHere))
           {	
+	  
+		    //first check rcaptcha
+            var RecaptchaCheck = ElementByXPath("//div[contains(@class,'recaptcha-form')]");	
+            if (IsVisible(RecaptchaCheck))
+            {
+		    Log("MiningClick - RecaptchaCheck here - call it ");
+            Recaptcha_Function(); //call
+		    }
+			
 			Wait(2,5);	
 		    Log("MiningClick - wait normal");
 		  
