@@ -1,0 +1,197 @@
+﻿//css_ref FaucetCollector.Utilities
+//css_ref FaucetCollector.Captcha
+//css_ref FaucetCollector.FaucetTemplates
+using FaucetCollector.FaucetTemplates;
+using FaucetCollector.Script;
+
+public class CashFatScript : FaucetScript
+{
+    /// <summary>
+    /// List of Settings that will be shown in the bot when selecting this Faucet in the bot.
+    /// You can get the value the user entered with the methods: GetSetting("[Name of the FaucetSetting]"), GetBoolSetting and GetDateTimeSetting
+    /// You can also create a new setting value using SetSetting("[Name you want to use]", "value")
+    /// </summary>
+    public override FaucetSettings Settings
+    {
+        get
+        {
+            return new FaucetSettings(BaseUrl)
+            {
+                new FaucetSetting(){Name="User",Display="Username",Type=EditorType.TextBox,Required=true},
+                new FaucetSetting(){Name="Pass",Display="Password",Type=EditorType.Password,Required=true},
+                new FaucetSetting(){Name="UseSolvemedia",Display="UseSolvemedia",Type=EditorType.CheckBox,Default=true },
+
+                new FaucetSetting()
+                {
+                    Name="DoShortLink",Display="DoShortLink",Type=EditorType.CheckBox,Default=true
+                }
+                //insert user settings here
+                //new FaucetSetting { 
+                //    Name = "Name of your setting", 
+                //    Display = "Display shown in Faucet Collector", 
+                //    Type = EditorType.TextBox | EditorType.Password | EditorType.CheckBox | EditorType.Wallet | EditorType.Numeric | EditorType.ComboBox | EditorType.CheckComboBox, 
+                //    Required = true | false, 
+                //    Default = "Optionally a default value" | true | false | null.
+                //    Items = new List<string> { "item1", "item2" } (only valid for ComboBox or CheckComboBox)
+                //} 
+            };
+        }
+    }
+    public const string BaseUrl="https://cashfat.com/";
+    public const string FaucetUrl=BaseUrl+"?page=faucet";
+    public const string ShortlinkUrl=BaseUrl+"?page=shortlinks";
+    private BfreeSolver manager { get; set; }
+
+    /// <summary>
+    /// This method gets called when the faucet is enabled and the GO button is clicked
+    /// </summary>
+    public override void Start( )
+    {
+        //Title that shows in the browser. Is used to identify and close popup windows
+        Title="More";
+
+        //After we did try to claim on the faucet we search for these elements to determine if it was a success or a fail
+        SuccessXPath="//div[@class='alert' and contains(text(),'Congratulations')]";
+        FailXPath="//div[@class='alert alert-danger']";
+        manager=new BfreeSolver(this);
+        //Let Faucet Collector start up everything
+        base.Start( );
+
+    }
+
+
+    public override bool IsLoggedIn( )
+    {
+        return manager.IsLoggedIn( );
+    }
+
+    /// <summary>
+    /// This method gets called if IsLoggedIn returned false, right before the DoLogin method is called.
+    /// </summary>
+    public override int BeforeLogin( )
+    {
+        return manager.BeforeLogin( );
+    }
+
+    /// <summary>
+    /// This method gets called after BeforeLogin, but only if IsLoggedIn returned false.
+    /// It can be used to actually login the user/enter wallet details in the faucet
+    /// </summary>
+    /// <returns></returns>
+    public override int DoLogin( )
+    {
+        return manager.DoLogin( );
+    }
+
+
+    public override int GetFaucetWaitTime( )
+    {
+        return manager.GetFaucetWaitTime( );
+    }
+
+    public override int AfterSolveCaptcha( )
+    {
+        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+        return base.AfterSolveCaptcha( );
+    }
+
+    public override int BeforeSolveFaucet( )
+    {
+        if ( GetBoolSetting("DoShortLink") )
+        {
+            GoToUrl(ShortlinkUrl);
+            Wait( );
+            var Shortlinks = manager.GetShortlinks();
+            if ( Shortlinks.Count>0 )
+            {
+                int NShort = Random(0, Shortlinks.Count - 1);
+
+                try
+                {
+
+
+
+                    FaucetCollector.Captcha.IconCaptchaSolver solver=new FaucetCollector.Captcha.IconCaptchaSolver(this);
+                    Click(Shortlinks[NShort]);
+                    Wait( );
+                    int count=0;
+                    while ( IsVisible(Shortlinks[NShort])&&!solver.IsVisibleIconCaptcha( )&&count<5 )
+                    {
+                        Click(Shortlinks[NShort]);
+                        Wait( );
+                        count++;
+
+                    }
+
+                    if ( solver.IsVisibleIconCaptcha( ) )
+                    {
+                        solver.DoSolve( );
+                        Wait(4 , 5);
+                        if ( !solver.IsVisibleIconCaptcha( ) )
+                        {
+                            FaucetCollector.Utilities.ShortLinkBypasser bypasser = new FaucetCollector.Utilities.ShortLinkBypasser(this);
+                            if ( bypasser.IsValidShortLink( ) )
+                            {
+                                bool cs = bypasser.DoShortLink();
+
+                                if ( cs )
+                                {
+                                    Log("ShortlinkSuccess");
+                                }
+                                else
+                                {
+                                    Log("Something is wrong with the shortlink");
+                                }
+
+                            }
+                            else
+                            {
+                                GoToUrl(ShortlinkUrl);
+                                return Fail("Something went wrong shortlink this is not a shortlink");
+                            }
+                        }
+                        else
+                        {
+                            return Fail("Icon captcha incorrectly solved");
+                        }
+
+                    }
+
+
+                }
+                finally
+                {
+                    if ( !Driver.Url.Contains(ShortlinkUrl) )
+                    {
+
+                        GoToUrl(ShortlinkUrl);
+                    }
+
+                }
+
+            }
+            else
+            {
+                Log("No more shortlinks available");
+            }
+
+        }
+        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+        return base.BeforeSolveCaptcha( );
+    }
+
+    /// <summary>
+    /// This method gets called after the BeforeSolveFaucet. You can do the actual claiming of the faucet in here.
+    /// </summary>
+    /// <returns></returns>
+    public override int DoSolveFaucet( )
+    {
+        if ( Driver.Url!=BaseUrl )
+        {
+            GoToUrl(BaseUrl);
+            Wait( );
+        }
+
+        return manager.DoSolveFaucet( );
+    }
+}
