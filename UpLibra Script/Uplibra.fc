@@ -1,6 +1,8 @@
 ﻿using FaucetCollector.Script;
 using System;
-//css_inc RecaptchaUtilities
+using System.Linq;
+//css_ref FaucetCollector.Utilities
+//css_ref FaucetCollector.Captcha
 
 class Uplibrascript : FaucetScript
 {
@@ -51,7 +53,7 @@ class Uplibrascript : FaucetScript
     public override bool IsLoggedIn ( )
     {
         // See if the element is visible;
-        return ElementByXPath ( "//a[contains(@href,'logout')]" )!=null;
+        return ElementByXPath ("//a[contains(@href,'action=logout')]")!=null;
     }
 
 
@@ -130,7 +132,7 @@ class Uplibrascript : FaucetScript
     public override int DoSolveCaptcha ( )
     {
         var result=base.DoSolveCaptcha();
-       RecaptchaUtility util=new RecaptchaUtility(this);
+        FaucetCollector.Captcha.RecaptchaUtility util=new FaucetCollector.Captcha.RecaptchaUtility(this);
 
       if(result<=0){
          util.DoSolve ( );
@@ -177,8 +179,23 @@ class Uplibrascript : FaucetScript
 
     public override int CheckFaucetResult ( )
     {
+        
+        var CountDown=ElementByXPath("//button[@id='yj_lottery_countdown']");
+        if ( IsVisible(CountDown) )
+        {
+            var ClaimedAmountElem=ElementsByXPath("//td[@data-field='amount']//span[@class='kt-font-bold']").FirstOrDefault();
+            if ( IsVisible(ClaimedAmountElem) )
+            {
+                Log("You have claimed "+ClaimedAmountElem.Text+" libra");
+                ClaimSuccess( );
+                IsSuccess=true;
 
-        return base.CheckFaucetResult ( );
+                return 0;
+            }
+        }
+       
+            return base.CheckFaucetResult( );
+        
     }
 
 }
