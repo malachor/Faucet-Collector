@@ -109,9 +109,17 @@ public class AllCoinsPWScript : FaucetScript
         WaitForSiteLoad( );
 
         var loginPanelBtn = ElementByXPath("//a[contains(@data-target,'login')]");
-        if ( IsVisible(loginPanelBtn)  && !IsVisible(ElementByXPath("//div[@id='login']")))
+        if ( IsVisible(loginPanelBtn)  && !IsVisible(ElementByXPath("//div[@id='login']")) && !IsVisible(ElementByXPath("//div[@id='register']//button[@id='swlogin']")))
         {
             Click(loginPanelBtn);
+        }
+        else
+        {
+            var GotoLogin=ElementByXPath("//div[@id='register']//button[@id='swlogin']");
+            if ( IsVisible(GotoLogin) )
+            {
+                Click(GotoLogin);
+            }
         }
         Wait(2);
 
