@@ -2,7 +2,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 01/02/2020 10:30AM - Version 1
-//Last Update: 01/02/2020 10:30AM - Version 1
+//Last Update: 09/06/2020 19:40AM - Version 2
 //==================//
 
 using System;
@@ -300,6 +300,8 @@ public class haugames : FaucetScript
 		Recaptcha_Function(); //call
 		
 		Wait(2);		
+
+        Title = "haugames.com";
 		
         var ButtonLog = ElementByXPath("//a[contains(text(),'Go')]");  
         if (IsVisible(ButtonLog))
