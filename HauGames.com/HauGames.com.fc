@@ -1,8 +1,7 @@
 
-
 //==================//
 //script Written by: ••AviramDayan•• 01/02/2020 10:30AM - Version 1
-//Last Update: 09/06/2020 19:40AM - Version 2
+//Last Update: 09/06/2020 19:55AM - Version 3
 //==================//
 
 using System;
@@ -368,8 +367,8 @@ public class haugames : FaucetScript
            {
 	         Log("ClaimBTC - WaitTimerText apper - return to site time"); 
              int min,sec;
-             min = Convert.ToInt32(MinVar.Text.Trim().Replace("m.", "").Replace("s.", "").Split(' ')[0])*60;
-             sec = Convert.ToInt32(SecVar.Text.Trim().Replace("m.", "").Replace("s.", "").Split(' ')[1]);
+             min = Convert.ToInt32(MinVar.Text.Trim() )*60;
+             sec = Convert.ToInt32(SecVar.Text.Trim() );
              return min+sec;
            } 
 
