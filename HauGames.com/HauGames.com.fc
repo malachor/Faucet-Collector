@@ -1,7 +1,8 @@
 
+
 //==================//
 //script Written by: ••AviramDayan•• 01/02/2020 10:30AM - Version 1
-//Last Update: 09/06/2020 19:55AM - Version 3
+//Last Update: 10/06/2020 15:00AM - Version 4
 //==================//
 
 using System;
@@ -34,7 +35,7 @@ public class haugames : FaucetScript
         {
             return new FaucetSettings("https://haugames.com")
             {
-                new FaucetSetting(){Name="Email",Display="UserName",Type=EditorType.TextBox,Required=true},
+                new FaucetSetting(){Name="Email",Display="Your Email (important not UserName)",Type=EditorType.TextBox,Required=true},
                 new FaucetSetting(){Name="Password",Display="Password",Type=EditorType.Password,Required=true},
 				
                 new FaucetSetting(){Name="FaucetClaim",Display="FaucetClaim - NEO",Type=EditorType.CheckBox,Default=true},		
@@ -396,7 +397,7 @@ public class haugames : FaucetScript
 		  {
             //SolveCaptcha if apper
             var result = base.DoSolveCaptcha();
-            if (result > 0)
+			if (result > 0)
             {
                 return Fail("Fail solving captcha");
             }
