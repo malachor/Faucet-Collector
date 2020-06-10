@@ -1,0 +1,145 @@
+﻿using FaucetCollector.Script;
+using System.Linq;
+
+public class BitEarn : FaucetScript
+{
+    public override FaucetSettings Settings
+    {
+
+        get
+        {
+
+            return new FaucetSettings("https://bitearn.io/")
+            {
+                new FaucetSetting(){Name="User",Type=EditorType.TextBox,Required=true,Display="Username"},
+                new FaucetSetting(){Name="Pass",Type=EditorType.Password,Required=true,Display="Password"}
+
+            };
+
+        }
+
+    }
+
+    public override void Start( )
+    {
+        Title="BitEarn";
+        SuccessXPath="//div[@class='alert alert-info' and contains(text(),'BTC has been sent')]";
+        FailXPath="//div[@class='alert alert-info']";
+
+        base.Start( );
+    }
+    public override int DoLogin( )
+    {
+        GoToUrl("https://bitearn.io/account/login");
+
+        Wait(6);
+        // 6 seconds to avoid cloudflare
+        var userBox=ElementByXPath("//input[@name='user_name']");
+        if ( !IsVisible(userBox) )
+        {
+            return Fail("User box is not visible");
+        }
+        SetText(userBox , GetSetting("User"));
+
+        var PwdBox=ElementByXPath("//input[@name='password']");
+        if ( !IsVisible(PwdBox) )
+        {
+            return Fail("Password box not visible");
+        }
+        SetText(PwdBox , GetPassword("Pass"));
+
+        var StayLogged=ElementByXPath("//input[@name='remember_me']");
+        if ( IsVisible(StayLogged) )
+        {
+            Click(StayLogged);
+        }
+
+
+        var result=DoSolveCaptcha();
+        if ( result>0 )
+        {
+            return result;
+        }
+
+        var loginBtn=ElementByXPath("//input[@name='login']");
+        if ( !IsVisible(loginBtn) )
+        {
+            return Fail("Login btn not visible");
+        }
+
+
+        Click(loginBtn);
+
+        var ErrorLogin=ElementByXPath("//div[@class='alert alert-info']");
+        if ( IsVisible(ErrorLogin) )
+        {
+            Log(ErrorLogin.Text);
+        }
+
+        return base.DoLogin( );
+    }
+
+    public override bool IsLoggedIn( )
+    {
+        return ElementByXPath("//a[contains(@href,'logout')]")!=null;
+    }
+
+
+    public override int DoSolveFaucet( )
+    {
+        if ( Driver.Url!="https://bitearn.io/page/dashboard" )
+        {
+            GoToUrl("https://bitearn.io/page/dashboard");
+
+            Wait(3);
+        }
+
+        var claimBtn=ElementByXPath("//input[@name='claim']");
+        if ( !IsVisible(claimBtn) )
+        {
+            return Fail("claim btn not visible");
+        }
+        var result=DoSolveCaptcha();
+        if ( result>0 )
+        {
+            return result;
+        }
+
+        Click(claimBtn);
+
+        Wait(2);
+
+
+        return base.DoSolveFaucet( );
+    }
+
+
+    public override int GetFaucetWaitTime( )
+    {
+        if ( Driver.Url!="https://bitearn.io/page/dashboard" )
+        {
+            GoToUrl("https://bitearn.io/page/dashboard");
+
+            Wait(3);
+        }
+        var LastClaim=ElementsByXPath("//tr[@class='primary']//td[3]").FirstOrDefault();
+        if ( IsVisible(LastClaim)&&LastClaim.Text.Contains("m") )
+        {
+            int Minutes;
+            if ( int.TryParse(LastClaim.Text.Replace("m" , "").Replace("ago" , "").Trim( ) , out Minutes) )
+            {
+                int Timer=30-Minutes;
+
+                return Timer>0 ? Timer*60 : 0;
+
+            }
+
+        }
+
+        return 0;
+    }
+
+
+
+}
+
