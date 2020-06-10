@@ -131,7 +131,7 @@ public class AllCoinsPWScript : FaucetScript
         }
         SetText(UserBox , GetSetting("User"));
 
-        var PassBox=ElementByXPath("//input[@id='lpw'");
+        var PassBox=ElementByXPath("//input[@id='lpw']");
         if ( !IsVisible(PassBox) )
         {
             return Fail("Password box is not visible");
