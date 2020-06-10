@@ -420,12 +420,12 @@ public class MoonBitcoinScript : FaucetScript
 
 
         //Find the button to open the popup window where we can solve the captcha and claim on the faucet.
-        var claimButton = ElementById("SubmitButton");
+        var claimButton = ElementByXPath("//button[@data-target='#ClaimModal']");
         DateTime Timeout = DateTime.Now.AddSeconds(15);
         while ( !IsVisible(claimButton) )
         {
             Wait( );
-            claimButton=ElementById("SubmitButton");
+            claimButton=ElementByXPath("//button[@data-target='#ClaimModal']");
             if ( DateTime.Now>Timeout ) { break; }
         }
 
