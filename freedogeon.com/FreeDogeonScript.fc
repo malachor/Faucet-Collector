@@ -8,13 +8,13 @@ public class FreeDogeonScript : FaucetScript
 {
     public override int DoLogin ( )
     {
-        OpenQA.Selenium.IWebElement signInEmail = ElementById("login_form_doge_address");
+        var signInEmail =ElementByXPath("//form[@id='login_form']//input[@type='text']");
         if ( signInEmail==null )
         {
             return Fail ( "Signin email input not found." );
 
         }
-        OpenQA.Selenium.IWebElement signInPassword = ElementById("login_form_password");
+        var signInPassword =ElementByXPath("//form[@id='login_form']//input[@type='password']");
         if ( signInPassword==null )
         {
             return Fail ( "Signin password input not found." );
