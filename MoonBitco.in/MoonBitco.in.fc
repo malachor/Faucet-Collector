@@ -564,7 +564,7 @@ public class MoonBitcoinScript : FaucetScript
         var currentBalance = ElementByXPath("//a[contains(@data-bind,'text: balance().toFixed(8)')]");
         if ( IsVisible(currentBalance) )
         {
-            Log("Balance: "+currentBalance.Text+" BCH");
+            Log("Balance: "+currentBalance.Text+" BTC");
         }
         return result;
     }
