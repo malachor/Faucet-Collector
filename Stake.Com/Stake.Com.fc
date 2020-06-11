@@ -2,7 +2,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 26/05/2019 04:00PM
-//Last Update: 17/04/2020 21:30AM - Version 9
+//Last Update: 11/06/2020 17:00PM - Version 10
 //==================//
 
 using System;
@@ -36,13 +36,14 @@ public class stake : FaucetScript
                 new FaucetSetting(){Name="Email",Display="Email OR UserName",Type=EditorType.TextBox,Required=false},
                 new FaucetSetting(){Name="Password",Display="Password",Type=EditorType.Password,Required=false},
 				
-                new FaucetSetting() { Name = "btc", Display = "btc - claim", Type = EditorType.CheckBox, Default =true},	
-                //new FaucetSetting() { Name = "eth", Display = "eth - claim", Type = EditorType.CheckBox, Default = false},	
-                //new FaucetSetting() { Name = "ltc", Display = "ltc - claim", Type = EditorType.CheckBox, Default = false},	
-                //new FaucetSetting() { Name = "doge", Display = "doge - claim", Type = EditorType.CheckBox, Default = false},	
-                //new FaucetSetting() { Name = "bch", Display = "bch - claim", Type = EditorType.CheckBox, Default = false},	
-                //new FaucetSetting() { Name = "xrp", Display = "xrp - claim", Type = EditorType.CheckBox, Default = false},	
-				
+                new FaucetSetting() { Name = "btc", Display = "btc - claim", Type = EditorType.CheckBox, Default =true},
+				/*
+                new FaucetSetting() { Name = "eth", Display = "eth - claim", Type = EditorType.CheckBox, Default = false},	
+                new FaucetSetting() { Name = "ltc", Display = "ltc - claim", Type = EditorType.CheckBox, Default = false},	
+                new FaucetSetting() { Name = "doge", Display = "doge - claim", Type = EditorType.CheckBox, Default = false},	
+                new FaucetSetting() { Name = "bch", Display = "bch - claim", Type = EditorType.CheckBox, Default = false},	
+                new FaucetSetting() { Name = "xrp", Display = "xrp - claim", Type = EditorType.CheckBox, Default = false},	
+				*/
                 new FaucetSetting() { Name = "AffWithdraw", Display = "AffWithdraw", Type = EditorType.CheckBox, Default = false},	
 
 
@@ -91,13 +92,13 @@ public class stake : FaucetScript
     public override bool IsLoggedIn()
     {
 	    //save Login Cookies - Check if the "Logout" exist
-        return ElementByXPath("//div[contains(@class,'RightContentWrapper')]") != null;
-	 
-        //return base.IsLoggedIn();
+		return ElementByXPath("//div[contains(@class,'RightContentWrapper')]") != null;
+	    //return true;
     }
 //==================//
 //save Login Cookies 
 //==================//	
+
 
 
 
@@ -108,10 +109,6 @@ public class stake : FaucetScript
     public override int BeforeLogin()
     {
 		
-
-        //if we already login go to here
-        GoToUrl("https://www.stake.com/");
-
 		
         //This faucet has nothing to do here. We will let Faucet Collector handle it.
         return base.BeforeLogin();
@@ -140,7 +137,15 @@ public class stake : FaucetScript
 		Wait();		
 		Wait(2);
 
-        var box_user = ElementByXPath("//input[contains(@name,'email')]");
+        /*
+        var LogInButton = ElementByXPath("//span[contains(text(),'Login')]");
+	    if (IsVisible(LogInButton))
+	    {
+         Click(LogInButton);
+        }
+        */
+        
+		var box_user = ElementByXPath("//input[contains(@name,'email')]");
         SetText(box_user, GetSetting("Email"));
 		
 		Wait(2);
@@ -166,9 +171,7 @@ public class stake : FaucetScript
           }
           RecaptchaUtility utility = new RecaptchaUtility(this);
           utility.DoSolve();
-         }
-
-
+        }
 		
 		Wait();	
 
@@ -211,9 +214,6 @@ public class stake : FaucetScript
         {
 		    //Log("return ad");
 			ad=false;
-			Driver.Close();  // Close specific chrome window
-            Driver.Quit();  // also Close the console app, that was used to kick off the chrome window
-            Driver.Dispose();  // Close the chromedriver.exe
             return GetWaitSetting();
         }
 
@@ -466,9 +466,7 @@ public class stake : FaucetScript
 		
 	 }
 
-		ad = true;    // if i do true - it report as succeed // only one time no multi and also required -> return GetWaitSetting();	
-        //return GetWaitSetting();	
-	
+		return Time_Function(); //call to function time
 	
         //We are good to continue
         return base.DoSolveFaucet();
@@ -510,6 +508,36 @@ public class stake : FaucetScript
         //This faucet has nothing to do here. We will let Faucet Collector handle it.
         return base.CheckFaucetResult();
     }
+
+
+	
+        //=================//
+       //Time_Function
+        //=================//
+        public int Time_Function()
+        {
+			
+           var MinVar = ElementByXPath("//article[contains(@class,'maincontent')]//span[2]/span[1]") ;
+		   var SecVar = ElementByXPath("//article[contains(@class,'maincontent')]//span[3]/span[1]") ;
+
+           if (IsVisible(MinVar))
+           {
+	         Log("ClaimBTC - WaitTimerText apper - return to site time"); 
+             int min,sec;
+             min = Convert.ToInt32(MinVar.Text.Trim().Replace("m.", "").Replace("s.", "").Split(' ')[0])*60;
+             sec = Convert.ToInt32(SecVar.Text.Trim().Replace("m.", "").Replace("s.", "").Split(' ')[1]);
+             return min+sec;
+           } 
+
+           if (!IsVisible(MinVar))
+           {
+	            Log("ClaimBTC - return to your time"); 
+		        return GetWaitSetting();
+           }
+
+           return 0;		
+        }//end Time_Function
+        //=================//	
 
 
         //=========//
@@ -565,46 +593,6 @@ public class stake : FaucetScript
 		
 		}//end Claim_Function
 		//=========//
-		
-
-    public bool SeeIfThereisColor(Bitmap Image)
-    {
-        bool ContainsColor = false;
-        for(int i = 0; i < Image.Width && ! ContainsColor; i++)
-        {
-            for(int j = 0; j < Image.Height; j++)
-            {
-                if(Image.GetPixel(i,j)!=Color.FromArgb(0,0,0) && Image.GetPixel(i,j)!=Color.FromArgb(255, 255, 255))
-                {
-                    ContainsColor = true;
-                    break;
-                }
-            }
-        }
-
-        return ContainsColor;
-
-    }
-	
-	
-    private IWebElement FindCorrectArrow()
-    {
-        var Arrows = ElementsByXPath("//div[@class='verify-gap']");
-        int n = 0;
-        foreach(var arrow in Arrows)
-        {
-            if(SeeIfThereisColor(TakeScreenshot(Base.Captcha.CaptchaService.Manual,arrow)))
-            {
-                Log("Element is" + n.ToString());
-                return arrow;
-
-            }
-            n++;
-
-        }
-        return null;
-
-    }
 
 
         //=========//
@@ -622,45 +610,13 @@ public class stake : FaucetScript
             if (IsVisible(ReCaptchaIframe))
             {	
 		      Log("call to solve captch");
-              var result = DoSolveCaptcha(); //call to solve captch		   
+              var result = DoSolveCaptcha(); //call to solve captch		 
+		      ClaimSuccess(); //Marks the claim as a success
 		    }
 
 		  }
 
 		}// end BalanceNeedToBeZero_Function
-		//=========//
-
-
-
-        //=========//
-        //SolveCaptcha_RightSquare_Function
-		//=========//
-        public void SolveCaptcha_RightSquare_Function()
-        {	
-		
-        /*
-        GetestCaptchaUtilities.GetestCaptcha getestCaptcha = new GetestCaptchaUtilities.GetestCaptcha(this);
-        bool res2=  getestCaptcha.DoInitSolve();
-        */
-
-        var Arrow = FindCorrectArrow();
-        if(IsVisible(Arrow))
-		{
-            Log("SolveCaptcha_RightSquare_Function - Arrow");	
-
-            var ToMove = ElementByXPath("//div[@class='verify-sub-block']");
-            if (IsVisible(ToMove))
-            {
-                Log("SolveCaptcha_RightSquare_Function - ToMove");	
-                Actions actions = new Actions(Driver);
-                actions.DragAndDrop(ToMove, Arrow).Build().Perform();
-                Wait();
-
-			}
-        }
-
-	
-		}// end SolveCaptcha_RightSquare_Function
 		//=========//
 
 	
