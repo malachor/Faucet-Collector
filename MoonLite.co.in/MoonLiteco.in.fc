@@ -1,6 +1,7 @@
 using FaucetCollector.Script;
 using OpenQA.Selenium;
 using System;
+using System.Linq;
 //css_ref FaucetCollector.Utilities
 public class MoonLiteCoinScript : FaucetScript
 {
@@ -178,6 +179,19 @@ public class MoonLiteCoinScript : FaucetScript
     /// </summary>
     public override int AfterLogin( )
     {
+        // se if we have an error notification
+        var BtnCloseAd=ElementByXPath("//button[@data-bind='click: close']" );
+        if ( IsVisible(BtnCloseAd) )
+        {
+            var TextArea=ElementsByXPath("//div[@data-bind='html: bodyHtml']").FirstOrDefault(x=>IsVisible(x));
+
+            if ( TextArea!=null )
+            {
+                Log(TextArea.Text);
+            }
+            // Refresh the before start login again
+            Driver.Navigate( ).Refresh( );
+        }
 
         return base.AfterLogin( );
     }
