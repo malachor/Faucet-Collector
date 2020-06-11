@@ -2,7 +2,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 26/05/2019 04:00PM
-//Last Update: 11/06/2020 17:00PM - Version 4
+//Last Update: 11/06/2020 21:45PM - Version 4
 //==================//
 
 using System;
@@ -150,29 +150,27 @@ public class stake : FaucetScript
         var box_pass = ElementByXPath("//input[contains(@name,'password')]");
         SetText(box_pass, GetPassword("Password"));
 
-		Wait(4);
-		
-        var ButtonLog = ElementByXPath("//button[contains(@type,'submit')]");
-        Click(ButtonLog);
-		
 		Wait(2);
-
+		
         var RecaptchaOpen_Iframe = ElementByXPath ("//iframe[contains(@src,'recaptcha/api2/anchor')]"); 
         if (IsVisible(RecaptchaOpen_Iframe))
         {
           //SolveCaptcha if apper
-        var result = base.DoSolveCaptcha();
-        if (result > 0)
-        {
+          var result = base.DoSolveCaptcha();
+          if (result > 0)
+          {
           
-            return result;
-        }
-        RecaptchaUtility utility = new RecaptchaUtility(this);
-        utility.DoSolve();
-        return result;
-		
+              return result;
+          }
+          RecaptchaUtility utility = new RecaptchaUtility(this);
+          utility.DoSolve();
         }
 		
+		Wait(2);
+		
+        var ButtonLog = ElementByXPath("//button[contains(@type,'submit')]");
+        Click(ButtonLog);
+
 		Wait();	
 		
 	 } // end ExitButton
@@ -310,12 +308,12 @@ public class stake : FaucetScript
         }//end btc_VAR
 		
 	    Wait(2);
-		
-        Claim_Function(); //call
+
+        BalanceNeedToBeZero_Function();	
 		
 	    Wait(2);
-
-        BalanceNeedToBeZero_Function();
+		
+        Claim_Function(); //call
 		}
         //=====//	
 	
@@ -338,12 +336,12 @@ public class stake : FaucetScript
         }//end eth_VAR
 		
 	    Wait(2);
-		
-        Claim_Function(); //call
+
+        BalanceNeedToBeZero_Function();	
 		
 	    Wait(2);
-
-        BalanceNeedToBeZero_Function();
+		
+        Claim_Function(); //call
 		}
         //=====//		
 	
@@ -366,12 +364,12 @@ public class stake : FaucetScript
         }//end ltc_VAR
 		
 	    Wait(2);
-		
-        Claim_Function(); //call
+
+        BalanceNeedToBeZero_Function();	
 		
 	    Wait(2);
-
-        BalanceNeedToBeZero_Function();
+		
+        Claim_Function(); //call
 		}
         //=====//		
 			
@@ -394,12 +392,12 @@ public class stake : FaucetScript
         }//end doge_VAR
 		
 	    Wait(2);
-		
-        Claim_Function(); //call
+
+        BalanceNeedToBeZero_Function();	
 		
 	    Wait(2);
-
-        BalanceNeedToBeZero_Function();
+		
+        Claim_Function(); //call
 		}
         //=====//				
 			
@@ -420,14 +418,14 @@ public class stake : FaucetScript
 		Log("bch");
         Click(bch_VAR);
         }//end bch_VAR	
+		
+	    Wait(2);
 
+        BalanceNeedToBeZero_Function();	
+		
 	    Wait(2);
 		
         Claim_Function(); //call
-		
-	    Wait(2);
-
-        BalanceNeedToBeZero_Function();
 		}
         //=====//				
 			
@@ -450,12 +448,12 @@ public class stake : FaucetScript
         }//end xrp_VAR	
 		
 	    Wait(2);
-		
-        Claim_Function(); //call
+
+        BalanceNeedToBeZero_Function();	
 		
 	    Wait(2);
-
-        BalanceNeedToBeZero_Function();
+		
+        Claim_Function(); //call
 		}
         //=====//				
 
