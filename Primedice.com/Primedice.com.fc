@@ -1,8 +1,8 @@
-﻿
+
 
 //==================//
 //script Written by: ••AviramDayan•• 26/05/2019 04:00PM
-//Last Update: 22/08/2019 09:00AM - Version 3
+//Last Update: 11/06/2020 17:00PM - Version 4
 //==================//
 
 using System;
@@ -31,18 +31,19 @@ public class stake : FaucetScript
         get
         {
 			
-            return new FaucetSettings("https://Primedice.com/")
+            return new FaucetSettings("https://primedice.com/")
             {
                 new FaucetSetting(){Name="Email",Display="Email OR UserName",Type=EditorType.TextBox,Required=false},
                 new FaucetSetting(){Name="Password",Display="Password",Type=EditorType.Password,Required=false},
 				
-                new FaucetSetting() { Name = "btc", Display = "btc - claim", Type = EditorType.CheckBox, Default =false},	
+                new FaucetSetting() { Name = "btc", Display = "btc - claim", Type = EditorType.CheckBox, Default =true},	
+				/*
                 new FaucetSetting() { Name = "eth", Display = "eth - claim", Type = EditorType.CheckBox, Default = false},	
                 new FaucetSetting() { Name = "ltc", Display = "ltc - claim", Type = EditorType.CheckBox, Default = false},	
                 new FaucetSetting() { Name = "doge", Display = "doge - claim", Type = EditorType.CheckBox, Default = false},	
                 new FaucetSetting() { Name = "bch", Display = "bch - claim", Type = EditorType.CheckBox, Default = false},	
                 new FaucetSetting() { Name = "xrp", Display = "xrp - claim", Type = EditorType.CheckBox, Default = false},	
-				
+				*/
                 new FaucetSetting() { Name = "AffWithdraw", Display = "AffWithdraw", Type = EditorType.CheckBox, Default = false},	
 
 
@@ -59,7 +60,7 @@ public class stake : FaucetScript
         ad = false;
        
         //Title that shows in the browser. Is used to identify and close popup windows
-        Title = "Primedice";
+        Title = "primedice.com";
 
 		SuccessXPath = "//*";  //*[@id='']
         FailXPath = "//*"; //*[@id='']
@@ -91,14 +92,12 @@ public class stake : FaucetScript
     public override bool IsLoggedIn()
     {
 	    //save Login Cookies - Check if the "Logout" exist
-        return ElementByXPath("//button[@data-test='user-dropdown-menu']") != null;
-	 
-        //return base.IsLoggedIn();
+		return ElementByXPath("//div[contains(@class,'RightContentWrapper')]") != null;
+	    //return true;
     }
 //==================//
 //save Login Cookies 
 //==================//	
-
 
 
 
@@ -108,11 +107,7 @@ public class stake : FaucetScript
     public override int BeforeLogin()
     {
 		
-
-        //if we already login go to here
-        GoToUrl("https://www.Primedice.com/");
-
-		
+	
         //This faucet has nothing to do here. We will let Faucet Collector handle it.
         return base.BeforeLogin();
     }
@@ -129,60 +124,57 @@ public class stake : FaucetScript
 //========//
     public override int DoLogin()
     {
-	
-      var ExitButton = ElementByXPath("//button[@data-test='user-dropdown-menu']");
 
+	
+      var ExitButton = ElementByXPath("//div[contains(@class,'RightContentWrapper')]");
 	
 	 //if i NOT Login - go to Login Page
 	 if (!IsVisible(ExitButton))
 	 {
 
-		GoToUrl("https://www.primedice.com/");
+		//GoToUrl("https://primedice.com/?modal=login");
 		Wait();		
 		Wait(2);
-     
-        var StartOpenLogin = ElementByXPath("//a[@data-test='login-link']");
-	    if (IsVisible(StartOpenLogin))
-	    { 
-        Click(StartOpenLogin);
-		}
 
-		Wait(2);
+        var LogInButton = ElementByXPath("//span[contains(text(),'Login')]");
+	    if (IsVisible(LogInButton))
+	    {
+         Click(LogInButton);
+        }
 		
-        var box_user = ElementByXPath("//input[@name='emailOrName']");
+        var box_user = ElementByXPath("//input[contains(@name,'email')]");
         SetText(box_user, GetSetting("Email"));
 		
 		Wait(2);
 		
-        var box_pass = ElementByXPath("//input[@name='password']");
+        var box_pass = ElementByXPath("//input[contains(@name,'password')]");
         SetText(box_pass, GetPassword("Password"));
 
 		Wait(4);
 		
-        var ButtonLog = ElementByXPath("//button[@data-test='button-login']");
+        var ButtonLog = ElementByXPath("//button[contains(@type,'submit')]");
         Click(ButtonLog);
 		
 		Wait(2);
-		
-        var RecaptchaOpen_Iframe = ElementByXPath ("//iframe[contains(@src,'recaptcha/api2/anchor')]"); // iframe
+
+        var RecaptchaOpen_Iframe = ElementByXPath ("//iframe[contains(@src,'recaptcha/api2/anchor')]"); 
         if (IsVisible(RecaptchaOpen_Iframe))
-		{
-        //SolveCaptcha if apper
+        {
+          //SolveCaptcha if apper
         var result = base.DoSolveCaptcha();
+        if (result > 0)
+        {
+          
+            return result;
+        }
         RecaptchaUtility utility = new RecaptchaUtility(this);
         utility.DoSolve();
-		}
-
-/*		
-        var Error_Message = ElementByXPath ("//div[@id='add_err']/div/div[@class='message' and contains(text(),'fille' | 'captcha' ) ]");
-        if (IsVisible(Error_Message))
-        {
-            Log("Error_Message - Appear - we return after 1 min ");
-            return 1*60; //we return after 1 min
+        return result;
+		
         }
-*/		
+		
 		Wait();	
-
+		
 	 } // end ExitButton
 
         
@@ -222,9 +214,6 @@ public class stake : FaucetScript
         {
 		    //Log("return ad");
 			ad=false;
-			Driver.Close();  // Close specific chrome window
-            Driver.Quit();  // also Close the console app, that was used to kick off the chrome window
-            Driver.Dispose();  // Close the chromedriver.exe
             return GetWaitSetting();
         }
 
@@ -295,7 +284,7 @@ public class stake : FaucetScript
      //=============//	 
  
 
-        GoToUrl("https://www.Primedice.com/");
+        GoToUrl("https://primedice.com/?currency=btc&modal=vipReload");
 		Log("Go to faucet");	
 		
 		Wait();
@@ -313,7 +302,7 @@ public class stake : FaucetScript
 
 	    Wait(2);
 
-        var btc_VAR = ElementByXPath("//ul[@class='styles__ActionList-sc-10xbq0o-0 gyYHwY styles__Ul-sc-18fkhar-0 gsiUwX']/li[1]");
+        var btc_VAR = ElementByXPath("//li[1]/button[contains(@class,'Button__StyledButton-sc-8bd3dp-0 dMsnbY')]");
         if (IsVisible(btc_VAR))
         {		
 		Log("btc");		
@@ -321,13 +310,12 @@ public class stake : FaucetScript
         }//end btc_VAR
 		
 	    Wait(2);
-
-        BalanceNeedToBeZero_Function();
+		
+        Claim_Function(); //call
 		
 	    Wait(2);
 
-        Claim_Function(); //call
-		
+        BalanceNeedToBeZero_Function();
 		}
         //=====//	
 	
@@ -342,7 +330,7 @@ public class stake : FaucetScript
 
 	    Wait(2);
 
-        var eth_VAR = ElementByXPath("//ul[@class='styles__ActionList-sc-10xbq0o-0 gyYHwY styles__Ul-sc-18fkhar-0 gsiUwX']/li[2]");
+        var eth_VAR = ElementByXPath("//li[2]/button[contains(@class,'Button__StyledButton-sc-8bd3dp-0 dMsnbY')]");
         if (IsVisible(eth_VAR))
         {	
 		Log("eth");		
@@ -350,12 +338,12 @@ public class stake : FaucetScript
         }//end eth_VAR
 		
 	    Wait(2);
-
-        BalanceNeedToBeZero_Function();
-	
-	    Wait(2);
 		
         Claim_Function(); //call
+		
+	    Wait(2);
+
+        BalanceNeedToBeZero_Function();
 		}
         //=====//		
 	
@@ -370,7 +358,7 @@ public class stake : FaucetScript
 
 	    Wait(2);
 
-        var ltc_VAR = ElementByXPath("//ul[@class='styles__ActionList-sc-10xbq0o-0 gyYHwY styles__Ul-sc-18fkhar-0 gsiUwX']/li[3]");
+        var ltc_VAR = ElementByXPath("//li[3]/button[contains(@class,'Button__StyledButton-sc-8bd3dp-0 dMsnbY')]");
         if (IsVisible(ltc_VAR))
         {	
 		Log("ltc");			
@@ -378,12 +366,12 @@ public class stake : FaucetScript
         }//end ltc_VAR
 		
 	    Wait(2);
-
-        BalanceNeedToBeZero_Function();
-	
-	    Wait(2);
 		
         Claim_Function(); //call
+		
+	    Wait(2);
+
+        BalanceNeedToBeZero_Function();
 		}
         //=====//		
 			
@@ -398,7 +386,7 @@ public class stake : FaucetScript
 
 	    Wait(2);
 
-        var doge_VAR = ElementByXPath("//ul[@class='styles__ActionList-sc-10xbq0o-0 gyYHwY styles__Ul-sc-18fkhar-0 gsiUwX']/li[4]");
+        var doge_VAR = ElementByXPath("//li[4]/button[contains(@class,'Button__StyledButton-sc-8bd3dp-0 dMsnbY')]");
         if (IsVisible(doge_VAR))
         {	
 		Log("doge");	
@@ -406,12 +394,12 @@ public class stake : FaucetScript
         }//end doge_VAR
 		
 	    Wait(2);
-
-        BalanceNeedToBeZero_Function();
-	
-	    Wait(2);
 		
         Claim_Function(); //call
+		
+	    Wait(2);
+
+        BalanceNeedToBeZero_Function();
 		}
         //=====//				
 			
@@ -426,20 +414,20 @@ public class stake : FaucetScript
 
 	    Wait(2);
 
-        var bch_VAR = ElementByXPath("//ul[@class='styles__ActionList-sc-10xbq0o-0 gyYHwY styles__Ul-sc-18fkhar-0 gsiUwX']/li[5]");
+        var bch_VAR = ElementByXPath("//li[5]/button[contains(@class,'Button__StyledButton-sc-8bd3dp-0 dMsnbY')]");
         if (IsVisible(bch_VAR))
         {	
 		Log("bch");
         Click(bch_VAR);
         }//end bch_VAR	
+
+	    Wait(2);
+		
+        Claim_Function(); //call
 		
 	    Wait(2);
 
         BalanceNeedToBeZero_Function();
-	
-	    Wait(2);
-		
-        Claim_Function(); //call
 		}
         //=====//				
 			
@@ -454,7 +442,7 @@ public class stake : FaucetScript
 
 	    Wait(2);
 
-        var xrp_VAR = ElementByXPath("//ul[@class='styles__ActionList-sc-10xbq0o-0 gyYHwY styles__Ul-sc-18fkhar-0 gsiUwX']/li[6]");
+        var xrp_VAR = ElementByXPath("//li[6]/button[contains(@class,'Button__StyledButton-sc-8bd3dp-0 dMsnbY')]");
         if (IsVisible(xrp_VAR))
         {	
 		Log("xrp");
@@ -462,20 +450,16 @@ public class stake : FaucetScript
         }//end xrp_VAR	
 		
 	    Wait(2);
-
-        BalanceNeedToBeZero_Function();
-	
-	    Wait(2);
 		
         Claim_Function(); //call
+		
+	    Wait(2);
+
+        BalanceNeedToBeZero_Function();
 		}
         //=====//				
-		
 
-
-		ad = true;    // if i do true - it report as succeed // only one time no multi and also required -> return GetWaitSetting();	
-        //return GetWaitSetting();	
-	
+		return Time_Function(); //call to function time
 	
         //We are good to continue
         return base.DoSolveFaucet();
@@ -485,7 +469,7 @@ public class stake : FaucetScript
 //==============///
 	
 	
-	
+
 	
 	
 //==============//
@@ -518,12 +502,43 @@ public class stake : FaucetScript
         return base.CheckFaucetResult();
     }
 
+	
+        //=================//
+       //Time_Function
+        //=================//
+        public int Time_Function()
+        {
+			
+           var MinVar = ElementByXPath("//article[contains(@class,'maincontent')]//span[2]/span[1]") ;
+		   var SecVar = ElementByXPath("//article[contains(@class,'maincontent')]//span[3]/span[1]") ;
+
+           if (IsVisible(MinVar))
+           {
+	         Log("ClaimBTC - WaitTimerText apper - return to site time"); 
+             int min,sec;
+             min = Convert.ToInt32(MinVar.Text.Trim().Replace("m.", "").Replace("s.", "").Split(' ')[0])*60;
+             sec = Convert.ToInt32(SecVar.Text.Trim().Replace("m.", "").Replace("s.", "").Split(' ')[1]);
+             return min+sec;
+           } 
+
+           if (!IsVisible(MinVar))
+           {
+	            Log("ClaimBTC - return to your time"); 
+		        return GetWaitSetting();
+           }
+
+           return 0;		
+        }//end Time_Function
+        //=================//	
+
 
         //=========//
         //FaucetButton_Function
 		//=========//
         public void FaucetButton_Function()
-        {	
+        {
+			
+        /*			
         var DepositButton = ElementByXPath("//a/span[contains(text(),'Deposit')]");
         Click(DepositButton);
 		
@@ -533,7 +548,8 @@ public class stake : FaucetScript
         Click(FaucetTAB);
 		
 		Wait(2);	
-
+        */
+		
 		}//end FaucetButton_Function
 		//=========//
 		
@@ -543,9 +559,14 @@ public class stake : FaucetScript
 		//=========//
         public void Menu_Function()
         {	
-        Log("Menu_Function");		
-        var MenuVAR = ElementByXPath("//div[2]/div/div[1]/span/button[@class='Button-sc-1n30nq3-0 hbLKty']");       			
-        Click(MenuVAR);
+		
+          var MenuVAR = ElementByXPath("//form[contains(@class,'styles__Form')]//button[contains(@class,'Button__StyledButton-sc-8bd3dp-0 dMsnbY')]");       			
+          if (IsVisible(MenuVAR))
+          {
+            Log("Menu_Function");				  
+		    Click(MenuVAR);			  
+		  }
+		  
 		}//end Menu_Function
 		//=========//
 		
@@ -556,57 +577,16 @@ public class stake : FaucetScript
         public void Claim_Function()
         {			
 		
-        var ClaimVAR = ElementByXPath("//button[@class='Button-sc-1n30nq3-0 feVsk' and not (@disabled) ]");   
-        if (IsVisible(ClaimVAR))
-        {	
-        Log("Claim_Function");	
-        Click(ClaimVAR);
-        }//end ClaimVAR
+          var CheckClaim = ElementByXPath("//div[contains(@class,'styles__Buttons')]//button[contains(@class,'Button__StyledButton') and (@disabled) ]"); 
+          if (!IsVisible(CheckClaim))
+          {	
+            Log("Claim_Function - claim button available after captch - do click");
+            var ClaimVAR = ElementByXPath("//div[contains(@class,'styles__Buttons')]//button[contains(@class,'Button__StyledButton')]"); 
+            Click(ClaimVAR);
+          }//end ClaimVAR
 		
 		}//end Claim_Function
 		//=========//
-		
-
-    public bool SeeIfThereisColor(Bitmap Image)
-    {
-        bool ContainsColor = false;
-        for(int i = 0; i < Image.Width && ! ContainsColor; i++)
-        {
-            for(int j = 0; j < Image.Height; j++)
-            {
-                if(Image.GetPixel(i,j)!=Color.FromArgb(0,0,0) && Image.GetPixel(i,j)!=Color.FromArgb(255, 255, 255))
-                {
-                    ContainsColor = true;
-                    break;
-                }
-            }
-        }
-
-        return ContainsColor;
-
-    }
-	
-	
-    private IWebElement FindCorrectArrow()
-    {
-        var Arrows = ElementsByXPath("//div[@class='verify-gap']");
-        int n = 0;
-        foreach(var arrow in Arrows)
-        {
-            if(SeeIfThereisColor(TakeScreenshot(Base.Captcha.CaptchaService.Manual,arrow)))
-            {
-                Log("Element is" + n.ToString());
-                return arrow;
-
-            }
-            n++;
-
-        }
-        return null;
-
-    }
-
-
 
 
         //=========//
@@ -615,46 +595,22 @@ public class stake : FaucetScript
         public void BalanceNeedToBeZero_Function()
         {	
 		
-        var BalanceNeedToBeZero = ElementByXPath("//p/span[contains(text(),'Balance must be')]");
-        if (!IsVisible(BalanceNeedToBeZero)) //if is not visible - BalanceNeedToBeZero - DoSolveCaptcha 
-        {	
-        var result = DoSolveCaptcha();
-		}
+          var BalanceNeedToBeZero = ElementByXPath("//span[contains(text(),'Next claim available')]"); 
+          if (!IsVisible(BalanceNeedToBeZero)) //if is not visible - BalanceNeedToBeZero - DoSolveCaptcha 
+          {	
+		    Log("faucet visible - do stuff");
+		  
+            var ReCaptchaIframe = ElementByXPath("//iframe[contains(@src,'recaptcha/api2/anchor')]"); 
+            if (IsVisible(ReCaptchaIframe))
+            {	
+		      Log("call to solve captch");
+              var result = DoSolveCaptcha(); //call to solve captch	
+		      ClaimSuccess(); //Marks the claim as a success
+		    }
+
+		  }
 		
 		}// end BalanceNeedToBeZero_Function
-		//=========//
-
-
-
-        //=========//
-        //SolveCaptcha_RightSquare_Function
-		//=========//
-        public void SolveCaptcha_RightSquare_Function()
-        {	
-		
-        /*
-        GetestCaptchaUtilities.GetestCaptcha getestCaptcha = new GetestCaptchaUtilities.GetestCaptcha(this);
-        bool res2=  getestCaptcha.DoInitSolve();
-        */
-
-        var Arrow = FindCorrectArrow();
-        if(IsVisible(Arrow))
-		{
-            Log("SolveCaptcha_RightSquare_Function - Arrow");	
-
-            var ToMove = ElementByXPath("//div[@class='verify-sub-block']");
-            if (IsVisible(ToMove))
-            {
-                Log("SolveCaptcha_RightSquare_Function - ToMove");	
-                Actions actions = new Actions(Driver);
-                actions.DragAndDrop(ToMove, Arrow).Build().Perform();
-                Wait();
-
-			}
-        }
-
-	
-		}// end SolveCaptcha_RightSquare_Function
 		//=========//
 
 	
