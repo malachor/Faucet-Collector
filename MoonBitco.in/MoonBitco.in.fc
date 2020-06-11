@@ -1,6 +1,7 @@
 using FaucetCollector.Script;
 using OpenQA.Selenium;
 using System;
+using System.Linq;
 //css_ref FaucetCollector.Utilities
 public class MoonBitcoinScript : FaucetScript
 {
@@ -181,18 +182,18 @@ public class MoonBitcoinScript : FaucetScript
     /// </summary>
     public override int AfterLogin( )
     {
-        //Check if the login doesn't show an error message.
-        var failedLogin = ElementById("BodyPlaceholder_FailedSignInPanel");
-        if ( IsVisible(failedLogin) )
+        // se if we have an error notification
+        var BtnCloseAd=ElementByXPath("//button[@data-bind='click: close']" );
+        if ( IsVisible(BtnCloseAd) )
         {
-            if ( failedLogin.Text.Contains("is not registered with CoinPot") )
-            {
-                //Invalid email address entered. Log and disable this faucet.
-                Log("Please enter a correct coinpot.co email address.");
-                Disable( );
-            }
+            var TextArea=ElementsByXPath("//div[@data-bind='html: bodyHtml']").FirstOrDefault(x=>IsVisible(x));
 
-            return Fail("Login failed: "+failedLogin.Text);
+            if ( TextArea!=null )
+            {
+                Log(TextArea.Text);
+            }
+            // Refresh the before start login again
+            Driver.Navigate( ).Refresh( );
         }
 
         //we are good to continue

@@ -1,6 +1,7 @@
 using FaucetCollector.Script;
 using OpenQA.Selenium;
 using System;
+using System.Linq;
 //css_ref FaucetCollector.Utilities
 
 public class MoonDogeScript_ : FaucetScript
@@ -231,6 +232,19 @@ public class MoonDogeScript_ : FaucetScript
     /// </summary>
     public override int AfterLogin( )
     {
+        // se if we have an error notification
+        var BtnCloseAd=ElementByXPath("//button[@data-bind='click: close']" );
+        if ( IsVisible(BtnCloseAd) )
+        {
+            var TextArea=ElementsByXPath("//div[@data-bind='html: bodyHtml']").FirstOrDefault(x=>IsVisible(x));
+
+            if ( TextArea!=null )
+            {
+                Log(TextArea.Text);
+            }
+            // Refresh the before start login again
+            Driver.Navigate( ).Refresh( );
+        }
         //we don't need to do anything here for this faucet - let Faucet Collector do its stuff.
         return base.AfterLogin( );
     }
