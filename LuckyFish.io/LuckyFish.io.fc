@@ -1,7 +1,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 26/05/2019 04:00PM - Version 1
-//Last Update: 25/05/2020 17:04PM - Version 22
+//Last Update: 22/06/2020 22:25PM - Version 23
 //==================//
 
 using System;
@@ -132,20 +132,7 @@ public class luckyfishorg : FaucetScript
     public override int BeforeLogin()
     {
 		
-
-	 //var checks login or exit
-     var ExitButton = ElementByXPath("//img[@class='userPhoto']");
-
-	 
-	 //if i already Login - go to "bonus"	 
-	 if (IsVisible(ExitButton))
-	 {
-        //if we already login go to here
-        GoToUrl("https://www.luckyfish.io/");
-	 }	
-	
-		
-        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+       //This faucet has nothing to do here. We will let Faucet Collector handle it.
         return base.BeforeLogin();
     }
 //=============//
@@ -163,11 +150,8 @@ public class luckyfishorg : FaucetScript
     {
 	
       var ExitButton = ElementByXPath("//img[@class='userPhoto']");
-
-	
-	 //if i NOT Login - go to Login Page
-	 if (!IsVisible(ExitButton))
-	 {
+      if (!IsVisible(ExitButton))
+	  {
 
 		GoToUrl("https://www.luckyfish.io/");
 		Wait();		
@@ -175,7 +159,7 @@ public class luckyfishorg : FaucetScript
      
         Login_General_Function(); //call
 
-	 } // end ExitButton
+	  } // end ExitButton
 
         
        return base.DoLogin();
@@ -932,7 +916,7 @@ public class luckyfishorg : FaucetScript
 
 
         //solve Captcha X2 XPath (1 = captcha image | 2 = input text )
-        var result = DoSolveImageCaptcha(ElementByXPath("//div[contains(@class,'faucet')]/img"),ElementByXPath("//div[contains(@class,'faucet')]/input")); 
+        var result = DoSolveImageCaptcha(ElementByXPath("//div[contains(@class,'img_wrap')]/img"),ElementByXPath("//div[contains(@class,'faucet')]/input")); 
 
         if (result > 0)
         {
