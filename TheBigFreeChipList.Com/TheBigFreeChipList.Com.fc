@@ -1,7 +1,7 @@
-﻿
+
 //==================//
 //script Written by: ••AviramDayan•• 18/07/2019 21:09PM - Version 1
-//Last Update: 18/07/2019 21:09PM - Version 1
+//Last Update: 13/06/2020 14:30PM - Version 2
 //==================//
 
 using System;
@@ -43,7 +43,7 @@ public class thebigfreechiplist : FaucetScript
         ad = false;
        
         //Title that shows in the browser. Is used to identify and close popup windows
-        Title = "THEBIGFREECHIPLIST";
+        Title = "TheBigFreeChipList";
 
 		SuccessXPath = "//*";  //*[@id='']
         FailXPath = "//*"; //*[@id='']
@@ -71,21 +71,20 @@ public class thebigfreechiplist : FaucetScript
     }
 
 
-	
+
 //==================//
 //save Login Cookies 
 //==================//
     public override bool IsLoggedIn()
     {
-	    //save Login Cookies - Check if the "Logout" exist
-        return ElementByXPath ("//div[@id='hello_user']") != null;
-	 
-        //return base.IsLoggedIn();
+
+        //In this case we check for en element with the class "loggedIn"
+		return ElementByXPath("//span[@id='hello_user']") != null;
+		//return true;
     }
 //==================//
 //save Login Cookies 
-//==================//	
-
+//==================//
 
 
 
@@ -105,16 +104,13 @@ public class thebigfreechiplist : FaucetScript
 
 	
 	
-	
-
-	
 //========//
 //DoLogin
 //========//
     public override int DoLogin()
     {
 	
-      var ExitButton = ElementByXPath ("//div[@id='hello_user']");
+      var ExitButton = ElementByXPath ("//span[@id='hello_user']");
 	
 	 //if i NOT Login - go to Login Page
 	 if (!IsVisible(ExitButton))
@@ -124,11 +120,11 @@ public class thebigfreechiplist : FaucetScript
 		Wait();		
 		Wait(2);
 
-        var StartOpenLogin = ElementByXPath("//span[@class='d_login_popup']");
-	    if (IsVisible(StartOpenLogin))
-	    { 
+        var StartOpenLogin = ElementByXPath("//span[@class='log-out__open non-user']");
+	    //if (IsVisible(StartOpenLogin))
+	    //{ 
         Click(StartOpenLogin);
-		}
+		//}
 
 		Wait(2);
 		
