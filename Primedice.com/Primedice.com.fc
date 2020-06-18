@@ -2,7 +2,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 26/05/2019 04:00PM
-//Last Update: 12/06/2020 15:00PM - Version 5
+//Last Update: 18/06/2020 21:15PM - Version 6
 //==================//
 
 using System;
@@ -605,6 +605,7 @@ public class stake : FaucetScript
 		      Log("call to solve captch");
               var result = DoSolveCaptcha(); //call to solve captch	
 		      ClaimSuccess(); //Marks the claim as a success
+			  Log("Success");
 		    }
 
 		  }
