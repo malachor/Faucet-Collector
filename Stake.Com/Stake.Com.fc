@@ -2,7 +2,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 26/05/2019 04:00PM
-//Last Update: 11/06/2020 17:00PM - Version 10
+//Last Update: 18/06/2020 21:15PM - Version 11
 //==================//
 
 using System;
@@ -153,13 +153,7 @@ public class stake : FaucetScript
         var box_pass = ElementByXPath("//input[contains(@name,'password')]");
         SetText(box_pass, GetPassword("Password"));
 
-		Wait(4);
-		
-        var ButtonLog = ElementByXPath("//button[contains(@type,'submit')]");
-        Click(ButtonLog);
-		
-		Wait(2);
-
+		Wait(3);
         var RecaptchaOpen_Iframe = ElementByXPath ("//iframe[contains(@src,'recaptcha/api2/anchor')]"); 
         if (IsVisible(RecaptchaOpen_Iframe))
         {
@@ -168,11 +162,16 @@ public class stake : FaucetScript
           if (result > 0)
           {
               return Fail("Fail solving captcha");
+							
           }
           RecaptchaUtility utility = new RecaptchaUtility(this);
           utility.DoSolve();
         }
+
+		Wait(2);
 		
+        var ButtonLog = ElementByXPath("//button[contains(@type,'submit')]");
+        Click(ButtonLog);
 		Wait();	
 
 	 } // end ExitButton
@@ -314,13 +313,12 @@ public class stake : FaucetScript
         }//end btc_VAR
 		
 	    Wait(2);
-
+		
         BalanceNeedToBeZero_Function();
 		
 	    Wait(2);
-
-        Claim_Function(); //call
 		
+        Claim_Function(); //call
 		}
         //=====//	
 	
@@ -343,9 +341,9 @@ public class stake : FaucetScript
         }//end eth_VAR
 		
 	    Wait(2);
-
+		
         BalanceNeedToBeZero_Function();
-	
+		
 	    Wait(2);
 		
         Claim_Function(); //call
@@ -371,9 +369,9 @@ public class stake : FaucetScript
         }//end ltc_VAR
 		
 	    Wait(2);
-
+		
         BalanceNeedToBeZero_Function();
-	
+		
 	    Wait(2);
 		
         Claim_Function(); //call
@@ -399,9 +397,9 @@ public class stake : FaucetScript
         }//end doge_VAR
 		
 	    Wait(2);
-
+		
         BalanceNeedToBeZero_Function();
-	
+		
 	    Wait(2);
 		
         Claim_Function(); //call
@@ -427,9 +425,9 @@ public class stake : FaucetScript
         }//end bch_VAR	
 		
 	    Wait(2);
-
+		
         BalanceNeedToBeZero_Function();
-	
+		
 	    Wait(2);
 		
         Claim_Function(); //call
@@ -455,9 +453,9 @@ public class stake : FaucetScript
         }//end xrp_VAR	
 		
 	    Wait(2);
-
+		
         BalanceNeedToBeZero_Function();
-	
+		
 	    Wait(2);
 		
         Claim_Function(); //call
@@ -612,6 +610,7 @@ public class stake : FaucetScript
 		      Log("call to solve captch");
               var result = DoSolveCaptcha(); //call to solve captch		 
 		      ClaimSuccess(); //Marks the claim as a success
+			  Log("Success");
 		    }
 
 		  }
