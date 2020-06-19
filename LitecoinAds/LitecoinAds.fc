@@ -1,0 +1,268 @@
+﻿using FaucetCollector.Script;
+using System;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+
+namespace NewScripts.PTCShare
+{
+    public class LitecoinAdsScript : FaucetScript
+    {
+        public override FaucetSettings Settings
+        {
+            get
+            {
+
+
+                return new FaucetSettings("https://litecoinads.com/")
+                        {
+                            new FaucetSetting()
+                            {
+                                Name="User",
+                                Display="Username",
+                                Type=EditorType.TextBox,
+                                Required=true
+                            
+                            },
+                            new FaucetSetting( )
+                            {
+                                Name="Pass",
+                                Display="Password",
+                                Type=EditorType.Password,
+                                Required=true
+                            }
+                        };
+
+            }
+
+
+        }
+
+        public override void Start( )
+        {
+            Title="litecoinads";
+
+            SuccessXPath="//div[@class='alert alert-success']";
+            FailXPath="//div[@class='alert alert-danger";
+            base.Start( );
+        }
+
+        public override int DoLogin( )
+        {
+            GoToUrl("https://litecoinads.com/login.aspx");
+
+            Wait(2);
+
+            var UserBox=ElementByXPath("//input[@id='ctl02_Username']");
+            if ( !IsVisible(UserBox) )
+            {
+                return Fail("User box not found");
+            }
+            var PasswordBox=ElementByXPath("//input[@id='ctl02_Password']");
+            if ( !IsVisible(PasswordBox) )
+            {
+                return Fail("Password bot not found");
+            }
+            SetText(UserBox , GetSetting("User"));
+            SetText(PasswordBox , GetPassword("Pass"));
+
+            var result=DoSolveCaptcha();
+            if ( result>0 )
+            {
+                return result;
+
+            }
+            var loginBtn=ElementByXPath("//input[@id='ctl02_LoginButton']");
+            if ( !IsVisible(loginBtn) )
+            {
+                return Fail("login button not found");
+            }
+            Click(loginBtn);
+
+            var ErrorLogin=ElementByXPath("//div[@class='alert alert-danger");
+            if ( IsVisible(ErrorLogin) )
+            {
+                return Fail(ErrorLogin.Text);
+            }
+
+
+            return base.DoLogin( ); 
+        }
+        public override int DoSolveCaptcha( )
+        {
+            if ( IsVisible(ElementByXPath("//p[@class='visualCaptcha-explanation']//strong")) )
+            {
+                bool captcha_solved = false;
+                while ( !captcha_solved )
+                {
+                    var name_ = ElementByXPath("//p[@class='visualCaptcha-explanation']//strong");
+                    captcha_solved=SolveVisualCaptcha(name_.Text);
+                    Wait( );
+                    if ( !captcha_solved )
+                    {
+                        var refresh = ElementByXPath("//div[@class='visualCaptcha-refresh-button']");
+                        Click(refresh);
+                        Wait(2 , 3);
+                    }
+                }
+            }
+            return base.DoSolveCaptcha( );
+        }
+        public override bool IsLoggedIn( )
+        {
+
+            return ElementByXPath("//a[@href='/logout.aspx']")!=null;
+        }
+
+        public override int DoSolveFaucet( )
+        {
+            GoToUrl("https://litecoinads.com/user/earn/ads.aspx");
+            Wait(2);
+            string AdsXpath="//div[contains(@class,'AboxActive Ad')]";
+            
+            var ads=ElementsByXPath(AdsXpath).Where(x=>IsVisible(x)).ToList();
+            int n=0;
+
+            int NAds = ads.Count;
+            while ( ads.Count>n )
+            {
+
+                CheckForPopupsEnabled=false;
+
+
+                Click(ads[n] , false);
+
+                Wait(3);
+
+                Driver.SwitchTo( ).Window(Driver.WindowHandles[1]);
+
+                Wait(3);
+
+                var Vbutton = ElementByXPath("//input[@id='WatchAdButton']");
+                if ( Vbutton!=null )
+                {
+                    Click(Vbutton , false);
+                    Wait( );
+                    try
+                    {
+                        Driver.SwitchTo( ).Window(Driver.WindowHandles[1]);
+                        DateTime t1 = DateTime.Now.AddSeconds(75);
+                        while ( !IsVisible(ElementByXPath("//div[@id='CaptchaPanel']")) )
+                        {
+                            Wait( );
+                            if ( DateTime.Now>t1 )
+                            {
+                                break;
+                            }
+                        }
+                        Wait( );
+
+                        var result=DoSolveCaptcha();
+
+                        Wait( );
+                        var Credit = ElementByXPath("//input[@id='CreditAfterCaptcha']");
+                        if ( IsVisible(Credit) )
+                        {
+                            Click(Credit);
+                        }
+                        Wait(2 , 3);
+                        CheckFaucetResult( );
+                        Wait(1);
+                        Driver.SwitchTo( ).Window(Driver.WindowHandles[0]);
+                    }
+                    catch ( Exception )
+                    {
+                        CheckForPopupsEnabled=true;
+                    }
+                }
+
+                CheckForPopupsEnabled=true;
+                CheckForPopups( );
+                Wait( );
+
+
+
+                GoToUrl("https://litecoinads.com/user/earn/ads.aspx");
+
+                Wait(2 , 3);
+                ads=ElementsByXPath(AdsXpath).Where(x => IsVisible(x)).ToList( ); ;
+
+
+                if ( ads.Count==NAds )
+                {
+                    n++;
+
+                    NAds=ads.Count;
+                }
+
+            }
+
+            return GetWaitSetting( );
+        }
+
+        private bool SolveVisualCaptcha(string name)
+        {
+            Wait( );
+            var dir = AssetDir("Other");
+            dir+="\\VisualCaptchaPictures\\"+name+".png";
+            try
+            {
+
+                using ( Stream ImgStream = new FileStream(dir , FileMode.Open) )
+                {
+                    using ( Bitmap SolutionTemplate = new Bitmap(Image.FromStream(ImgStream)) )
+                    {
+                        ImgStream.Close( );
+
+
+                        var PosibleSolutions=ElementsByXPath("//img[contains(@id,'visual')]");
+                      
+
+                        var PosibleSolutionsPixels=PosibleSolutions.Select(x=>GetDifferentPixels(SolutionTemplate,TakeScreenshot(Base.Captcha.CaptchaService.Manual, x))).ToList();
+                        
+                        Wait( );
+                       
+                        int solution= PosibleSolutionsPixels.IndexOf(PosibleSolutionsPixels.Min());    
+                        
+                        var solution_xpath = ElementByXPath("//img[@id='visualCaptcha-img-" + solution.ToString() + "']");
+                        if ( IsVisible(solution_xpath) )
+                        {
+                            Click(solution_xpath);
+                            Wait( );
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch ( Exception )
+            {
+
+            }
+
+            return false;
+        }
+
+
+
+        private int GetDifferentPixels(Bitmap image1 , Bitmap image2)
+        {
+            int cont = 0;
+            for ( int i = 0 ; i<image1.Height ; i++ )
+            {
+                for ( int j = 0 ; j<image1.Width ; j++ )
+                {
+                    if ( image1.GetPixel(j , i)!=image2.GetPixel(j , i) )
+                    {
+
+                        cont++;
+
+                    }
+                }
+            }
+
+            return cont;
+
+
+        }
+    }
+}
