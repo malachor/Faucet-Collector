@@ -1,7 +1,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 13/11/2019 09:00AM - Version 1
-//Last Update: 24/04/2020 04:00PM - Version 4
+//Last Update: 20/06/2020 21:45PM - Version 5
 //==================//
 
 using System;
@@ -40,7 +40,7 @@ public class TrustDice : FaucetScript
  				new FaucetSetting() { Name = "TXT", Display = "TXT - ON/OFF", Type = EditorType.CheckBox, Default =true},	               
 				new FaucetSetting() { Name = "TXT_Claim", Display = "TXT_Claim - Mining Page - Claim TXT", Type = EditorType.CheckBox, Default =true},	
 				new FaucetSetting() { Name = "TXT_Stake", Display = "TXT_Stake - Rewards Page - Stake TXT", Type = EditorType.CheckBox, Default =true},
-                new FaucetSetting() { Name = "TXT_Reward", Display = "TXT_Reward - Rewards Page - Claim Reward TXT", Type = EditorType.CheckBox, Default =true},
+                //new FaucetSetting() { Name = "TXT_Reward", Display = "TXT_Reward - Rewards Page - Claim Reward TXT", Type = EditorType.CheckBox, Default =true},
 				
 
                 //new FaucetSetting() { Name = "LimitFaucet", Display = "LimitFaucet - write the full number of satoshi without point/decimals - 0.0 | 1.1 and etc (for example write: 100 200)", Type = EditorType.Numeric, Default = 1 },
@@ -213,35 +213,8 @@ public class TrustDice : FaucetScript
 
         if (ad)
         {
-
-           GoToUrl("https://TrustDice.win/faucet");
-		   Wait();
-		   Wait(8);	
-			
-		   ad=false;
-			
-		   var TimerRun = ElementByXPath("//div[2 and contains(@class,'main-bg')]/div[1]/div/div/div[1]/div/div//p[1]");  //the only option
-           if (IsVisible(TimerRun)) 
-		   {
-		     Log("return to website time");	 
-             var HourVAR = ElementByXPath("//div[2 and contains(@class,'main-bg')]/div[1]/div/div/div[1]/div/div/p[1]");  //the only option 
-             var MinVAR = ElementByXPath("//div[2 and contains(@class,'main-bg')]/div[1]/div/div/div[1]/div/div/p[2]");  //the only option
-             var SecVAR = ElementByXPath("//div[2 and contains(@class,'main-bg')]/div[1]/div/div/div[1]/div/div/p[3]");  //the only option
-
-             int hour,min,sec;
-             hour = Convert.ToInt32(HourVAR.Text)*3600;
-             min = Convert.ToInt32(MinVAR.Text)*60;
-             sec = Convert.ToInt32(SecVAR.Text);
-             return hour+min+sec;
-		   }
-		   
-           if (!IsVisible(TimerRun)) 
-		   {
-		     Log("return to user time");
-		     return 60*60;
-			 //return GetWaitSetting();
-		   }
-		   
+		  ad=false;			
+	   	  return GetWaitSetting();
         }
 
 		//let Faucet Collector continue.
@@ -305,24 +278,6 @@ public class TrustDice : FaucetScript
 		Wait(2);
 
 		//======//
-		//FaucetBtc//
-		//======//
-        if (GetBoolSetting("FaucetBtc"))
-        {	
-          GoToUrl("https://TrustDice.win/faucet");
-		  Wait();
-		  Wait(2);	
-		
-		  Log("FaucetBtc - try to claim");	
-          Faucet_Function(); //call
-		  
-	      Wait(2);
-
-		}
-        //=====//	
-
-
-		//======//
 		//TXT//
 		//======//
         if (GetBoolSetting("TXT"))
@@ -340,8 +295,25 @@ public class TrustDice : FaucetScript
 		}
         //=====//	
 
-		ad=true;
-        //return GetWaitSetting();	
+		//======//
+		//FaucetBtc//
+		//======//
+        if (GetBoolSetting("FaucetBtc"))
+        {	
+          GoToUrl("https://TrustDice.win/faucet");
+		  Wait();
+		  Wait(2);	
+		
+		  Log("FaucetBtc - try to claim");	
+          Faucet_Function(); //call
+		  
+	      Wait(2);
+
+		}
+        //=====//	
+
+		//ad=true;
+        return Time_Function();
 	
         //We are good to continue
         return base.DoSolveFaucet();
@@ -394,9 +366,9 @@ public class TrustDice : FaucetScript
 
            if (GetBoolSetting("TXT_Claim"))
            {	
-	   
-		      var MiningTab = ElementByXPath("//span[contains(@class,'MuiBadge-root') and contains(text(),'Mining')]"); 
-              Click(MiningTab);
+		      //var MiningTab = ElementByXPath("//span[contains(@class,'MuiBadge-root') and contains(text(),'Mining')]"); 
+              //Click(MiningTab);
+              GoToUrl("https://trustdice.win/txt/mine");
 		      
               Wait(3);
 		   
@@ -420,12 +392,13 @@ public class TrustDice : FaucetScript
 
            if (GetBoolSetting("TXT_Stake"))
            {	
-		      var RewardsTab = ElementByXPath("//button[contains(@class,'MuiTab-fullWidth') and @aria-selected='false'] //span[contains(text(),'Rewards')]"); 
-              Click(RewardsTab);
+		      //var RewardsTab = ElementByXPath("//button[contains(@class,'MuiTab-fullWidth') and @aria-selected='false'] //span[contains(text(),'Rewards')]"); 
+              //Click(RewardsTab);
+              GoToUrl("https://trustdice.win/txt/payout");
 
               Wait(3);
 
-		      var StakeCheck = ElementByXPath("//button[contains(@class,'disabled Mui-disabled')]//span[contains(text(),'Stake')]"); 
+		      var StakeCheck = ElementByXPath("//button[contains(@class,'disabled Mui-disabled')]//span[contains(text(),'Claim')]"); 
 		   
               if (IsVisible(StakeCheck)) 
 		      {
@@ -434,7 +407,7 @@ public class TrustDice : FaucetScript
 			  
               if (!IsVisible(StakeCheck)) 
 		      {
-		        var StakeButton = ElementByXPath("//button//span[contains(text(),'Stake')]"); 
+		        var StakeButton = ElementByXPath("//button//span[contains(text(),'Claim')]"); 
 				Click(StakeButton);
 		   	    ClaimSuccess(); //Marks the claim as a success	
 	            Log("TXT_Stake - Rewards Page - Success");			 
@@ -476,32 +449,16 @@ public class TrustDice : FaucetScript
 		//=========//
         public int Faucet_Function()
         {	
+		   var TimerRun = ElementByXPath("//h4[contains(text(),'wait')]"); 
 
-		   var TimerRun = ElementByXPath("//div[contains(@class,'faucet_countdown')]"); 
-		   
-		   
            if (IsVisible(TimerRun)) //if "TimerRun" NOT visible
 		   {	
-	         Log("FaucetBtc - CountDownTimer here - we return after the existing time");
-
-             var HourVAR = ElementByXPath("//div[2 and contains(@class,'main-bg')]/div[1]/div/div/div[1]/div/div/p[1]");
-             var MinVAR = ElementByXPath("//div[2 and contains(@class,'main-bg')]/div[1]/div/div/div[1]/div/div/p[2]");
-             var SecVAR = ElementByXPath("//div[2 and contains(@class,'main-bg')]/div[1]/div/div/div[1]/div/div/p[3]"); 
-			 
-             int hour,min,sec;
-             hour = Convert.ToInt32(HourVAR.Text)*3600;
-             min = Convert.ToInt32(MinVAR.Text)*60;
-             sec = Convert.ToInt32(SecVAR.Text);
-             return hour+min+sec;
-			 
-		   } //end TimerRun - visible
-		   
+	         Log("FaucetBtc - we return to site time");
+             return Time_Function();
+		   } //end TimerRun - visible   
 		   
            if (!IsVisible(TimerRun)) //if "TimerRun" NOT visible
 		   {		
-		   
-
-
              Wait(2);
 			 
 		     var ButtonFaucet = ElementByXPath("//div[2]/div[2]/div/button[contains(@class,'MuiButton-outlined MuiButton-outlinedSecondary')]");
@@ -528,12 +485,13 @@ public class TrustDice : FaucetScript
         //=========//
         //OpenFaucetTab_Faunction
 		//=========//
-        public void OpenFaucetTab_Faunction()
+        public int OpenFaucetTab_Faunction()
         {	
 	       Log("click on FaucetTab");
            var FaucetTab = ElementByXPath("//li[@class='header__menu-item' and contains(text(),'Faucet') ] | //li[@class='faucet-link' and contains(text(),'Faucet') ] ");
            Click(FaucetTab);
 		   
+         return 0;
 		}//end OpenFaucetTab_Faunction
 		//=========//
 	
@@ -542,7 +500,7 @@ public class TrustDice : FaucetScript
     //===========//
     //RainAirDropChat_Function//
     //===========//
-    public void RainAirDropChat_Function()
+    public int RainAirDropChat_Function()
     {	
 
 		   Log("Rain_AirDrop_Chat: Go to bonus Chat");	
@@ -574,8 +532,9 @@ public class TrustDice : FaucetScript
            Driver.Navigate().Refresh(); //RefrashPage	
 
            Wait();
-           Wait(2);				   
+           Wait(2);	
 		   
+    return 0;
     }
     //=========//
 
@@ -601,11 +560,49 @@ public class TrustDice : FaucetScript
       }
      }//end IframeCap
 	 
-  return 0;
-  
+  return 0;  
   }// end SolveCaptcha_Function
   //=========//
 
 
+	   	  
+ //==============//
+ //Time_Function
+ //=============//
+ public int Time_Function()
+ {	
+
+       GoToUrl("https://TrustDice.win/faucet");
+	   Wait();
+	   Wait(5);	
+
+	   var TimerRun = ElementByXPath("//h4[contains(text(),'wait')]"); 
+       if (IsVisible(TimerRun)) //if "TimerRun" visible
+	   {	
+	     Log("Time_Function - we return to site time");
+
+         var HourVAR = ElementByXPath("//div[2 and contains(@class,'main-bg')]/div[1]/div/div/div[1]/div/div/p[1]");
+         var MinVAR = ElementByXPath("//div[2 and contains(@class,'main-bg')]/div[1]/div/div/div[1]/div/div/p[2]");
+         var SecVAR = ElementByXPath("//div[2 and contains(@class,'main-bg')]/div[1]/div/div/div[1]/div/div/p[3]"); 
+	
+         int hour,min,sec;
+         hour = Convert.ToInt32(HourVAR.Text)*3600;
+         min = Convert.ToInt32(MinVAR.Text)*60;
+         sec = Convert.ToInt32(SecVAR.Text);
+         return hour+min+sec;
+	
+	   } //end TimerRun - visible
+	  
+       if (!IsVisible(TimerRun)) //if "TimerRun" NOT visible
+	   {	
+	     Log("Time_Function - we return to Your FC time");
+	     return GetWaitSetting();
+	   }
+  
+  return 0;
+  }// end Time_Function
+  //=========//
+ 
+ 
 	
 } //end public class
