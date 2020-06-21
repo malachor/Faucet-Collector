@@ -2,7 +2,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 01/02/2020 10:30AM - Version 1
-//Last Update: 21/06/2020 00:50AM - Version 1
+//Last Update: 21/06/2020 18:21PM - Version 1
 //==================//
 
 using System;
@@ -40,8 +40,8 @@ public class SimpleBits : FaucetScript
                 new FaucetSetting(){Name="Password",Display="Password",Type=EditorType.Password,Required=true},
 				
                 new FaucetSetting(){Name="ShortLinks",Display="ShortLinks",Type=EditorType.CheckBox,Default=true},		
-                new FaucetSetting(){Name="CaptchaLogin",Display="CaptchaLogin - ON - Recaptcha | OFF - SolveMedia ",Type=EditorType.CheckBox,Default=false},		             
-			
+                new FaucetSetting(){Name="CaptchaLogin",Display="CaptchaLogin - Use Recaptcha (Unchecked will use SolveMedia) ",Type=EditorType.CheckBox,Default=false},		             
+		
                 //insert user settings here
                 //new FaucetSetting { 
                 //    Name = "Name of your setting", 
