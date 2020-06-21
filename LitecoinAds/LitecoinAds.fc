@@ -224,19 +224,19 @@ namespace NewScripts.PTCShare
                        
                         int solution= PosibleSolutionsPixels.IndexOf(PosibleSolutionsPixels.Min());    
                         
-                        var solution_xpath = ElementByXPath("//img[@id='visualCaptcha-img-" + solution.ToString() + "']");
-                        if ( IsVisible(solution_xpath) )
+                        var CaptchaSolution = ElementByXPath("//img[@id='visualCaptcha-img-" + solution.ToString() + "']");
+                        if ( IsVisible(CaptchaSolution) )
                         {
-                            Click(solution_xpath);
+                            Click(CaptchaSolution);
                             Wait( );
                             return true;
                         }
                     }
                 }
             }
-            catch ( Exception )
+            catch ( Exception ex )
             {
-
+                Log("Problem solving VisualCaptcha" + ex.Message);
             }
 
             return false;
@@ -244,22 +244,25 @@ namespace NewScripts.PTCShare
 
 
 
-        private int GetDifferentPixels(Bitmap image1 , Bitmap image2)
+        private int GetDifferentPixels(Bitmap source , Bitmap target)
         {
             int cont = 0;
-            for ( int i = 0 ; i<image1.Height ; i++ )
+            using ( target )
             {
-                for ( int j = 0 ; j<image1.Width ; j++ )
+              
+                for ( int i = 0 ; i<source.Height ; i++ )
                 {
-                    if ( image1.GetPixel(j , i)!=image2.GetPixel(j , i) )
+                    for ( int j = 0 ; j<source.Width ; j++ )
                     {
+                        if ( source.GetPixel(j , i)!=target.GetPixel(j , i) )
+                        {
 
-                        cont++;
+                            cont++;
 
+                        }
                     }
                 }
             }
-
             return cont;
 
 
