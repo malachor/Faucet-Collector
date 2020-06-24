@@ -1,12 +1,12 @@
 ﻿using FaucetCollector.Script;
-using ImageProcessing.UsingColors;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-//css_inc RecaptchaUtilities
-//css_ref ImageProcessing.dll
+using System.Linq;
+//css_ref FaucetCollector.Utilities
+//css_ref FaucetCollector.Captcha
 public class CointiplyPtc : FaucetScript
 {
     public override FaucetSettings Settings
@@ -95,7 +95,7 @@ public class CointiplyPtc : FaucetScript
         }
         if (!GetBoolSetting("UseSolvemedia"))
         {
-            RecaptchaUtility recaptchaUtility = new RecaptchaUtility(this);
+            FaucetCollector.Captcha.RecaptchaUtility recaptchaUtility = new FaucetCollector.Captcha.RecaptchaUtility(this);
             recaptchaUtility.DoSolve();
         }
         else
@@ -313,36 +313,29 @@ public class CointiplyPtc : FaucetScript
                 img.Close();
                 CorrectImages();
                 var ImgC = ElementsByXPath("//img[contains(@src,'/ptc/captcha')]");
-                bool Visible = false;
                 DateTime TimeOut = DateTime.Now.AddSeconds(10);
-                while (!Visible && DateTime.Now<TimeOut)
+                while (!ImgC.All(x=>IsVisible(x)) && DateTime.Now<TimeOut)
                 {
-                    Visible = true;
-                    for(int i = 0; i < ImgC.Count; i++)
-                    {
-                        if (!IsVisible(ImgC[i]))
-                        {
-                            Visible = false;
-                            break;
-                        }
-                    }
+                    
+                 
                     ImgC = ElementsByXPath("//img[contains(@src,'/ptc/captcha')]");
                 }
-                Wait(3,5);
+                Log("All images visibles");
+                Wait();
                 if (ImgC.Count > 0)
                 {
-                    var Correct = new ImageProcessing.UsingColors.CorrectImageSelector(new ImageProcessing.UsingColors.MyImage(KnowImage, 2));
+                    var Correct = new FaucetCollector.Utilities.ImageProcessing.UsingColors.CorrectImageSelector(new FaucetCollector.Utilities.ImageProcessing.UsingColors.MyImage(KnowImage, 2));
                     List<Bitmap> CaptchaOption = new List<Bitmap>();
                     for (int i = 0; i < ImgC.Count; i++)
                     {
                         CaptchaOption.Add(TakeScreenshot(Base.Captcha.CaptchaService.Manual, ImgC[i]));
 
-                        Correct.AddNewSecundaryImg(new MyImage(CaptchaOption[i]), false);
+                        Correct.AddNewSecundaryImg(new FaucetCollector.Utilities.ImageProcessing.UsingColors.MyImage(CaptchaOption[i]), false);
                     }
                     Correct.CalculatePosition();
 
                     int Solution = Correct.GetPosition()[0];
-
+                    Log("Clicking on image N| "+Solution.ToString( ));
                     Click(ImgC[Solution]);
                     Wait(1);
                 }
