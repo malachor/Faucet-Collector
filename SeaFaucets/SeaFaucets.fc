@@ -1,0 +1,172 @@
+﻿using FaucetCollector.Captcha;
+using FaucetCollector.Script;
+using System.Collections.Generic;
+using System.Linq;
+//css_ref FaucetCollector.Utilities
+//css_ref FaucetCollector.Captcha
+   public class SeaFaucets : FaucetScript
+    {
+        public override FaucetSettings Settings
+        {
+            get
+            {
+
+                return new FaucetSettings("about:blank")
+                {
+                    new FaucetSetting(){Display="Username",Type=EditorType.TextBox,Required=true,Name="User"},
+                    new FaucetSetting(){Name="Pass",Type=EditorType.Password,Required=true,Display="Password"},
+                    new FaucetSetting(){Name="Faucet",Type=EditorType.ComboBox,Default=Faucets.Keys.FirstOrDefault(),Items=Faucets.Keys.ToList()}
+
+                };
+
+            }
+        }
+
+
+        private string BaseUrl;
+        public string LoginUrl
+        {
+            get
+            {
+
+                return BaseUrl+"login";
+
+
+            }
+        }
+
+        public string FaucetUrl
+        {
+            get
+            {
+                return BaseUrl+"faucet";
+            }
+
+        }
+        private Dictionary<string,string> Faucets=new Dictionary<string, string>()
+        {
+            {"LTC","https://sea-ltc.com/" },
+            {"DASH","https://sea-dash.com/" }
+        };
+        public override void Start( )
+        {
+            Title="SEA";
+            SuccessXPath="//div[@class='alert alert-success']|//span[@class='success']";
+            FailXPath="//span[contains(@style,'color:red')]|//span[@class='error']";
+
+            base.Start( );
+        }
+        public override int DoInit( )
+        {
+            string faucetSelected=GetSetting("Faucet");
+
+            BaseUrl=Faucets.ContainsKey(faucetSelected) ? Faucets[faucetSelected] : Faucets.Values.FirstOrDefault( );
+
+            Url=BaseUrl;
+
+            GoToUrl(BaseUrl);
+
+            return base.DoInit( );
+        }
+
+        public override int DoLogin( )
+        {
+            GoToUrl(LoginUrl);
+            Wait(1);
+
+            var UserBox=ElementByXPath("//input[@name='Funame']");
+            if ( !IsVisible(UserBox) )
+            {
+                return Fail("UserBox not visible");
+            }
+            SetText(UserBox , GetSetting("User"));
+
+            var PasswordBox=ElementByXPath("//input[@name='Fpass']");
+            if ( !IsVisible(PasswordBox) )
+            {
+                return Fail("Password box not visible");
+            }
+            SetText(PasswordBox , GetPassword("Pass"));
+
+            var LoginBtn=ElementByXPath("//input[@class='btn btn-default']");
+            if ( !IsVisible(LoginBtn) )
+            {
+                return Fail("Login btn not visible");
+            }
+            Click(LoginBtn);
+
+            Wait( );
+
+            var Error=ElementByXPath("//span[@class='error']");
+            if ( IsVisible(Error) )
+            {
+                Log(Error.Text);
+            }
+            return base.DoLogin( );
+        }
+
+        public override bool IsLoggedIn( )
+        {
+            return ElementByXPath("//a[contains(@href,'logout')]")!=null;
+        }
+
+        public override int DoSolveFaucet( )
+        {
+            GoToUrl(FaucetUrl);
+            Wait(2);
+
+            var ClaimBtn=ElementByXPath("//button[@id='fbtn']");
+            if ( !IsVisible(ClaimBtn) )
+            {
+                return Fail("Claim btn not visible");
+            }
+
+            var result=DoSolveCaptcha();
+            if ( result>0 )
+            {
+                return result;
+            }
+
+            Click(ClaimBtn);
+
+            return base.DoSolveFaucet( );
+        }
+
+        public override int DoSolveCaptcha( )
+        {
+
+            var result= base.DoSolveCaptcha( );
+            if ( result>0 )
+            {
+                return result;
+            }
+            RecaptchaUtility utility =new RecaptchaUtility(this);
+            utility.DoSolve( );
+
+            return result;
+
+        }
+
+        public override int GetFaucetWaitTime( )
+        {
+            var TimeElement=ElementByXPath("//h1[@id='demo']");
+            if ( IsVisible(TimeElement) )
+            {
+                string TimeElementText=TimeElement.Text;
+
+                var SplittedTimer=TimeElementText.Replace("m","").Replace("s","").Trim().Split(' ');
+
+                int min,seg;
+
+                if ( int.TryParse(SplittedTimer[0] , out min)&&int.TryParse(SplittedTimer[1] , out seg) )
+                {
+
+                    return min*60+seg;
+                }
+
+            }
+            return base.GetFaucetWaitTime( );
+        }
+
+    }
+
