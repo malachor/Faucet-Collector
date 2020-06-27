@@ -215,6 +215,10 @@ public class CointiplyPtc : FaucetScript
                     CheckForPopupsEnabled = false;
                     Click(Ads[n],false);
                     Wait();
+                    Driver.SwitchTo( ).Window(Driver.WindowHandles[0]);
+                    Wait(2);
+                    Driver.SwitchTo( ).Window(Driver.WindowHandles.Last( ));
+                    Wait( );
                     if (WaitUntil(TimeWait))
                     {
                         ValidateClick();
@@ -226,7 +230,7 @@ public class CointiplyPtc : FaucetScript
             }
             catch(Exception ex)
             {
-                
+                Log(ex.Message);
             }
             finally
             {
