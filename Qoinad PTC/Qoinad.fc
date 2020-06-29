@@ -54,11 +54,30 @@ public class Qocoinad : FaucetScript
         }
         return false;
     }
-	
-	
-	
 
- public override int DoLogin()
+    public override int BeforeCreateDriver( )
+    {
+        var Path=Directory.GetCurrentDirectory()+"\\data\\"+Name;
+        if ( Directory.Exists(Path) )
+        {
+            try
+            {
+                Directory.Delete(Path , true);
+            }
+            catch ( Exception ex )
+            {
+                Log("Fail to delete the data  "+ex.Message);
+            }
+        }
+        return base.BeforeCreateDriver( );
+    }
+
+    public override int DoInit( )
+    {
+        Driver.Manage( ).Cookies.DeleteAllCookies( );
+        return base.DoInit( );
+    }
+    public override int DoLogin()
  {
         GoToUrl ( LoginUrl );
         Wait ( 2 );
@@ -205,80 +224,76 @@ public class Qocoinad : FaucetScript
 	 
         //This faucet has nothing to do here. We will let Faucet Collector handle it.
  }
-	
-	
-	
-	
-	
-	
+
+
     private bool Solve_VisualCaptcha(string name)
     {
-        Wait();
+        Wait( );
         var dir = AssetDir("Other");
-        dir += "\\Images_qoinad\\" + name + ".png";
+        dir+="\\Images_qoinad\\"+name+".png";
         try
         {
 
             Stream d = new FileStream(dir, FileMode.Open);
             Bitmap img_c = new Bitmap(Image.FromStream(d));
-            d.Close();
+            d.Close( );
 
             int[] pixels = new int[5];
-            for (int i = 0; i < 4; i++)
+            for ( int i = 0 ; i<4 ; i++ )
             {
 
                 var element = ElementByXPath("//img[@id='visualCaptcha-img-" + i.ToString() + "']");
 
                 Bitmap img_to_c = TakeScreenshot(Base.Captcha.CaptchaService.Manual, element);
-             
 
 
-                pixels[i] = CompareImage(img_c, img_to_c);
+
+                pixels[i]=CompareImage(img_c , img_to_c);
             }
-            Wait();
+            Wait( );
             int solution = -1;
             int pixel_m = 0;
 
-            for (int i = 0; i < 4; i++)
+            for ( int i = 0 ; i<4 ; i++ )
             {
-                if (i == 0)
+                if ( i==0 )
                 {
-                    pixel_m = pixels[i];
-                    solution = i;
+                    pixel_m=pixels[i];
+                    solution=i;
                 }
-                if (pixels[i] < pixel_m)
+                if ( pixels[i]<pixel_m )
                 {
-                    pixel_m = pixels[i];
-                    solution = i;
+                    pixel_m=pixels[i];
+                    solution=i;
                 }
             }
 
             var solution_xpath = ElementByXPath("//img[@id='visualCaptcha-img-" + solution.ToString() + "']");
-            if (IsVisible(solution_xpath))
+            if ( IsVisible(solution_xpath) )
             {
-                Click(solution_xpath);          
-                Wait();
+                Click(solution_xpath);
+                Wait( );
                 return true;
             }
         }
-        catch (Exception)
+        catch ( Exception )
         {
 
         }
 
         return false;
     }
-	
-	
-	
-    private int CompareImage(Bitmap image1, Bitmap image2)
+
+
+
+    private int CompareImage(Bitmap image1 , Bitmap image2)
     {
         int cont = 0;
-        for (int i = 0; i < image1.Height; i++)
+        for ( int i = 0 ; i<image1.Height ; i++ )
         {
-            for (int j = 0; j < image1.Width; j++)
+            for ( int j = 0 ; j<image1.Width ; j++ )
             {
-                if (image1.GetPixel(j, i) != image2.GetPixel(j, i))
+                if ( image1.GetPixel(j , i)!=image2.GetPixel(j , i) )
                 {
 
                     cont++;
