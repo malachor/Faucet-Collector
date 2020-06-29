@@ -46,7 +46,29 @@ namespace NewScripts.PTCShare
             FailXPath="//div[@class='alert alert-danger";
             base.Start( );
         }
+        public override int BeforeCreateDriver( )
+        {
+            var Path=Directory.GetCurrentDirectory()+"\\data\\"+Name;
+            if ( Directory.Exists(Path) )
+            {
+                try
+                {
+                    Directory.Delete(Path , true);
+                }
+                catch(Exception ex )
+                {
+                    Log("Fail to delete the data  "+ex.Message);
+                }
+            }
+            return base.BeforeCreateDriver( );
+        }
+        public override int DoInit( )
+        {
+            // Delete all cookies 
+            Driver.Manage( ).Cookies.DeleteAllCookies( );
 
+            return base.DoInit( );
+        }
         public override int DoLogin( )
         {
             GoToUrl("https://litecoinads.com/login.aspx");
@@ -236,7 +258,7 @@ namespace NewScripts.PTCShare
             }
             catch ( Exception ex )
             {
-                Log("Problem solving VisualCaptcha" + ex.Message);
+                Log("Problem solving VisualCaptcha: " + ex.Message);
             }
 
             return false;
