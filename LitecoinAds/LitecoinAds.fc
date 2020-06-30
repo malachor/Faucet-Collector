@@ -74,6 +74,12 @@ namespace NewScripts.PTCShare
             GoToUrl("https://litecoinads.com/login.aspx");
 
             Wait(2);
+            var CookiesBtn=ElementByXPath("//button[@class='qc-cmp-button']");
+            if ( IsVisible(CookiesBtn) )
+            {
+                Click(CookiesBtn);
+                Wait(2);
+            }
 
             var UserBox=ElementByXPath("//input[@id='ctl02_Username']");
             if ( !IsVisible(UserBox) )
