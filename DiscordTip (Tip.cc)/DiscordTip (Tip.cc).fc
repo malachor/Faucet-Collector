@@ -1,7 +1,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 05/12/2018 06:00AM 
-//Last Update: 23/04/2020 03:45AM - Version 58
+//Last Update: 30/06/2020 02:30AM - Version 59
 //==================//
 
 using System;
@@ -38,6 +38,8 @@ public class discordapp_ : FaucetScript
 				new FaucetSetting(){Name="Menu_Bot_Currency",Display="Discordtip Bot | Main - Menu Bot Currency - Select Favorite Currency (correctly available only 'BTC')",Type=EditorType.ComboBox,Default="btc",Items=new System.Collections.Generic.List<string>{"btc","bch","btg","dash","dgb","doge","eos","eth","ethos","ltc","omg","wax","xzc","zec"}},
 
                 new FaucetSetting(){Name="Discordtip_FaucetCollector_OnOff",Display="FaucetCollector - AirDrop - OnOff",Type=EditorType.CheckBox,Default=true},		
+
+                new FaucetSetting(){Name="Discordtip_GridCoin_OnOff",Display="GridCoin - Faucet every 24h - OnOff",Type=EditorType.CheckBox,Default=true},		
 
                 new FaucetSetting(){Name="Discordtip_LaccsFaucet_BTC_OnOff",Display="LaccsFaucet BTC - AirDrop - On/off",Type=EditorType.CheckBox,Default=true},	
 				new FaucetSetting(){Name="LaccsFaucet_BTC_Boost",Display="LaccsFaucet BTC - Boost - On/off - if ON - type !faucet boost - you can boost a Bitcoin transaction (speeding it up)",Type=EditorType.CheckBox,Default=true},	
@@ -470,7 +472,7 @@ public class discordapp_ : FaucetScript
                  return GetWaitSetting();		 
 				}
 				
-                if (!GetBoolSetting("Discordtip_FaucetCollector_OnOff") && !GetBoolSetting("Discordtip_LaccsFaucet_BTC_OnOff") )
+                if (!GetBoolSetting("Discordtip_FaucetCollector_OnOff") && !GetBoolSetting("Discordtip_LaccsFaucet_BTC_OnOff") && !GetBoolSetting("Discordtip_GridCoin_OnOff") )
                 {
 	             Notification("ThanksMessage' - appear && the all AirDrop from Discordtip are disabled");	
 		         Log(" 'ThanksMessage' - appear && the all AirDrop from Discordtip are disabled ");  
@@ -491,7 +493,7 @@ public class discordapp_ : FaucetScript
                  return GetWaitSetting();	
 				}
 				
-                if (!GetBoolSetting("Discordtip_FaucetCollector_OnOff") && !GetBoolSetting("Discordtip_LaccsFaucet_BTC_OnOff") )
+                if (!GetBoolSetting("Discordtip_FaucetCollector_OnOff") && !GetBoolSetting("Discordtip_LaccsFaucet_BTC_OnOff") && !GetBoolSetting("Discordtip_GridCoin_OnOff") )
                 {
 	             Notification(" 'AlreadyVoted' - appear && the all AirDrop from Discordtip are disabled ");	
 		         Log(" 'AlreadyVoted' - appear && the all AirDrop from Discordtip are disabled ");  
@@ -536,20 +538,7 @@ public class discordapp_ : FaucetScript
 		
 		Wait(5);	
 		
-	    var inviteServer1Button = ElementByXPath("//button[@type='button']/div"); //[text()='Accept Invite']
-	    var ContinueToDiscordServer1Button = ElementByXPath("//button[@class='marginTop40-i-78cZ button-3k0cO7 button-38aScr lookFilled-1Gx00P colorBrand-3pXr91 sizeLarge-1vSeWK fullWidth-1orjjo grow-q77ONN']/div[text()='Continue to Discord']"); 
-
-	    if (IsVisible(inviteServer1Button))
-        {
-		Log("Discordtip_FaucetCollector: join to first server - FaucetCollector "); 	
-        Click(inviteServer1Button);
-        }
-		
-	    if (IsVisible(ContinueToDiscordServer1Button))
-        {
-		Log("Discordtip_FaucetCollector: Continue To Discord Server"); 	
-        Click(ContinueToDiscordServer1Button);
-        }
+        inviteServer_Elements_Function(); //call
 		
         while (true)
         {
@@ -589,7 +578,45 @@ public class discordapp_ : FaucetScript
         Wait(3);
 
      }	 //end Discordtip_FaucetCollector_OnOff
+     //========================//
 
+
+
+        //================//
+        //Discordtip_GridCoin_OnOff//
+        //================//
+        if (GetBoolSetting("Discordtip_GridCoin_OnOff"))
+        {
+
+          GoToUrl("https://discord.gg/QMJZnEx"); // my link never expire
+		  Log("Discordtip_GridCoin");
+          Wait();
+          Wait(2);
+          inviteServer_Elements_Function(); //call
+          Wait(2);
+		  
+          var UnVerifiedStart = ElementByXPath("//div[contains(text(),'unverified')]");
+          if (IsVisible(UnVerifiedStart))
+	      {
+            GoToUrl("https://discord.com/channels/211637812968161280/448301760730234880");
+			Log("Discordtip_GridCoin - do verify in your account ");
+			Wait(2);
+			SetText_GridCoin_1_SendKeys_Way_Function();  //call to set text !agree
+			Wait(2);
+			Enter_SendKeys_General_Discord_Input_Function(); //call to do enter	
+          }
+
+          GoToUrl("https://discord.com/channels/211637812968161280/424786671360409611");
+		  Log("Discordtip_GridCoin - go to 'wallet-bot' channel ");
+		  Wait(2);
+		  SetText_GridCoin_2_SendKeys_Way_Function();  //call to set text %get
+		  Wait(2);
+		  Enter_SendKeys_General_Discord_Input_Function(); //call to do enter	
+		  
+        } //end Discordtip_GridCoin_OnOff	
+     //========================//
+		
+		
 
         //===============================//
 		//LaccsFaucet_BTC_AutoWithdraw
@@ -690,20 +717,7 @@ public class discordapp_ : FaucetScript
 		
 		Wait(5);	
 				
-	    var inviteServer1Button = ElementByXPath("//button[@type='button']/div"); //[text()='Accept Invite']
-	    var ContinueToDiscordServer1Button = ElementByXPath("//button[@class='marginTop40-i-78cZ button-3k0cO7 button-38aScr lookFilled-1Gx00P colorBrand-3pXr91 sizeLarge-1vSeWK fullWidth-1orjjo grow-q77ONN']/div[text()='Continue to Discord']"); 
-
-	    if (IsVisible(inviteServer1Button))
-        {
-		Log("Discordtip_LaccsFaucet: join to first server - LaccsProduction "); 	
-        Click(inviteServer1Button);
-        }
-		
-	    if (IsVisible(ContinueToDiscordServer1Button))
-        {
-		Log("Discordtip_LaccsFaucet: Continue To Discord Server"); 	
-        Click(ContinueToDiscordServer1Button);
-        }
+        inviteServer_Elements_Function(); //call
 		
         while (true)
         {
@@ -988,6 +1002,33 @@ public class discordapp_ : FaucetScript
 
 
 
+   //=================//
+  //inviteServer_Elements_Function
+  //=================//
+  public int inviteServer_Elements_Function()
+  {
+	    var inviteServer1Button = ElementByXPath("//button[@type='button']/div"); //[text()='Accept Invite']
+	    var ContinueToDiscordServer1Button = ElementByXPath("//button[@class='marginTop40-i-78cZ button-3k0cO7 button-38aScr lookFilled-1Gx00P colorBrand-3pXr91 sizeLarge-1vSeWK fullWidth-1orjjo grow-q77ONN']/div[text()='Continue to Discord']"); 
+
+	    if (IsVisible(inviteServer1Button))
+        {
+		Log("join to first server"); 	
+        Click(inviteServer1Button);
+		Wait(4);
+        }
+		
+	    if (IsVisible(ContinueToDiscordServer1Button))
+        {
+		Log("Continue To Discord Server"); 	
+        Click(ContinueToDiscordServer1Button);
+		Wait(4);
+        }
+		  
+   return 0;
+		
+  } //end inviteServer_Elements_Function
+   //=================//
+
 
       //=================//
       //Enter_SendKeys_General_Discord_Input_Function
@@ -1005,7 +1046,41 @@ public class discordapp_ : FaucetScript
 		 return 0;
       }
       //=================//	
-	  
+
+
+      //=================//
+      //SetText_GridCoin_1_SendKeys_Way_Function
+      //=================//	
+      public int SetText_GridCoin_1_SendKeys_Way_Function()
+      {
+         var TextCommand = ElementByXPath("//div[contains(@class,'inner')]/div[contains(@class,'textArea')]");
+	     //SetText Keyboard
+         Log("TextCommand");
+         Actions Builder4Act = new Actions(Driver);
+         Builder4Act.MoveToElement(TextCommand).Build().Perform(); 
+         Wait(3);
+         Builder4Act.SendKeys(TextCommand, "!agree").Build().Perform();
+		 
+		 return 0;
+      }
+      //=================//		  
+
+      //=================//
+      //SetText_GridCoin_2_SendKeys_Way_Function
+      //=================//	
+      public int SetText_GridCoin_2_SendKeys_Way_Function()
+      {
+         var TextCommand = ElementByXPath("//div[contains(@class,'inner')]/div[contains(@class,'textArea')]");
+	     //SetText Keyboard
+         Log("TextCommand");
+         Actions Builder4Act = new Actions(Driver);
+         Builder4Act.MoveToElement(TextCommand).Build().Perform(); 
+         Wait(3);
+         Builder4Act.SendKeys(TextCommand, "%get").Build().Perform();
+		 
+		 return 0;
+      }
+      //=================//	
 	
       //=================//
       //SetText_1_Laccs_SendKeys_Way_Function
