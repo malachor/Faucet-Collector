@@ -1,7 +1,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 05/12/2018 06:00AM 
-//Last Update: 01/07/2020 02:30AM - Version 59
+//Last Update: 01/07/2020 06:00AM - Version 59
 //==================//
 
 using System;
@@ -600,18 +600,34 @@ public class discordapp_ : FaucetScript
 	      {
             GoToUrl("https://discord.com/channels/211637812968161280/448301760730234880");
 			Log("Discordtip_GridCoin - do verify in your account ");
-			Wait(2);
+			Wait(6);
 			SetText_GridCoin_1_SendKeys_Way_Function();  //call to set text !agree
 			Wait(2);
 			Enter_SendKeys_General_Discord_Input_Function(); //call to do enter	
           }
 
           GoToUrl("https://discord.com/channels/211637812968161280/424786671360409611");
-		  Log("Discordtip_GridCoin - go to 'wallet-bot' channel ");
-		  Wait(2);
-		  SetText_GridCoin_2_SendKeys_Way_Function();  //call to set text %get
+		  Log("Discordtip_GridCoin - go to 'wallet-bot' channel ");	  
+		  Wait(6);
+		  SetText_GridCoin_3_SendKeys_Way_Function();  //call to set text %get
 		  Wait(2);
 		  Enter_SendKeys_General_Discord_Input_Function(); //call to do enter	
+		  Wait(3);
+
+          var NeedToRegister = ElementByXPath("//div[contains(text(),'You do not have an account') and last() ]");
+          if (IsVisible(NeedToRegister))
+	      {
+		    Log("Discordtip_GridCoin - need to register ");	 
+		  	Wait(6);
+		    SetText_GridCoin_2_SendKeys_Way_Function();  //call to set text %new	  
+		    Wait(2);
+		    Enter_SendKeys_General_Discord_Input_Function(); //call to do enter	
+		    Wait(6);
+		    SetText_GridCoin_3_SendKeys_Way_Function();  //call to set text %get
+		    Wait(2);
+		    Enter_SendKeys_General_Discord_Input_Function(); //call to do enter	
+		    Wait(3);
+          }
 		  
         } //end Discordtip_GridCoin_OnOff	
      //========================//
@@ -1068,11 +1084,27 @@ public class discordapp_ : FaucetScript
          Actions Builder4Act = new Actions(Driver);
          Builder4Act.MoveToElement(TextCommand).Build().Perform(); 
          Wait(3);
-         Builder4Act.SendKeys(TextCommand, "%get").Build().Perform();
-		 
+         Builder4Act.SendKeys(TextCommand, "%new").Build().Perform();	
 		 return 0;
       }
       //=================//	
+
+      //=================//
+      //SetText_GridCoin_3_SendKeys_Way_Function
+      //=================//	
+      public int SetText_GridCoin_3_SendKeys_Way_Function()
+      {
+         var TextCommand = ElementByXPath("//div[contains(@class,'inner')]/div[contains(@class,'textArea')]");
+	     //SetText Keyboard
+         Log("TextCommand");
+         Actions Builder4Act = new Actions(Driver);
+         Builder4Act.MoveToElement(TextCommand).Build().Perform(); 
+         Wait(3);
+         Builder4Act.SendKeys(TextCommand, "%get").Build().Perform();
+		 return 0;
+      }
+      //=================//	
+	
 	
       //=================//
       //SetText_1_Laccs_SendKeys_Way_Function
