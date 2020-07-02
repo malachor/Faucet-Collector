@@ -1,7 +1,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 05/11/2018 17:00PM
-//Last update - version 11 - 10/05/2020 13:35PM
+//Last update - 02/07/2020 00:55PM - version 12
 //==================//
 
 using System;
@@ -636,7 +636,7 @@ public override int GetFaucetWaitTime()
 
            if (IsVisible(ChatAlready_Close))
            {
-           var ChatButton = ElementByXPath("//i[@class='fas fa-angle-double-right']"); //ChatAlready_Close
+           var ChatButton = ElementByXPath("//div[@id='chat-switch']"); //ChatAlready_Close
            Click(ChatButton);
 		   Log("Rain_AirDrop_Chat: click on ChatAlready_Close - to open the chat");
 		   } 	
