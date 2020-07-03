@@ -19,7 +19,7 @@ public class ContractMiner : FaucetScript
                 new FaucetSetting(){Name="User",Display="Username",Type=EditorType.TextBox,Required=true},
                 new FaucetSetting(){Name="Pass",Display="Password",Type=EditorType.Password,Required=true},
                 new FaucetSetting(){Name="LoginW",Display="Login With",Type=EditorType.ComboBox,Items=new System.Collections.Generic.List<string>{"Solvemedia","Recaptcha"},Default="Recaptcha"},            
-                new FaucetSetting(){Name="ContractN",Display="Contact Nº:",Type=EditorType.Numeric,Default=1},
+                //new FaucetSetting(){Name="ContractN",Display="Contact Nº:",Type=EditorType.Numeric,Default=1},
                 new FaucetSetting(){Name="TimedlyHour",Display="ClaimTimedlyHour",Type=EditorType.CheckBox,Default=true},
                 new FaucetSetting(){Name="MinersTap",Display="MinersTap",Type=EditorType.CheckBox,Default=true},
                 new FaucetSetting(){Name="AutoMiner",Display="AutoMiner_(0 Disabled)",Type=EditorType.Numeric,Default=0},
@@ -229,173 +229,7 @@ public class ContractMiner : FaucetScript
     }
     public override int BeforeSolveFaucet()
     {
-        int Number = GetIntSetting("AutoMiner");
-        if (Number != 0)
-        {
-            GoToUrl("https://www.contract-miner.com/?city=home&earn=auto-miner");
-            Wait(2);
-            var ButtonComplete = ElementByXPath("//button[@name='am_captcha_solution']");
-            if (IsVisible(ButtonComplete))
-            {
-                var result = DoSolveCaptcha();
-                if (result > 0)
-                {
-                    Log("Fail in AutoMiner , captcha solution incorrect");
-                }
-                Wait(1);
-                Click(ButtonComplete);
-            }
-
-            var ButtonClaim = ElementsByXPath("//button[@name='start_auto_miner']");
-            if (ButtonClaim.Count > 0)
-            {
-                int CountClaim = ButtonClaim.Count >= Number ? Number - 1 : ButtonClaim.Count - 1;
-                if (CountClaim >= 0)
-                {
-                    Click(ButtonClaim[CountClaim]);
-                    Wait();
-                }
-            }
-        }
-        //button[@name='start_auto_miner']
-        if (GetBoolSetting("MinersTap"))
-        {
-            Log("Into minerstap");
-            bool Claim = true;
-            try
-            {
-                DateTime D=Convert.ToDateTime(GetSetting("Actived15"));
-                if (D.AddMinutes(15) > DateTime.Now)
-                {
-                    Claim = false;
-                }
-            }
-            catch (Exception)
-            {
-                SetSetting("Actived15", DateTime.Now);
-            }
-            if (Claim)
-            {
-                GoToUrl("https://www.contract-miner.com/?city=home&app=miners-tap");
-                Wait();
-                var ShortlinkButton = ElementByXPath("//button[@id='generate_mt_end_shortener_cm']");
-                if (IsVisible(ShortlinkButton))
-                {
-                    Click(ShortlinkButton);
-                    Wait();
-                    var ButtonGoto = ElementByXPath("//a[contains(text(),'Stay in same tab')]");
-                    if (IsVisible(ButtonGoto))
-                    {
-                        Click(ButtonGoto);
-                        DoTheInternalShort();
-                    }
-                    var ToastSucceded = ElementByXPath("//div[@class='toast toast-success']");
-                    if (IsVisible(ToastSucceded))
-                    {
-                        Log(ToastSucceded.Text);
-                    }
-                }
-                var ButtonClaim = ElementByXPath("//button[@name='mt_claim']");
-                if (IsVisible(ButtonClaim))
-                {
-                    Click(ButtonClaim);
-                    Wait();
-
-                    SetSetting("Actived15", DateTime.Now); 
-                    Log("Sucessfully activated");
-                }
-
-            }
-                Wait();
-              
-            }
-        
-
-        if (GetBoolSetting("TimedlyHour"))
-        {
-          
-            bool Claim = true;
-            try
-            {
-               
-
-                    DateTime time = Convert.ToDateTime(GetSetting("ActivedHour"));
-                    if (DateTime.Now < time.AddHours(1))
-                    {
-                        Claim = false;
-                    }
-
-
-                
-            }
-            catch (Exception)
-            {
-                SetSetting("ActivedHour", DateTime.Now);
-            }
-            if (Claim)
-            {
-                GoToUrl("https://www.contract-miner.com/?city=home&app=hourly-pot");
-                Wait();
-                var ShortlinkButton = ElementByXPath("//button[@id='generate_mt_end_shortener_cm']");
-                if (IsVisible(ShortlinkButton))
-                {
-                    Click(ShortlinkButton);
-                    Wait();
-                    var ButtonGoto = ElementByXPath("//a[contains(text(),'Stay in same tab')]");
-                    if (IsVisible(ButtonGoto))
-                    {
-                        Click(ButtonGoto);
-                        DoTheInternalShort();
-                    }
-                    var ToastSucceded = ElementByXPath("//div[@class='toast toast-success']");
-                    if (IsVisible(ToastSucceded))
-                    {
-                        Log(ToastSucceded.Text);
-                    }
-                }
-                Wait();
-                var BeginClaim = ElementByXPath("//button[@name='hp_claim']");
-                if (IsVisible(BeginClaim))
-                {
-                    Click(BeginClaim);
-                    Wait();
-                    var ActivedMhs = ElementByXPath("//span[@class='counter-number-related text-capitalize']");
-                    if (IsVisible(ActivedMhs))
-                    {
-                        SetSetting("ActivedHour", DateTime.Now);
-                        Log("Sucessfull actived" + ActivedMhs.Text.ToString() + "For one hour");
-                    }
-
-
-                }
-            }
-            else
-            {
-                Log("Claim of hourly pot not available");
-            }
-            
-        }
-
-        if (!Driver.Url.Contains("https://www.contract-miner.com/?city=home&earn=paid-contracts"))
-        {
-            GoToUrl("https://www.contract-miner.com/?city=home&earn=paid-contracts");
-        }
-        if (IsVisible(ElementByXPath("//button[@id='generate_end_auth']")))
-        {
-            TryUseShortlink();
-          
-
-            }
-            var AlertFinished = ElementByXPath("//div[@class='alert alert-success']");
-            if (IsVisible(AlertFinished))
-            {
-                Log(AlertFinished.Text);
-            }
-        
-   
-        //img[@id='adcopy-puzzle-image-image-captchaShortlink']
-
-        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+       
         return base.BeforeSolveFaucet();
     }
 
@@ -454,24 +288,153 @@ public class ContractMiner : FaucetScript
     /// <returns></returns>
     public override int DoSolveFaucet()
     {
-        
-        int NContract = GetIntSetting("ContractN", 1);
-        var CreateContractButton = ElementsByXPath("//button[@name='create_paid_contract_submit']");
-        if (CreateContractButton.Count > 0)
+        int Number = GetIntSetting("AutoMiner");
+        if ( Number!=0 )
         {
-            if (NContract > CreateContractButton.Count)
+            GoToUrl("https://www.contract-miner.com/?city=home&earn=auto-miner");
+            Wait(2);
+            var ButtonComplete = ElementByXPath("//button[@name='am_captcha_solution']");
+            if ( IsVisible(ButtonComplete) )
             {
-                Click(CreateContractButton[CreateContractButton.Count - 1]);
+                var result = DoSolveCaptcha();
+                if ( result>0 )
+                {
+                    Log("Fail in AutoMiner , captcha solution incorrect");
+                }
+                Wait(1);
+                Click(ButtonComplete);
+            }
+
+            var ButtonClaim = ElementsByXPath("//button[@name='start_auto_miner']");
+            if ( ButtonClaim.Count>0 )
+            {
+                int CountClaim = ButtonClaim.Count >= Number ? Number - 1 : ButtonClaim.Count - 1;
+                if ( CountClaim>=0 )
+                {
+                    Click(ButtonClaim[CountClaim]);
+                    Wait( );
+                }
+            }
+        }
+        //button[@name='start_auto_miner']
+        if ( GetBoolSetting("MinersTap") )
+        {
+            Log("Into minerstap");
+            bool Claim = true;
+            try
+            {
+                DateTime D=Convert.ToDateTime(GetSetting("Actived15"));
+                if ( D.AddMinutes(15)>DateTime.Now )
+                {
+                    Claim=false;
+                }
+            }
+            catch ( Exception )
+            {
+                SetSetting("Actived15" , DateTime.Now);
+            }
+            if ( Claim )
+            {
+                GoToUrl("https://www.contract-miner.com/?city=home&app=miners-tap");
+                Wait( );
+                var ShortlinkButton = ElementByXPath("//button[@id='generate_mt_end_shortener_cm']");
+                if ( IsVisible(ShortlinkButton) )
+                {
+                    Click(ShortlinkButton);
+                    Wait( );
+                    var ButtonGoto = ElementByXPath("//a[contains(text(),'Stay in same tab')]");
+                    if ( IsVisible(ButtonGoto) )
+                    {
+                        Click(ButtonGoto);
+                        DoTheInternalShort( );
+                    }
+                    var ToastSucceded = ElementByXPath("//div[@class='toast toast-success']");
+                    if ( IsVisible(ToastSucceded) )
+                    {
+                        Log(ToastSucceded.Text);
+                    }
+                }
+                var ButtonClaim = ElementByXPath("//button[@name='mt_claim']");
+                if ( IsVisible(ButtonClaim) )
+                {
+                    Click(ButtonClaim);
+                    Wait( );
+
+                    SetSetting("Actived15" , DateTime.Now);
+                    Log("Sucessfully activated");
+                }
+
+            }
+            Wait( );
+
+        }
+
+
+        if ( GetBoolSetting("TimedlyHour") )
+        {
+
+            bool Claim = true;
+            try
+            {
+
+
+                DateTime time = Convert.ToDateTime(GetSetting("ActivedHour"));
+                if ( DateTime.Now<time.AddHours(1) )
+                {
+                    Claim=false;
+                }
+
+
+
+            }
+            catch ( Exception )
+            {
+                SetSetting("ActivedHour" , DateTime.Now);
+            }
+            if ( Claim )
+            {
+                GoToUrl("https://www.contract-miner.com/?city=home&app=hourly-pot");
+                Wait( );
+                var ShortlinkButton = ElementByXPath("//button[@id='generate_mt_end_shortener_cm']");
+                if ( IsVisible(ShortlinkButton) )
+                {
+                    Click(ShortlinkButton);
+                    Wait( );
+                    var ButtonGoto = ElementByXPath("//a[contains(text(),'Stay in same tab')]");
+                    if ( IsVisible(ButtonGoto) )
+                    {
+                        Click(ButtonGoto);
+                        DoTheInternalShort( );
+                    }
+                    var ToastSucceded = ElementByXPath("//div[@class='toast toast-success']");
+                    if ( IsVisible(ToastSucceded) )
+                    {
+                        Log(ToastSucceded.Text);
+                    }
+                }
+                Wait( );
+                var BeginClaim = ElementByXPath("//button[@name='hp_claim']");
+                if ( IsVisible(BeginClaim) )
+                {
+                    Click(BeginClaim);
+                    Wait( );
+                    var ActivedMhs = ElementByXPath("//span[@class='counter-number-related text-capitalize']");
+                    if ( IsVisible(ActivedMhs) )
+                    {
+                        SetSetting("ActivedHour" , DateTime.Now);
+                        Log("Sucessfull actived"+ActivedMhs.Text.ToString( )+"For one hour");
+                    }
+
+
+                }
             }
             else
             {
-                Click(CreateContractButton[NContract - 1]);
+                Log("Claim of hourly pot not available");
             }
+
         }
-        else
-        {
-            return Fail("Create Contract Button not found");
-        }
+
         //This faucet has nothing to do here. We will let Faucet Collector handle it.
         return base.DoSolveFaucet();
     }
