@@ -13,7 +13,7 @@ public class BitfunScript : FaucetScript
     {
         get
         {
-            return new FaucetSettings("httpss://bitfun.co/games/")
+            return new FaucetSettings("https://bitfun.co/games/")
             {
                 //We have a setting to get the email address used for bitfun
                 new FaucetSetting() { Name = "Email", Display = "Email", Type = EditorType.TextBox, Required = true },

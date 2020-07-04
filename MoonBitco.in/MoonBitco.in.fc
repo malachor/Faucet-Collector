@@ -115,12 +115,6 @@ public class MoonBitcoinScript : FaucetScript
     {
         DoBlock( );
         CheckForPopup( );
-        var Continue=ElementByXPath("//a[contains(text(),'Proceed Anyway')]");
-        if ( IsVisible(Continue) )
-        {
-            Click(Continue);
-            Wait(2);
-        }
         //Find the signin button to open the login popup
         var signInButton = ElementByXPath("//button[@data-target='#SignInModal']");
         if ( signInButton==null )
