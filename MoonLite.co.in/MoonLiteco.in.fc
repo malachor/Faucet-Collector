@@ -14,7 +14,7 @@ public class MoonLiteCoinScript : FaucetScript
     {
         get
         {
-            return new FaucetSettings("http://moonliteco.in/")
+            return new FaucetSettings("https://moonliteco.in/")
             {
                 //We have a setting to get the email address used for the coinpot account
                 new FaucetSetting() { Name = "Email", Display = "Coinpot email addres", Type = EditorType.TextBox, Required = true },
@@ -45,7 +45,7 @@ public class MoonLiteCoinScript : FaucetScript
             Wait(1);
         }
     }
-
+ 
     public override int DoInit( )
     {
         Adblock=new FaucetCollector.Utilities.Adblock(this);
@@ -112,6 +112,7 @@ public class MoonLiteCoinScript : FaucetScript
     {
         DoBlock( );
         CheckForPopup( );
+      
         //Find the signin button to open the login popup
         var signInButton = ElementByXPath("//button[@data-target='#SignInModal']");
         if ( signInButton==null )

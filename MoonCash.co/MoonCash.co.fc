@@ -13,7 +13,7 @@ public class MoonCashScript : FaucetScript
     {
         get
         {
-            return new FaucetSettings("http://moonbitcoin.cash/faucet/")
+            return new FaucetSettings("https://moonbitcoin.cash/faucet/")
             {
                 //We have a setting to get the email address used for the coinpot account
                 new FaucetSetting() { Name = "Email", Display = "Coinpot email addres", Type = EditorType.TextBox, Required = true },
@@ -106,6 +106,7 @@ public class MoonCashScript : FaucetScript
     {
         DoBlock( );
         CheckForPopup();
+      
         //Find the signin button to open the login popup
         var signInButton = ElementByXPath("//button[@data-target='#SignInModal']");
         if (signInButton == null)
@@ -292,6 +293,7 @@ public class MoonCashScript : FaucetScript
 
 
     }
+   
 
     /// <summary>
     /// This method gets called after BeforeSolveCaptcha and it does the actual captcha solving
