@@ -14,7 +14,7 @@ public class MoonDashScript : FaucetScript
     {
         get
         {
-            return new FaucetSettings("http://moondash.co.in/faucet/")
+            return new FaucetSettings("https://moondash.co.in/faucet/")
             {
                 //We have a setting to get the email address used for the coinpot account
                 new FaucetSetting() { Name = "Email", Display = "Coinpot email addres", Type = EditorType.TextBox, Required = true },
@@ -58,7 +58,7 @@ public class MoonDashScript : FaucetScript
         //Let Faucet Collector start up everything
         base.Start();
     }
-
+ 
     private void DoBlock( )
     {
         if(GetBoolSetting("Adblock") )
@@ -164,7 +164,7 @@ public class MoonDashScript : FaucetScript
 
         return DoSolveCaptcha ( );
     }
-
+  
     /// <summary>
     /// This method gets called if IsLoggedIn returned false, right before the DoLogin method is called.
     /// </summary>
@@ -172,6 +172,7 @@ public class MoonDashScript : FaucetScript
     {
         DoBlock( );
         CheckForPopup();
+        
         //Find the signin button to open the login popup
         var signInButton = ElementByXPath("//button[@data-target='#SignInModal']");
         if (signInButton == null)

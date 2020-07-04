@@ -14,7 +14,7 @@ public class MoonBitcoinScript : FaucetScript
     {
         get
         {
-            return new FaucetSettings("http://moonbit.co.in/")
+            return new FaucetSettings("https://moonbit.co.in/")
             {
                 //We have a setting to get the email address used for the coinpot account
                 new FaucetSetting() { Name = "Email", Display = "Coinpot email addres", Type = EditorType.TextBox, Required = true },
@@ -338,7 +338,7 @@ public class MoonBitcoinScript : FaucetScript
         //Let Faucet Collector continue
         return base.BeforeSolveFaucet( );
     }
-
+   
     /// <summary>
     /// This method gets called after BeforeSolveCaptcha and it does the actual captcha solving
     /// It will automatically try to see if there is a SolveMedia captcha active or a reCAPTCHA active. 

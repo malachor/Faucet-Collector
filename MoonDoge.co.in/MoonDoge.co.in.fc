@@ -15,7 +15,7 @@ public class MoonDogeScript_ : FaucetScript
     {
         get
         {
-            return new FaucetSettings("http://moondoge.co.in/")
+            return new FaucetSettings("https://moondoge.co.in/")
             {
                 //We have a setting to get the email address used for the coinpot account
                 new FaucetSetting() { Name = "Email", Display = "Coinpot email addres", Type = EditorType.TextBox, Required = true },
@@ -99,14 +99,18 @@ public class MoonDogeScript_ : FaucetScript
 
         return isLoggedIn;
     }
-
+    
     /// <summary>
     /// This method gets called if IsLoggedIn returned false, right before the DoLogin method is called.
     /// </summary>
     public override int BeforeLogin( )
     {
+
+
         DoBlock( );
         CheckForPopup( );
+
+      
         //Find the signin button to open the login popup
         var signInButton = ElementByXPath("//button[@data-target='#SignInModal']");
         if ( signInButton==null )
