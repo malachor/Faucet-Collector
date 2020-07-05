@@ -14,7 +14,7 @@ public class MoonLiteCoinScript : FaucetScript
     {
         get
         {
-            return new FaucetSettings("https://moonliteco.in/")
+            return new FaucetSettings("http://moonliteco.in/")
             {
                 //We have a setting to get the email address used for the coinpot account
                 new FaucetSetting() { Name = "Email", Display = "Coinpot email addres", Type = EditorType.TextBox, Required = true },

@@ -14,7 +14,7 @@ public class MoonDashScript : FaucetScript
     {
         get
         {
-            return new FaucetSettings("https://moondash.co.in/faucet/")
+            return new FaucetSettings("http://moondash.co.in/faucet/")
             {
                 //We have a setting to get the email address used for the coinpot account
                 new FaucetSetting() { Name = "Email", Display = "Coinpot email addres", Type = EditorType.TextBox, Required = true },

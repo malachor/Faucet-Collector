@@ -14,7 +14,7 @@ public class BonusBitcoinScript : FaucetScript
     {
         get
         {
-            return new FaucetSettings("https://bonusbitcoin.co/faucet/")
+            return new FaucetSettings("http://bonusbitcoin.co/faucet/")
             {
                 //We have a setting to get the email address used for bonusbitcoin
                 new FaucetSetting() { Name = "Email", Display = "Email", Type = EditorType.TextBox, Required = true },

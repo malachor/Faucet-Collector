@@ -13,7 +13,7 @@ public class MoonCashScript : FaucetScript
     {
         get
         {
-            return new FaucetSettings("https://moonbitcoin.cash/faucet/")
+            return new FaucetSettings("http://moonbitcoin.cash/faucet/")
             {
                 //We have a setting to get the email address used for the coinpot account
                 new FaucetSetting() { Name = "Email", Display = "Coinpot email addres", Type = EditorType.TextBox, Required = true },
