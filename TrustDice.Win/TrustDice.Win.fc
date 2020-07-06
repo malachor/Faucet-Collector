@@ -1,7 +1,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 13/11/2019 09:00AM - Version 1
-//Last Update: 20/06/2020 21:45PM - Version 5
+//Last Update: 06/07/2020 01:30AM - Version 6
 //==================//
 
 using System;
@@ -36,10 +36,12 @@ public class TrustDice : FaucetScript
                 new FaucetSetting(){Name="Password",Display="Password",Type=EditorType.Password,Required=false},
 
                 new FaucetSetting() { Name = "FaucetBtc", Display = "FaucetBtc - claim BTC ", Type = EditorType.CheckBox, Default =true},
-				
+
+ 				new FaucetSetting() { Name = "DailyActiveClaim", Display = "DailyActiveClaim - ON/OFF", Type = EditorType.CheckBox, Default =true},	               
+
  				new FaucetSetting() { Name = "TXT", Display = "TXT - ON/OFF", Type = EditorType.CheckBox, Default =true},	               
 				new FaucetSetting() { Name = "TXT_Claim", Display = "TXT_Claim - Mining Page - Claim TXT", Type = EditorType.CheckBox, Default =true},	
-				new FaucetSetting() { Name = "TXT_Stake", Display = "TXT_Stake - Rewards Page - Stake TXT", Type = EditorType.CheckBox, Default =true},
+				new FaucetSetting() { Name = "TXT_Stake", Display = "TXT_Stake - Rewards Page - Stake TXT", Type = EditorType.CheckBox, Default =true},				
                 //new FaucetSetting() { Name = "TXT_Reward", Display = "TXT_Reward - Rewards Page - Claim Reward TXT", Type = EditorType.CheckBox, Default =true},
 				
 
@@ -296,6 +298,39 @@ public class TrustDice : FaucetScript
         //=====//	
 
 		//======//
+		//DailyActiveClaim//
+		//======//
+        GoToUrl("https://TrustDice.win/");
+		Wait();
+		Wait(6);
+		
+        var DailyActiveClaim_Check = ElementByXPath("//span[contains(@class,'jss104')]//span[contains(@class,'invisible')]");
+        if (!IsVisible(DailyActiveClaim_Check)) //if this class "MuiBadge-invisible" - NOT Visible - do stuff
+	    {
+         var DailyActiveClaim = ElementByXPath("//span[contains(@class,'jss104')]/img");
+         Click(DailyActiveClaim);
+		 Log("DailyActiveClaim - available - do stuff");
+
+		 Wait(6);
+
+         var ClaimButton = ElementByXPath("//button//span[contains(text(),'Claim')]");
+		 
+		 if (IsVisible(ClaimButton))
+	     {
+         Click(ClaimButton);
+		 Log("DailyActiveClaim - claim - success");
+		 ClaimSuccess();
+		 }
+
+		 if (!IsVisible(ClaimButton))
+	     {
+		 Log("DailyActiveClaim - Already did it");
+		 } 
+			 
+        }
+        //=====//	
+				
+		//======//
 		//FaucetBtc//
 		//======//
         if (GetBoolSetting("FaucetBtc"))
@@ -311,6 +346,9 @@ public class TrustDice : FaucetScript
 
 		}
         //=====//	
+
+
+
 
 		//ad=true;
         return Time_Function();
