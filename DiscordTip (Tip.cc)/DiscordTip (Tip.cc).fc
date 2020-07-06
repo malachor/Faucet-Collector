@@ -1,7 +1,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 05/12/2018 06:00AM 
-//Last Update: 01/07/2020 06:00AM - Version 59
+//Last Update: 06/07/2020 05:40AM - Version 60
 //==================//
 
 using System;
@@ -32,18 +32,21 @@ public class discordapp_ : FaucetScript
 				new FaucetSetting(){Name="ALLIN_Success",Display="ALLIN_Success - if ON - it will Skip on all 'Discordtip Main Bot Vote' + 'AirDrops' Tasks & will check same as Success - If you've already done them + If you don't want to repeat the all your actions (under) ",Type=EditorType.CheckBox,Default=false},
 				new FaucetSetting(){Name="All_AirDrop_Success",Display="All_AirDrop_Success - if ON - it will Skip on all 'AirDrops' Tasks & check same as Success",Type=EditorType.CheckBox,Default=false},
                 new FaucetSetting(){Name="ProtectionSetEnglishLanguage",Display="ProtectionSetEnglishLanguage - On/off",Type=EditorType.CheckBox,Default=true},	
-				
+
+                new FaucetSetting(){Name="Discordtip_Main_OnOff",Display="Discordtip Bot | Main - On/off",Type=EditorType.CheckBox,Default=true},						
 				new FaucetSetting(){Name="Discordtip_Main_ID",Display="Discordtip Bot | Main - Vote and Claim between 100 to 500 satoshi - every 12 hours' ",Default="617037497574359050",Type=EditorType.TextBox,Required=true},
-                new FaucetSetting(){Name="Discordtip_Main_OnOff",Display="Discordtip Bot | Main - On/off",Type=EditorType.CheckBox,Default=true},		
 				new FaucetSetting(){Name="Menu_Bot_Currency",Display="Discordtip Bot | Main - Menu Bot Currency - Select Favorite Currency (correctly available only 'BTC')",Type=EditorType.ComboBox,Default="btc",Items=new System.Collections.Generic.List<string>{"btc","bch","btg","dash","dgb","doge","eos","eth","ethos","ltc","omg","wax","xzc","zec"}},
 
                 new FaucetSetting(){Name="Discordtip_FaucetCollector_OnOff",Display="FaucetCollector - AirDrop - OnOff",Type=EditorType.CheckBox,Default=true},		
 
-                new FaucetSetting(){Name="Discordtip_GridCoin_OnOff",Display="GridCoin - Faucet every 24h - OnOff",Type=EditorType.CheckBox,Default=true},		
-
                 new FaucetSetting(){Name="Discordtip_LaccsFaucet_BTC_OnOff",Display="LaccsFaucet BTC - AirDrop - On/off",Type=EditorType.CheckBox,Default=true},	
-				new FaucetSetting(){Name="LaccsFaucet_BTC_Boost",Display="LaccsFaucet BTC - Boost - On/off - if ON - type !faucet boost - you can boost a Bitcoin transaction (speeding it up)",Type=EditorType.CheckBox,Default=true},	
-                
+				new FaucetSetting(){Name="Command_1",Display="LaccsFaucet_BTC - Command_1",Default="!claim",Type=EditorType.TextBox,Required=true},
+				new FaucetSetting(){Name="Command_2",Display="LaccsFaucet_BTC - Command_2",Default="%claim",Type=EditorType.TextBox,Required=true},
+                new FaucetSetting(){Name="Discordtip_LaccsFaucet_vote_OnOff",Display="Discordtip_LaccsFaucet_vote - On/off",Type=EditorType.CheckBox,Default=true},
+				new FaucetSetting(){Name="Discordtip_LaccsFaucet_Main_ID",Display="LaccsFaucet - Vote and Claim between 50 to 100 satoshi - every 12 hours' ",Default="621049716913733642",Type=EditorType.TextBox,Required=true},
+
+                new FaucetSetting(){Name="Discordtip_GridCoin_OnOff",Display="GridCoin - Faucet every 24h - OnOff",Type=EditorType.CheckBox,Default=true},		
+              
 				new FaucetSetting(){Name="AutoWithdraw_BTC",Display="AutoWithdraw BTC - On/off",Type=EditorType.CheckBox,Default=false},		
 				new FaucetSetting(){Name="AmountToWithdraw_BTC",Display="AmountToWithdraw BTC - for my opinion i set default from 0.10 mbtc Equal to 10000 satoshi (Because of a high withdrawal fee)",Default="0.10",Type=EditorType.TextBox,Required=false},
 				new FaucetSetting(){Name="WalletAddress_BTC",Display="WalletAddress BTC",Type=EditorType.TextBox,Required=false},
@@ -174,7 +177,7 @@ public class discordapp_ : FaucetScript
 	 //if i already Login - go to "bonus"	 
 	 if (IsVisible(ExitButton))
 	 {		 
-      ADFunction_String_URL(); //call to ADFunction_String_URL
+      //ADFunction_String_URL_DiscordBotsTip(); //call to ADFunction_String_URL_DiscordBotsTip
       Wait();
 	  CheckCloudFlare(); //call to CheckCloudFlare Function
 	 }	
@@ -391,121 +394,37 @@ public class discordapp_ : FaucetScript
  
         } //end ProtectionSetEnglishLanguage
         //================//
-		
-	
+
 	
         //================//
         //Discordtip_Main//
         //================//
         if (GetBoolSetting("Discordtip_Main_OnOff"))
         {
-	
             Title = "Discordtip";
-            ADFunction_String_URL(); //call to Discordtip main 
+            ADFunction_String_URL_DiscordBotsTip(); //call to Discordtip main 
             Wait();
-	        CheckCloudFlare(); //call to CheckCloudFlare Function
-            Wait(3);
 
-            var discordbotsLogin = ElementByXPath("//a[@href='/login']");
-            if (IsVisible(discordbotsLogin))
-            {
-                Click(discordbotsLogin);
-                Wait(3);
-            }
+			Log("Discordtip_Main - do vote");			
+            Tasks_Function(); //call
+        
+		} //end FaucetClaim
+        //================//
 
-            var AuthorizeButton = ElementByXPath("//button/div[contains(text(),'Authorize')]");   //("//button[@class='primary'] [text()='Authorize']")
-
-            if (IsVisible(AuthorizeButton))
-            {
-                Click(AuthorizeButton);
-                Log("AfterLogin: Click AuthorizeButton");
-            }
-
-            if (!IsVisible(AuthorizeButton))
-            {
-                Log("AfterLogin: Success - We Already Login with Authorize");
-            }
-
-            //vote button
-            var VoteButton = ElementByXPath("//span[@id='votingvoted']");
-            if (IsVisible(VoteButton))
-            {
-                Click(VoteButton);
-            }
-
-            Wait(2, 3);
-
-            var LogAccessButton = ElementByXPath("//strong[contains(text(),'Login')]");
-
-            if (IsVisible(LogAccessButton))
-            {
-                Click(LogAccessButton);
-                Log("AfterLogin: Click LogAccessButton");
-            }
-            Wait(1);
-            var Autorizate = ElementByXPath("//button/div[contains(text(),'Authorize')]");  //("//button[contains(@class,'primary')]")
-            if (IsVisible(Autorizate))
-            {
-                Click(Autorizate);
-            }
-
-            Wait(2);
-
-            //vote button
-            var Vote2Button = ElementByXPath("//span[@id='votingvoted']");
-            Click(Vote2Button);
-            Wait(3);
-
-            var ThanksMessage = ElementByXPath("//div[@id='reminder']/p[text()='Thanks for voting!']");
-            var AlreadyVoted = ElementByXPath("//span[@id='votingvoted'] [text()='You already voted for this bot. Try again in 12 hours.']");
-
-            if (IsVisible(ThanksMessage))
-            {
-				
-                Log("FaucetClaim:" + ThanksMessage.Text);				
-				
-				if (GetBoolSetting("All_AirDrop_Success"))
-				{
-		         Log(" ThanksMessage - All_AirDrop_Success ");  
-	             Notification("ThanksMessage - All_AirDrop_Success");	
-		    	 ClaimSuccess();
-                 return GetWaitSetting();		 
-				}
-				
-                if (!GetBoolSetting("Discordtip_FaucetCollector_OnOff") && !GetBoolSetting("Discordtip_LaccsFaucet_BTC_OnOff") && !GetBoolSetting("Discordtip_GridCoin_OnOff") )
-                {
-	             Notification("ThanksMessage' - appear && the all AirDrop from Discordtip are disabled");	
-		         Log(" 'ThanksMessage' - appear && the all AirDrop from Discordtip are disabled ");  
-		         ClaimSuccess();
-                }
-
-            }
-
-            if (IsVisible(AlreadyVoted))
-            {
-                Log("FaucetClaim: Already Voted");
-				
-				if (GetBoolSetting("All_AirDrop_Success"))
-				{
-	             Notification("AlreadyVoted - All_AirDrop_Success");	
-		         Log("AlreadyVoted - All_AirDrop_Success ");  
-		    	 ClaimSuccess(); 
-                 return GetWaitSetting();	
-				}
-				
-                if (!GetBoolSetting("Discordtip_FaucetCollector_OnOff") && !GetBoolSetting("Discordtip_LaccsFaucet_BTC_OnOff") && !GetBoolSetting("Discordtip_GridCoin_OnOff") )
-                {
-	             Notification(" 'AlreadyVoted' - appear && the all AirDrop from Discordtip are disabled ");	
-		         Log(" 'AlreadyVoted' - appear && the all AirDrop from Discordtip are disabled ");  
-		    	 ClaimSuccess();
-                }
-             
-            }
-
-
-        } //end FaucetClaim
-
-
+        //================//
+        //Discordtip_LaccsFaucet_vote_OnOff//
+        //================//
+        if (GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {
+           Title = "Discordtip";
+           ADFunction_String_URL_Discordtip_LaccsFaucet(); //call to Discordtip_LaccsFaucet 
+           Wait();
+		
+ 	       Log("Discordtip_LaccsFaucet - do vote first");			
+           Tasks_Function(); //call
+        
+		} //end FaucetClaim
+        //================//
 		
 
         //=========================//
@@ -604,6 +523,7 @@ public class discordapp_ : FaucetScript
 			SetText_GridCoin_1_SendKeys_Way_Function();  //call to set text !agree
 			Wait(2);
 			Enter_SendKeys_General_Discord_Input_Function(); //call to do enter	
+		    Wait(3);
           }
 
           GoToUrl("https://discord.com/channels/211637812968161280/424786671360409611");
@@ -707,7 +627,7 @@ public class discordapp_ : FaucetScript
         //=========================//
         if (GetBoolSetting("Discordtip_LaccsFaucet_BTC_OnOff"))
         {
- 
+
 		//first go to server
 	    Title = "Discord";	
 		GoToUrl("https://discord.gg/52zUZaM");
@@ -921,16 +841,11 @@ public class discordapp_ : FaucetScript
         if (IsVisible(TextCommand))
         {
 
-		  if (GetBoolSetting("LaccsFaucet_BTC_Boost"))
-          {
 			Wait(2);
-			SetText_2_Laccs_SendKeys_Way_Function(); //call to SetText SendKeys Way
-            //SetText(TextCommand,"!faucet boost");
-            Enter_SendKeys_General_Discord_Input_Function(); //call to Enter_SendKeys_General_Discord_Input_Function
-		  }
-		  
 			SetText_1_Laccs_SendKeys_Way_Function(); //call to SetText SendKeys Way
-            //SetText(Text2Command,"!claim");
+            Enter_SendKeys_General_Discord_Input_Function(); //call to Enter_SendKeys_General_Discord_Input_Function
+
+			SetText_2_Laccs_SendKeys_Way_Function(); //call to SetText SendKeys Way
 		    Wait(2);
             Enter_SendKeys_General_Discord_Input_Function(); //call to Enter_SendKeys_General_Discord_Input_Function
 			
@@ -1117,7 +1032,7 @@ public class discordapp_ : FaucetScript
          Actions Builder4Act = new Actions(Driver);
          Builder4Act.MoveToElement(TextCommand).Build().Perform(); 
          Wait(3);
-         Builder4Act.SendKeys(TextCommand, "!claim").Build().Perform();
+         Builder4Act.SendKeys(TextCommand, GetSetting("Command_1") ).Build().Perform(); 
 		 
 		 return 0;
       }
@@ -1135,7 +1050,7 @@ public class discordapp_ : FaucetScript
          Actions Builder4Act = new Actions(Driver);
          Builder4Act.MoveToElement(TextCommand).Build().Perform(); 
          Wait(3);
-         Builder4Act.SendKeys(TextCommand, "!faucet boost").Build().Perform();
+         Builder4Act.SendKeys(TextCommand, GetSetting("Command_2") ).Build().Perform();
 		 
 		 return 0;
       }
@@ -1255,8 +1170,116 @@ public class discordapp_ : FaucetScript
         }
     }
   //=================//
-  
-  
+
+
+      //=================//
+      //Tasks_Function
+      //=================//
+      private int Tasks_Function()
+      {
+
+	        CheckCloudFlare(); //call to CheckCloudFlare Function
+            Wait(3);
+			
+            var discordbotsLogin = ElementByXPath("//a[@href='/login']");
+            if (IsVisible(discordbotsLogin))
+            {
+                Click(discordbotsLogin);
+                Wait(3);
+            }
+
+            var AuthorizeButton = ElementByXPath("//button/div[contains(text(),'Authorize')]");   //("//button[@class='primary'] [text()='Authorize']")
+
+            if (IsVisible(AuthorizeButton))
+            {
+                Click(AuthorizeButton);
+                Log("AfterLogin: Click AuthorizeButton");
+            }
+
+            if (!IsVisible(AuthorizeButton))
+            {
+                Log("AfterLogin: Success - We Already Login with Authorize");
+            }
+
+            //vote button
+            var VoteButton = ElementByXPath("//span[@id='votingvoted']");
+            if (IsVisible(VoteButton))
+            {
+                Click(VoteButton);
+            }
+
+            Wait(2, 3);
+
+            var LogAccessButton = ElementByXPath("//strong[contains(text(),'Login')]");
+
+            if (IsVisible(LogAccessButton))
+            {
+                Click(LogAccessButton);
+                Log("AfterLogin: Click LogAccessButton");
+            }
+            Wait(1);
+            var Autorizate = ElementByXPath("//button/div[contains(text(),'Authorize')]");  //("//button[contains(@class,'primary')]")
+            if (IsVisible(Autorizate))
+            {
+                Click(Autorizate);
+            }
+
+            Wait(2);
+
+            //vote button
+            var Vote2Button = ElementByXPath("//span[@id='votingvoted']");
+            Click(Vote2Button);
+            Wait(3);
+
+            var ThanksMessage = ElementByXPath("//div[@id='reminder']/p[text()='Thanks for voting!']");
+            var AlreadyVoted = ElementByXPath("//span[@id='votingvoted'] [text()='You already voted for this bot. Try again in 12 hours.']");
+
+            if (IsVisible(ThanksMessage))
+            {
+				
+                Log("FaucetClaim:" + ThanksMessage.Text);				
+				
+				if (GetBoolSetting("All_AirDrop_Success"))
+				{
+		         Log(" ThanksMessage - All_AirDrop_Success ");  
+	             Notification("ThanksMessage - All_AirDrop_Success");	
+		    	 ClaimSuccess();
+                 return GetWaitSetting();		 
+				}
+				
+                if (!GetBoolSetting("Discordtip_FaucetCollector_OnOff") && !GetBoolSetting("Discordtip_LaccsFaucet_BTC_OnOff") && !GetBoolSetting("Discordtip_GridCoin_OnOff") )
+                {
+	             Notification("ThanksMessage' - appear && the all AirDrop from Discordtip are disabled");	
+		         Log(" 'ThanksMessage' - appear && the all AirDrop from Discordtip are disabled ");  
+		         ClaimSuccess();
+                }
+
+            }
+
+            if (IsVisible(AlreadyVoted))
+            {
+                Log("FaucetClaim: Already Voted");
+				
+				if (GetBoolSetting("All_AirDrop_Success"))
+				{
+	             Notification("AlreadyVoted - All_AirDrop_Success");	
+		         Log("AlreadyVoted - All_AirDrop_Success ");  
+		    	 ClaimSuccess(); 
+                 return GetWaitSetting();	
+				}
+				
+                if (!GetBoolSetting("Discordtip_FaucetCollector_OnOff") && !GetBoolSetting("Discordtip_LaccsFaucet_BTC_OnOff") && !GetBoolSetting("Discordtip_GridCoin_OnOff") )
+                {
+	             Notification(" 'AlreadyVoted' - appear && the all AirDrop from Discordtip are disabled ");	
+		         Log(" 'AlreadyVoted' - appear && the all AirDrop from Discordtip are disabled ");  
+		    	 ClaimSuccess();
+                }
+             
+            }
+			
+        return 0;
+      } //end Tasks_Function
+    //====================//
 	
 	
   //=================//
@@ -1393,16 +1416,128 @@ public class discordapp_ : FaucetScript
   //====================//
   
   
+
+
+  //====================//
+  //ADFunction_String_URL_Discordtip_LaccsFaucet
+  //====================//
+  private bool ADFunction_String_URL_Discordtip_LaccsFaucet()
+  {
+
+        string Channel_Base_Url_String = "https://discordbots.org/bot/";
+		
+		//Discordtip_LaccsFaucet_Main_ID
+        var Discordtip_LaccsFaucet_Main_ID_Var = GetSetting("Discordtip_LaccsFaucet_Main_ID");
+		string Discordtip_LaccsFaucet_Main_ID_String = Discordtip_LaccsFaucet_Main_ID_Var;
+		
+		//Custom_Bot_ID
+        var Input_Custom_Bot_ID_Var = GetSetting("Input_Custom_Bot_ID_Setting");
+		string Input_Custom_Bot_ID_String = Input_Custom_Bot_ID_Var;
+		
+        string Channel_End_Url_String = "/vote?currency=";
+		
+		var Menu_Bot_Currency_Var =	GetSetting("Menu_Bot_Currency");	 
+		string Menu_Bot_Currency_string = Menu_Bot_Currency_Var;	
+
+		//get all strings - Discordtip_LaccsFaucet_Main_ID
+		string Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet = Channel_Base_Url_String + Discordtip_LaccsFaucet_Main_ID_String + Channel_End_Url_String + Menu_Bot_Currency_string;
+
+		//===============//
+		//Discordtip_LaccsFaucet ID
+		//===============//
+        if(Menu_Bot_Currency_Var=="btc" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))  
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - btc");
+        }
+		
+        if(Menu_Bot_Currency_Var=="bch" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - bch");
+        }
+		
+        if(Menu_Bot_Currency_Var=="btg" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - btg");
+        }
+		
+        if(Menu_Bot_Currency_Var=="dash" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - dash");
+        }
+		
+        if(Menu_Bot_Currency_Var=="dgb" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - dgb");
+        }
+		
+        if(Menu_Bot_Currency_Var=="eos" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - eos");
+        }
+		
+        if(Menu_Bot_Currency_Var=="eth" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - eth");
+        }
+		
+        if(Menu_Bot_Currency_Var=="ethos" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - ethos");
+        }
+		
+        if(Menu_Bot_Currency_Var=="ltc" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - ltc");
+        }
+		
+        if(Menu_Bot_Currency_Var=="omg" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - omg");
+        }
+		
+        if(Menu_Bot_Currency_Var=="wax" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - wax");
+        }
+		
+        if(Menu_Bot_Currency_Var=="xzc" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - xzc");
+        }
+		
+        if(Menu_Bot_Currency_Var=="zec" && GetBoolSetting("Discordtip_LaccsFaucet_vote_OnOff"))
+        {	
+        GoToUrl(Channel_ID_AllUrl_MainString_Discordtip_LaccsFaucet);
+        Log("Discordtip_LaccsFaucet - go to string url - zec");
+        }
+		//===============//
+		
+        return true;	
+  } //end ADFunction_String_URL_Discordtip_LaccsFaucet
+  //====================//
+  
 	
   //====================//
-  //ADFunction_String_URL
+  //ADFunction_String_URL_DiscordBotsTip
   //====================//
-  private bool ADFunction_String_URL()
+  private bool ADFunction_String_URL_DiscordBotsTip()
   {
 			
         string Channel_Base_Url_String = "https://discordbots.org/bot/";
 		
-		//Menu ID - DiscordBotsTip ID
+		//Main ID - DiscordBotsTip ID
         var Discordtip_Main_ID_Var = GetSetting("Discordtip_Main_ID");
 		string Discordtip_Main_ID_String = Discordtip_Main_ID_Var;
 		
@@ -1416,99 +1551,97 @@ public class discordapp_ : FaucetScript
 		string Menu_Bot_Currency_string = Menu_Bot_Currency_Var;	
 	    
 		//get all strings - DiscordBotsTip ID
-		string Channel_ID_AllUrl_MainString = Channel_Base_Url_String + Discordtip_Main_ID_String + Channel_End_Url_String + Menu_Bot_Currency_string;
+		string Channel_ID_AllUrl_MainString_DiscordBotsTip = Channel_Base_Url_String + Discordtip_Main_ID_String + Channel_End_Url_String + Menu_Bot_Currency_string;
 
 		//get all strings - Custom_Bot_ID
-		string Custom_Bot_ID_AllUrl_MainString = Channel_Base_Url_String + Input_Custom_Bot_ID_String + Channel_End_Url_String + Menu_Bot_Currency_string;
-
+		//string Custom_Bot_ID_AllUrl_MainString = Channel_Base_Url_String + Input_Custom_Bot_ID_String + Channel_End_Url_String + Menu_Bot_Currency_string;
 		
 		//===============//
 		//DiscordBotsTip ID
 		//===============//
         if(Menu_Bot_Currency_Var=="btc" && GetBoolSetting("Discordtip_Main_OnOff"))  
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - btc");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - btc");
         }
 		
         if(Menu_Bot_Currency_Var=="bch" && GetBoolSetting("Discordtip_Main_OnOff"))
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - bch");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - bch");
         }
 		
         if(Menu_Bot_Currency_Var=="btg" && GetBoolSetting("Discordtip_Main_OnOff"))
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - btg");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - btg");
         }
 		
         if(Menu_Bot_Currency_Var=="dash" && GetBoolSetting("Discordtip_Main_OnOff"))
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - dash");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - dash");
         }
 		
         if(Menu_Bot_Currency_Var=="dgb" && GetBoolSetting("Discordtip_Main_OnOff"))
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - dgb");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - dgb");
         }
 		
         if(Menu_Bot_Currency_Var=="eos" && GetBoolSetting("Discordtip_Main_OnOff"))
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - eos");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - eos");
         }
 		
         if(Menu_Bot_Currency_Var=="eth" && GetBoolSetting("Discordtip_Main_OnOff"))
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - eth");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - eth");
         }
 		
         if(Menu_Bot_Currency_Var=="ethos" && GetBoolSetting("Discordtip_Main_OnOff"))
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - ethos");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - ethos");
         }
 		
         if(Menu_Bot_Currency_Var=="ltc" && GetBoolSetting("Discordtip_Main_OnOff"))
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - ltc");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - ltc");
         }
 		
         if(Menu_Bot_Currency_Var=="omg" && GetBoolSetting("Discordtip_Main_OnOff"))
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - omg");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - omg");
         }
 		
         if(Menu_Bot_Currency_Var=="wax" && GetBoolSetting("Discordtip_Main_OnOff"))
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - wax");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - wax");
         }
 		
         if(Menu_Bot_Currency_Var=="xzc" && GetBoolSetting("Discordtip_Main_OnOff"))
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - xzc");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - xzc");
         }
 		
         if(Menu_Bot_Currency_Var=="zec" && GetBoolSetting("Discordtip_Main_OnOff"))
         {	
-        GoToUrl(Channel_ID_AllUrl_MainString);
-        Log("go to string url - zec");
+        GoToUrl(Channel_ID_AllUrl_MainString_DiscordBotsTip);
+        Log("DiscordBotsTip - go to string url - zec");
         }
 		//===============//
 
-		
-		
 		//===============//
 		//Custom_Bot_ID
 		//===============//
+		/*
         if(Menu_Bot_Currency_Var=="btc" && GetBoolSetting("Custom_Bot_ID_OnOff")) 
         {	
         GoToUrl(Custom_Bot_ID_AllUrl_MainString);
@@ -1586,15 +1719,12 @@ public class discordapp_ : FaucetScript
         GoToUrl(Custom_Bot_ID_AllUrl_MainString);
         Log("go to string url - Custom_Bot_ID  - zec");
         }
+		*/
 		//===============//
 		
-		
-        return true;
-  } //end ADFunction_String_URL
-
+        return true;	
+  } //end ADFunction_String_URL_DiscordBotsTip
   //====================//
-
-
 
 
 
