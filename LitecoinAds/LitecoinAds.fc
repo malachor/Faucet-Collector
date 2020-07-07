@@ -69,6 +69,7 @@ namespace NewScripts.PTCShare
 
             return base.DoInit( );
         }
+        private bool TryingLoginAgain=false;
         public override int DoLogin( )
         {
             GoToUrl("https://litecoinads.com/login.aspx");
@@ -77,14 +78,30 @@ namespace NewScripts.PTCShare
             var CookiesBtn=ElementByXPath("//button[@class='qc-cmp-button']");
             if ( IsVisible(CookiesBtn) )
             {
+
                 Click(CookiesBtn);
                 Wait(2);
+                Log("Cookies btn clicked");
             }
 
             var UserBox=ElementByXPath("//input[@id='ctl02_Username']");
             if ( !IsVisible(UserBox) )
             {
-                return Fail("User box not found");
+                if ( !TryingLoginAgain )
+                {
+                    TryingLoginAgain=true;
+                    return DoLogin( );
+                }
+                else
+                {
+                    TryingLoginAgain=false;
+                    return Fail("User box not found");
+                }
+
+            }
+            else if ( TryingLoginAgain )
+            {
+                TryingLoginAgain=false;
             }
             var PasswordBox=ElementByXPath("//input[@id='ctl02_Password']");
             if ( !IsVisible(PasswordBox) )
@@ -150,7 +167,6 @@ namespace NewScripts.PTCShare
             
             var ads=ElementsByXPath(AdsXpath).Where(x=>IsVisible(x)).ToList();
             int n=0;
-
             int NAds = ads.Count;
             while ( ads.Count>n )
             {
@@ -209,8 +225,14 @@ namespace NewScripts.PTCShare
                 Wait( );
 
 
-
-                GoToUrl("https://litecoinads.com/user/earn/ads.aspx");
+                if ( Driver.Url!="https://litecoinads.com/user/earn/ads.aspx" )
+                {
+                    GoToUrl("https://litecoinads.com/user/earn/ads.aspx");
+                }
+                else
+                {
+                    Driver.Navigate( ).Refresh( );
+                }
 
                 Wait(2 , 3);
                 ads=ElementsByXPath(AdsXpath).Where(x => IsVisible(x)).ToList( ); ;
