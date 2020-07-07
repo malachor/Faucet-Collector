@@ -4,6 +4,7 @@
 //css_ref FaucetCollector.FaucetTemplates
 using FaucetCollector.FaucetTemplates;
 using FaucetCollector.Script;
+using System.Linq;
 
 public class NeobitsScript : FaucetScript
 {
@@ -16,7 +17,7 @@ public class NeobitsScript : FaucetScript
     {
         get
         {
-            return new FaucetSettings("https://neobits.net")
+            return new FaucetSettings("https://neobits.net/")
             {
                 new FaucetSetting(){Name="User",Display="Username",Type=EditorType.TextBox,Required=true},
                 new FaucetSetting(){Name="Pass",Display="Password",Type=EditorType.Password,Required=true},
@@ -86,11 +87,40 @@ public class NeobitsScript : FaucetScript
         return manager.GetFaucetWaitTime( );
     }
 
-    public const string ShortUrl="https://bitsfree.net/shortlinks.html";
+    public string ShortUrl
+    {
+        get
+        {
+            if ( manager!=null )
+            {
+                string Base=manager.BaseUri;
+                if ( Base.LastOrDefault( )!='/' )
+                {
+                    Base+="/";
+                }
+
+                return Base+"shortlinks.html";
+
+            }
+
+            return string.Empty;
+
+        }
+    }
+
+    //
     public override int BeforeSolveFaucet( )
     {
         if ( GetBoolSetting("DoShortLink") )
         {
+            string ShortUrl=this.ShortUrl;
+            if ( string.IsNullOrEmpty(ShortUrl) )
+            {
+
+                return base.BeforeSolveFaucet( );
+            }
+
+
             GoToUrl(ShortUrl);
             Wait( );
             var Shortlinks = manager.GetShortlinks();
@@ -178,11 +208,6 @@ public class NeobitsScript : FaucetScript
     /// <returns></returns>
     public override int DoSolveFaucet( )
     {
-        if ( Driver.Url!="https://bitsfree.net/" )
-        {
-            GoToUrl("https://bitsfree.net/");
-            Wait( );
-        }
         return manager.DoSolveFaucet( );
     }
 }
