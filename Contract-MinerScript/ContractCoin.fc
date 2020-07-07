@@ -14,7 +14,7 @@ public class ContractMiner : FaucetScript
     {
         get
         {
-            return new FaucetSettings("https://www.contract-miner.com/?city=home&earn=paid-contracts")
+            return new FaucetSettings("https://www.contract-miner.com/")
             {
                 new FaucetSetting(){Name="User",Display="Username",Type=EditorType.TextBox,Required=true},
                 new FaucetSetting(){Name="Pass",Display="Password",Type=EditorType.Password,Required=true},
