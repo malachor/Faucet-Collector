@@ -432,7 +432,7 @@ public class GetZen : FaucetScript
 
 		Wait(5);
 
-        if (!IsVisible(ElementByXPath ("//div[@class='modal-content']//div[@id='result1' and contains(text(),'claimed Zen in the last')] | //div[@class='modal-content']//div[@id='result1' and contains(text(),'transferred to your')]") )) 
+        if (!IsVisible(ElementByXPath ("//div[@class='modal-content']//div[@id='result1' and contains(text(),'claimed Zen in the last')] | //td[text()='You Won:']") )) 
         {
          Log("Claim_Button - 2 - again");
          Click(Claim_Button);
@@ -440,11 +440,11 @@ public class GetZen : FaucetScript
 	
 		Wait(5);
 
-        var StatusCheck_Success = ElementByXPath("//div[@class='modal-content']//div[@id='result1' and contains(text(),'transferred to your')]");       
+        var StatusCheck_Success = ElementByXPath("//td[text()='You Won:']");       
 		if (IsVisible(StatusCheck_Success))
         {
-         var SuccessAmountMessage = ElementByXPath("//div[@class='modal-content']//div[contains(@id,'result')]");       
-         Log("success"+SuccessAmountMessage.Text);		
+         var SuccessAmountMessage = ElementByXPath("//div[@id='result1']//tr[1]/td[2]");       
+         Log("success "+SuccessAmountMessage.Text);		
          //ad = true; //success
 		 ClaimSuccess(); //Marks the claim as a success
 		}
