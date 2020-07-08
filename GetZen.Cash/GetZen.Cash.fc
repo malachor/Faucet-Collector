@@ -1,7 +1,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 23/12/2019 01:30PM - Version 1
-//Last Update: 09/04/2020 03:00PM - Version 8
+//Last Update: 08/07/2020 19:35PM - Version 9
 //==================//
 
 using System;
@@ -423,7 +423,7 @@ public class GetZen : FaucetScript
 	
 		Wait(5);
 		
-        var ProceedToClaimButton = ElementByXPath("//button[contains(@class,'btn-claim js-Claim') and contains(text(),'claim')]");       
+        var ProceedToClaimButton = ElementByXPath("//button[contains(@class,'js-Claim')]");       
 		if (IsVisible(ProceedToClaimButton))
         {
          Log("ProceedToClaimButton");
