@@ -1,6 +1,7 @@
 ﻿using System;
 using FaucetCollector.Script;
-
+//css_ref FaucetCollector.Utilities
+//css_ref FaucetCollector.Captcha
 public class xcolanderXRP : FaucetScript
 {
     /// <summary>
@@ -240,60 +241,11 @@ public class xcolanderXRP : FaucetScript
         }
         Click(button_c);
         Wait(2, 4);
-        DateTime Timeout = DateTime.Now.AddSeconds(20);
-
-        var ButtonNext = ElementByXPath("//button[contains(text(),'NEXT STEP')]");
-        while (!IsVisible(ButtonNext))
+        FaucetCollector.Utilities.ShortLinkBypasser bypasser =new FaucetCollector.Utilities.ShortLinkBypasser(this);
+        bool cs=bypasser.DoShortLink();
+        if ( !cs )
         {
-            ButtonNext = ElementByXPath("//button[contains(text(),'NEXT STEP')]");
-            Wait();
-            if (DateTime.Now > Timeout) { break; }
-        }
-        Wait(1);
-        Click(ButtonNext);
-        Wait(2, 4);
-
-        int count = 0;
-        bool IsFinished = false;
-        var ButtonNext2_ = ElementByXPath("//button[@class='custom-link btn border-width-0 btn-color-432516 btn-circle btn-icon-left']");
-        Timeout = DateTime.Now.AddSeconds(20);
-        while (!IsVisible(ButtonNext2_))
-        {
-            ButtonNext2_ = ElementByXPath("//button[@class='custom-link btn border-width-0 btn-color-432516 btn-circle btn-icon-left']");
-            Wait();
-            if (DateTime.Now > Timeout) { break; }
-
-        }
-        Wait();
-        Click(ButtonNext2_);
-        Wait();
-        while (!IsFinished && count < 3)
-        {
-            var result = DoSolveCaptcha();
-            if (result > 0)
-            {
-                return Fail("Fail Solving");
-
-            }
-            var ButtonNext2 = ElementByXPath("//button[@class='btn btn-lg btn-success']");
-            DateTime Timeout_ = DateTime.Now.AddSeconds(20);
-            while (!IsVisible(ButtonNext2))
-            {
-                ButtonNext2 = ElementByXPath("//button[@class='btn btn-lg btn-success']");
-                Wait();
-                if (DateTime.Now > Timeout_) { break; }
-            }
-            Click(ButtonNext2);
-            Wait(1);
-
-            var Error = ElementByXPath("//p[contains(text(),'captcha invalid!')]");
-            if (!IsVisible(Error))
-            {
-                IsFinished = true;
-            }
-            count++;
-
-
+            Log("there is a problem with the shorltink");
         }
 
         //This faucet has nothing to do here. We will let Faucet Collector handle it.
