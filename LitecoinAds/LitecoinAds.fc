@@ -155,6 +155,12 @@ namespace NewScripts.PTCShare
         }
         public override bool IsLoggedIn( )
         {
+            if ( Driver.Url!="https://litecoinads.com/" )
+            {
+                GoToUrl("https://litecoinads.com/");
+                Wait(2);
+            }
+            
 
             return ElementByXPath("//a[@href='/logout.aspx']")!=null;
         }
