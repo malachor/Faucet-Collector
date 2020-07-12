@@ -155,9 +155,9 @@ namespace NewScripts.PTCShare
         }
         public override bool IsLoggedIn( )
         {
-            if ( Driver.Url!="https://litecoinads.com/" )
+            if ( Driver.Url!="https://litecoinads.com/user/default.aspx" )
             {
-                GoToUrl("https://litecoinads.com/");
+                GoToUrl("https://litecoinads.com/user/default.aspx");
                 Wait(2);
             }
             
