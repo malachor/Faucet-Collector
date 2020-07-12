@@ -16,6 +16,7 @@ public class ContractMiner : FaucetScript
         {
             return new FaucetSettings("https://www.contract-miner.com/")
             {
+
                 new FaucetSetting(){Name="User",Display="Username",Type=EditorType.TextBox,Required=true},
                 new FaucetSetting(){Name="Pass",Display="Password",Type=EditorType.Password,Required=true},
                 new FaucetSetting(){Name="LoginW",Display="Login With",Type=EditorType.ComboBox,Items=new System.Collections.Generic.List<string>{"Solvemedia","Recaptcha"},Default="Recaptcha"},            
@@ -196,7 +197,6 @@ public class ContractMiner : FaucetScript
     {
         CheckDailyAd();
 
-        GoToUrl("https://www.contract-miner.com/?city=home&earn=paid-contracts");
 
         //This faucet has nothing to do here. We will let Faucet Collector handle it.
         return base.AfterLogin();
