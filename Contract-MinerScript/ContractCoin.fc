@@ -306,65 +306,6 @@ public class ContractMiner : FaucetScript
     /// <returns></returns>
     public override int DoSolveFaucet()
     {
-       
-        return base.BeforeSolveFaucet();
-    }
-
-    public int TryUseShortlink(int tries = 0)
-    {
-        if (tries > 4)
-        {
-            return Fail("Fail do shortlink");
-        }
-        var GenerateShort = ElementByXPath("//button[@id='generate_end_auth']");
-        if (!IsVisible(GenerateShort))
-        {
-            return Fail("Generate ShortLink Button is not visible");
-        }
-        Click(GenerateShort);
-        var ButtonStay = ElementByXPath("//a[contains(text(),'Stay in same tab')]");
-        DateTime t1 = DateTime.Now.AddSeconds(15);
-        while (!IsVisible(ButtonStay))
-        {
-            ButtonStay = ElementByXPath("//a[contains(text(),'Stay in same tab')]");
-            Wait(1);
-            if (DateTime.Now > t1)
-            {
-                break;
-            }
-        }
-        if (!IsVisible(ButtonStay))
-        {
-            return Fail("Go to shortLink button is not visible");
-        }
-
-        Click(ButtonStay);
-        Wait();
-        if (!IsVisible(ElementByXPath("//input[@id='login_username']")))
-        {
-            DoTheInternalShort();
-            Wait(1);
-        }
-        else
-        {
-            Log("Need login again, Try login.");
-            BeforeLogin();
-            DoLogin();
-            GoToUrl(Url);
-           return TryUseShortlink(tries+1);
-
-
-        }
-
-        return 0;
-    }
-  
-    /// <summary>
-    /// This method gets called after the BeforeSolveFaucet. You can do the actual claiming of the faucet in here.
-    /// </summary>
-    /// <returns></returns>
-    public override int DoSolveFaucet()
-    {
         int Number = GetIntSetting("AutoMiner");
         if ( Number!=0 )
         {
@@ -447,7 +388,6 @@ public class ContractMiner : FaucetScript
         }
 
 
-
         if ( GetBoolSetting("TimedlyHour") )
         {
 
@@ -514,8 +454,6 @@ public class ContractMiner : FaucetScript
         }
 
         //This faucet has nothing to do here. We will let Faucet Collector handle it.
-
-
         return GetWaitSetting( );
     }
   
