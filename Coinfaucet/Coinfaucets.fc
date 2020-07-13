@@ -68,6 +68,12 @@ class Coinfaucets : FaucetScript
             Url="https://freeusdcoin.com/",
             MinWithdraw=1
         }
+        },
+        {"Binance Coin",new Coinfaucet
+        {
+            Url="https://freebinancecoin.com/",
+            MinWithdraw=1
+        } 
         }
 
 
