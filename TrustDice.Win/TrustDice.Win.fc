@@ -1,7 +1,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 13/11/2019 09:00AM - Version 1
-//Last Update: 06/07/2020 01:30AM - Version 6
+//Last Update: 15/07/2020 13:20PM - Version 7
 //==================//
 
 using System;
@@ -304,10 +304,10 @@ public class TrustDice : FaucetScript
 		Wait();
 		Wait(6);
 		
-        var DailyActiveClaim_Check = ElementByXPath("//span[contains(@class,'jss104')]//span[contains(@class,'invisible')]");
-        if (!IsVisible(DailyActiveClaim_Check)) //if this class "MuiBadge-invisible" - NOT Visible - do stuff
+        var DailyActiveClaim_Check = ElementByXPath ("//span[contains(@class,'jss')]//span[contains(@class,'dot')]");  //("//span[contains(@class,'jss')]//span[contains(@class,'invisible')]")
+        if (IsVisible(DailyActiveClaim_Check)) //if this class "MuiBadge-invisible" - NOT Visible - do stuff
 	    {
-         var DailyActiveClaim = ElementByXPath("//span[contains(@class,'jss104')]/img");
+         var DailyActiveClaim = ElementByXPath("//span[contains(@class,'jss')]/img[contains(@src,'6d4.svg')]");
          Click(DailyActiveClaim);
 		 Log("DailyActiveClaim - available - do stuff");
 
@@ -319,7 +319,14 @@ public class TrustDice : FaucetScript
 	     {
          Click(ClaimButton);
 		 Log("DailyActiveClaim - claim - success");
-		 ClaimSuccess();
+		 Wait(2);
+		 }
+
+         var SuccessMessage = ElementByXPath("//span[contains(text(),'success')]");
+		 if (IsVisible(SuccessMessage))
+	     {
+		 Log(SuccessMessage.Text);	 
+         ClaimSuccess();
 		 }
 
 		 if (!IsVisible(ClaimButton))
