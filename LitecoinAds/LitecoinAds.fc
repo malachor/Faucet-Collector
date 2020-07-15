@@ -43,7 +43,7 @@ namespace NewScripts.PTCShare
             Title="litecoinads";
 
             SuccessXPath="//div[@class='alert alert-success']";
-            FailXPath="//div[@class='alert alert-danger";
+            FailXPath="//div[@class='alert alert-danger]";
             base.Start( );
         }
         public override int BeforeCreateDriver( )
@@ -196,6 +196,7 @@ namespace NewScripts.PTCShare
                     try
                     {
                         Driver.SwitchTo( ).Window(Driver.WindowHandles[1]);
+                        Log($"Seeing ad Nº {n.ToString( )}");
                         DateTime t1 = DateTime.Now.AddSeconds(75);
                         while ( !IsVisible(ElementByXPath("//div[@id='CaptchaPanel']")) )
                         {
