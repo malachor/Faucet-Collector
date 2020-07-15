@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FaucetCollector.Script;
-//css_inc RecaptchaUtilities
+//css_ref FaucetCollector.Utilities
     class EarnFreeScript : FaucetScript
     {
 
@@ -144,8 +144,16 @@ using FaucetCollector.Script;
         {
             return Fail("Fail solving captcha");
         }
-
-        Click(ButtonClaim);
+        if ( string.IsNullOrEmpty(ButtonClaim.GetAttribute("onclick")) )
+        {
+            Click(ButtonClaim);
+        }
+        else
+        {
+            // call the submit of the form with javascript to avoid the popup
+            ExecuteScript("SetClaim();" , ButtonClaim);
+        }
+   
 
         return base.DoSolveFaucet();    
     }
@@ -157,7 +165,7 @@ using FaucetCollector.Script;
         {
             return result;
         }
-        RecaptchaUtility utility = new RecaptchaUtility(this);
+        FaucetCollector.Captcha.RecaptchaUtility utility = new FaucetCollector.Captcha.RecaptchaUtility(this);
         utility.DoSolve();
 
         return result;
