@@ -325,7 +325,7 @@ public class TrustDice : FaucetScript
          var SuccessMessage = ElementByXPath("//span[contains(text(),'success')]");
 		 if (IsVisible(SuccessMessage))
 	     {
-		 Log(SuccessMessage.Text)	 
+		 Log(SuccessMessage.Text);	 
          ClaimSuccess();
 		 }
 
