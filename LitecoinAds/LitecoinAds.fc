@@ -30,8 +30,17 @@ namespace NewScripts.PTCShare
                                 Display="Password",
                                 Type=EditorType.Password,
                                 Required=true
+                            },
+                            new FaucetSetting( )
+                            {
+                               Name="Ads",
+                               Type=EditorType.CheckBox,
+                               Default=true,
+                               Display="Check Ads"
+                              
                             }
                         };
+
 
             }
 
@@ -43,7 +52,7 @@ namespace NewScripts.PTCShare
             Title="litecoinads";
 
             SuccessXPath="//div[@class='alert alert-success']";
-            FailXPath="//div[@class='alert alert-danger]";
+            FailXPath="//div[@class='alert alert-danger']|//span[@id='ctl00_PageMainContent_CaptchaErrorLabel']";
             base.Start( );
         }
         public override int BeforeCreateDriver( )
@@ -135,7 +144,27 @@ namespace NewScripts.PTCShare
         }
         public override int DoSolveCaptcha( )
         {
-            if ( IsVisible(ElementByXPath("//p[@class='visualCaptcha-explanation']//strong")) )
+            var CaptchaSelector=ElementByXPath("//select[@id='ctl00_PageMainContent_CaptchaList']");
+            if ( IsVisible(CaptchaSelector) )
+            {
+                SelectOptionByValue(CaptchaSelector , "Solvemedia");
+                // Site need to load again so we wait 4 - 6 seconds
+                Wait(2,3);
+                DateTime Timeout=DateTime.Now.AddSeconds(20);
+                while ( ElementByXPath("//input[@id='adcopy_response']")==null && DateTime.Now<Timeout )
+                {
+
+                    Wait( );
+
+                }
+                Wait( );
+                if ( ElementByXPath("//input[@id='adcopy_response']")!=null )
+                {
+                    return DoSolveMediaCaptcha(ElementByXPath("//input[@id='adcopy_response']"));
+                }
+            }
+           
+            else if( IsVisible(ElementByXPath("//p[@class='visualCaptcha-explanation']//strong")) )
             {
                 bool captcha_solved = false;
                 while ( !captcha_solved )
@@ -151,6 +180,9 @@ namespace NewScripts.PTCShare
                     }
                 }
             }
+
+            
+
             return base.DoSolveCaptcha( );
         }
         public override bool IsLoggedIn( )
@@ -167,96 +199,155 @@ namespace NewScripts.PTCShare
 
         public override int DoSolveFaucet( )
         {
-            GoToUrl("https://litecoinads.com/user/earn/ads.aspx");
-            Wait(2);
-            string AdsXpath="//div[contains(@class,'AboxActive Ad')]";
-            
-            var ads=ElementsByXPath(AdsXpath).Where(x=>IsVisible(x)).ToList();
-            int n=0;
-            int NAds = ads.Count;
-            while ( ads.Count>n )
+            if ( GetBoolSetting("Ads") )
             {
+                Log("We are going to see if there are available ads");
 
-                CheckForPopupsEnabled=false;
+                GoToUrl("https://litecoinads.com/user/earn/ads.aspx");
+                Wait(2);
+                string AdsXpath="//div[contains(@class,'AboxActive Ad')]";
 
-
-                Click(ads[n] , false);
-
-                Wait(3);
-
-                Driver.SwitchTo( ).Window(Driver.WindowHandles[1]);
-
-                Wait(3);
-
-                var Vbutton = ElementByXPath("//input[@id='WatchAdButton']");
-                if ( Vbutton!=null )
+                var ads=ElementsByXPath(AdsXpath).ToList();
+                int n=0;
+                int NAds = ads.Count;
+                while ( ads.Count>n )
                 {
-                    Click(Vbutton , false);
-                    Wait( );
-                    try
+
+                    CheckForPopupsEnabled=false;
+                    Log("There are "+ads.Count);
+
+                    Click(ads[n] , false);
+
+                    Wait(3);
+
+                    Driver.SwitchTo( ).Window(Driver.WindowHandles[1]);
+
+                    Wait(3);
+
+                    var Vbutton = ElementByXPath("//input[@id='WatchAdButton']");
+                    if ( Vbutton!=null )
                     {
-                        Driver.SwitchTo( ).Window(Driver.WindowHandles[1]);
-                        Log("Seeing ad Nº "+n.ToString( ));
-                        DateTime t1 = DateTime.Now.AddSeconds(75);
-                        while ( !IsVisible(ElementByXPath("//div[@id='CaptchaPanel']")) )
+                        Click(Vbutton , false);
+                        Wait( );
+                        try
                         {
-                            Wait( );
-                            if ( DateTime.Now>t1 )
+                            Driver.SwitchTo( ).Window(Driver.WindowHandles[1]);
+                            Log("Seeing ad Nº "+( n+1 ).ToString( ));
+                            DateTime t1 = DateTime.Now.AddSeconds(75);
+                            while ( !IsVisible(ElementByXPath("//div[@id='CaptchaPanel']")) )
                             {
-                                break;
+                                Wait( );
+                                if ( DateTime.Now>t1 )
+                                {
+                                    break;
+                                }
                             }
+                            Wait( );
+
+                            var result=DoSolveCaptcha();
+
+                            Wait( );
+                            var Credit = ElementByXPath("//input[@id='CreditAfterCaptcha']");
+                            if ( IsVisible(Credit) )
+                            {
+                                Click(Credit);
+                            }
+                            Wait(2 , 3);
+                            CheckFaucetResult( );
+                            Wait(1);
+                            Driver.SwitchTo( ).Window(Driver.WindowHandles[0]);
                         }
-                        Wait( );
-
-                        var result=DoSolveCaptcha();
-
-                        Wait( );
-                        var Credit = ElementByXPath("//input[@id='CreditAfterCaptcha']");
-                        if ( IsVisible(Credit) )
+                        catch ( Exception )
                         {
-                            Click(Credit);
+                            CheckForPopupsEnabled=true;
                         }
-                        Wait(2 , 3);
-                        CheckFaucetResult( );
-                        Wait(1);
-                        Driver.SwitchTo( ).Window(Driver.WindowHandles[0]);
                     }
-                    catch ( Exception )
+
+                    CheckForPopupsEnabled=true;
+                    CheckForPopups( );
+                    Wait( );
+
+
+                    if ( Driver.Url!="https://litecoinads.com/user/earn/ads.aspx" )
                     {
-                        CheckForPopupsEnabled=true;
+                        GoToUrl("https://litecoinads.com/user/earn/ads.aspx");
                     }
+                    else
+                    {
+                        Driver.Navigate( ).Refresh( );
+                    }
+
+                    Wait(2 , 3);
+                    ads=ElementsByXPath(AdsXpath).ToList( ); ;
+
+
+                    if ( ads.Count==NAds )
+                    {
+                        n++;
+
+                        NAds=ads.Count;
+                    }
+
                 }
-
-                CheckForPopupsEnabled=true;
-                CheckForPopups( );
-                Wait( );
-
-
-                if ( Driver.Url!="https://litecoinads.com/user/earn/ads.aspx" )
-                {
-                    GoToUrl("https://litecoinads.com/user/earn/ads.aspx");
-                }
-                else
-                {
-                    Driver.Navigate( ).Refresh( );
-                }
-
-                Wait(2 , 3);
-                ads=ElementsByXPath(AdsXpath).Where(x => IsVisible(x)).ToList( ); ;
-
-
-                if ( ads.Count==NAds )
-                {
-                    n++;
-
-                    NAds=ads.Count;
-                }
-
             }
 
-            return GetWaitSetting( );
+            Log("See if the faucet Claim is available");
+
+            //Go to faucet url
+            GoToUrl("https://litecoinads.com/user/earn/faucet.aspx");
+
+            Wait(2,3);
+            DateTime Timeout=DateTime.Now.AddSeconds(20);
+            while( ElementByXPath("//select[@id='ctl00_PageMainContent_CaptchaList']")==null  && DateTime.Now<Timeout)
+            {
+
+                Wait( );
+
+            }
+            Wait(1);
+            // Solve the captcha of the faucet
+            var res=DoSolveCaptcha( );
+            if ( res>0 )
+            {
+               
+                return res;
+            }
+
+            var btnClaim=ElementByXPath("//input[@id='ctl00_PageMainContent_SolvemediaBtn']");
+            if ( !IsVisible(btnClaim) )
+            {
+                return Fail("Btn claim faucet not visible");
+            }
+            Click(btnClaim);
+           
+            return base.DoSolveFaucet( );
         }
 
+        public override int GetFaucetWaitTime( )
+        {
+            if(!Driver.Url.Contains("https://litecoinads.com/user/earn/faucet.aspx") )
+            {
+                GoToUrl("https://litecoinads.com/user/earn/faucet.aspx");
+                Wait(2);
+            }
+
+            var Timer=ElementByXPath("//span[@id='countdown']");
+            if (Timer!=null )
+            {
+                var TimerText=ExecuteScript("return arguments[0].textContent;",Timer).ToString().
+                    Replace("minutes","").Replace("and","").Replace("seconds","").Trim().Split(' ');
+                Log(TimerText[0]+" "+TimerText[1]);
+                int min, seg;
+
+                if(TimerText.Length == 2 && 
+                    int.TryParse(TimerText[0],out min) && int.TryParse(TimerText[1],out seg) )
+                {
+                    return min*60+seg;
+                }
+            }
+
+            return base.GetFaucetWaitTime( );
+        }
         private bool SolveVisualCaptcha(string name)
         {
             Wait( );
@@ -294,6 +385,7 @@ namespace NewScripts.PTCShare
             catch ( Exception ex )
             {
                 Log("Problem solving VisualCaptcha: " + ex.Message);
+                Log("Trying again....");
             }
 
             return false;
