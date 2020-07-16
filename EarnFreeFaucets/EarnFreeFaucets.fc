@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using FaucetCollector.Script;
 //css_ref FaucetCollector.Utilities
-    class EarnFreeScript : FaucetScript
+
+class EarnFreeScript : FaucetScript
     {
 
     public override FaucetSettings Settings
@@ -29,7 +30,7 @@ using FaucetCollector.Script;
         }
 
     }
-
+    public FaucetCollector.Utilities.Adblock Adblock_ { get; set; }
     private Dictionary<string, string> AvailableFaucets = new Dictionary<string, string>
     {
 
@@ -73,6 +74,7 @@ using FaucetCollector.Script;
     public override int DoInit ( )
     {
         Url=Url_;
+        Adblock_=new FaucetCollector.Utilities.Adblock(this);
         return base.DoInit ( );
     }
     public override int DoLogin()
@@ -83,6 +85,7 @@ using FaucetCollector.Script;
             GoToUrl(LoginUrl);
             Wait();
         }
+        Adblock_.DestroyAds( );
         var UserBox = ElementByXPath("//input[@placeholder='Enter Username']");
         if (!IsVisible(UserBox))
         {
@@ -133,6 +136,7 @@ using FaucetCollector.Script;
     {
         GoToUrl(Url_ + "/faucet");
         Wait();
+        Adblock_.DestroyAds( );
         var ButtonClaim = ElementByXPath("//button[@id='fbtn']");
         if (!IsVisible(ButtonClaim))
         {
@@ -150,8 +154,16 @@ using FaucetCollector.Script;
         }
         else
         {
+            Log("Submitting form...");
             // call the submit of the form with javascript to avoid the popup
             ExecuteScript("SetClaim();" , ButtonClaim);
+            DateTime Timeout=DateTime.Now.AddSeconds(10);
+            // The claim take some time to appear, wait before close the window.
+            while ( ElementByXPath("//h1[@id='demo']") ==null && DateTime.Now<Timeout )
+            {
+                Wait( );
+            }
+            Wait(1);
         }
    
 
