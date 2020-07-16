@@ -196,7 +196,7 @@ namespace NewScripts.PTCShare
                     try
                     {
                         Driver.SwitchTo( ).Window(Driver.WindowHandles[1]);
-                        Log($"Seeing ad Nº {n.ToString( )}");
+                        Log("Seeing ad Nº "+n.ToString( ));
                         DateTime t1 = DateTime.Now.AddSeconds(75);
                         while ( !IsVisible(ElementByXPath("//div[@id='CaptchaPanel']")) )
                         {
