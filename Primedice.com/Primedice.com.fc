@@ -2,7 +2,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 26/05/2019 04:00PM
-//Last Update: 17/07/2020 12:20AM - Version 7
+//Last Update: 17/07/2020 12:40AM - Version 7
 //==================//
 
 using System;
@@ -19,7 +19,7 @@ using OpenQA.Selenium.Interactions;
 //css_ref ProcessingImagesUsingLockBits
 //css_inc GetestCaptcha
 
-public class stake : FaucetScript
+public class primedice : FaucetScript
 {
     /// <summary>
     /// List of Settings that will be shown in the bot when selecting this Faucet in the bot.
@@ -136,7 +136,9 @@ public class stake : FaucetScript
 	    {
          Click(LogInButton);
         }
-		
+
+        Driver.Navigate().Refresh(); //that not enter multiple content in input
+
         var box_user = ElementByXPath("//input[contains(@name,'email')]");
         SetText(box_user, GetSetting("Email"));
 		
@@ -152,7 +154,7 @@ public class stake : FaucetScript
 		Wait();	
 
 		Wait(3);
-        var RecaptchaOpen_Iframe = ElementByXPath ("//iframe[contains(@src,'recaptcha/api2/anchor')]"); 
+        var RecaptchaOpen_Iframe = ElementByXPath ("//iframe[contains(@src,'recaptcha/api2')]"); 
         if (IsVisible(RecaptchaOpen_Iframe))
         {
           //SolveCaptcha if apper
@@ -430,7 +432,7 @@ public class stake : FaucetScript
               Click(Claim1VAR);
               Log("claim 1 - try");
 			  
-              var ReCaptchaIframe = ElementByXPath("//iframe[contains(@src,'recaptcha/api2/anchor')]"); 
+              var ReCaptchaIframe = ElementByXPath("//iframe[contains(@src,'recaptcha/api2')]"); 
               if (IsVisible(ReCaptchaIframe))
               {	
 		        Log("Reload - call to solve captch");
