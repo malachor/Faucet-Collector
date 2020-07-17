@@ -2,7 +2,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 26/05/2019 04:00PM
-//Last Update: 17/07/2020 02:40PM - Version 7
+//Last Update: 17/07/2020 03:00PM - Version 7
 //==================//
 
 using System;
@@ -375,7 +375,7 @@ public class stake : FaucetScript
 
            if (IsVisible(MinVar))
            {
-	         Log("ClaimBTC - WaitTimerText apper - return to site time"); 
+	         Log("WaitTimerText apper - return to site time"); 
              int min,sec;
              min = Convert.ToInt32(MinVar.Text.Trim().Replace("m.", "").Replace("s.", "").Split(' ')[0])*60;
              sec = Convert.ToInt32(SecVar.Text.Trim().Replace("m.", "").Replace("s.", "").Split(' ')[1]);
@@ -384,7 +384,7 @@ public class stake : FaucetScript
 
            if (!IsVisible(MinVar))
            {
-	            Log("ClaimBTC - return to your time"); 
+	            Log("return to your time"); 
 		        return GetWaitSetting();
            }
 
