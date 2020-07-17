@@ -145,7 +145,7 @@ namespace NewScripts.PTCShare
         public override int DoSolveCaptcha( )
         {
             var CaptchaSelector=ElementByXPath("//select[@id='ctl00_PageMainContent_CaptchaList']");
-            if ( IsVisible(CaptchaSelector) )
+            if ( CaptchaSelector!=null )
             {
                 SelectOptionByValue(CaptchaSelector , "Solvemedia");
                 // Site need to load again so we wait 4 - 6 seconds
@@ -336,7 +336,6 @@ namespace NewScripts.PTCShare
             {
                 var TimerText=ExecuteScript("return arguments[0].textContent;",Timer).ToString().
                     Replace("minutes","").Replace("and","").Replace("seconds","").Trim().Split(' ');
-                Log(TimerText[0]+" "+TimerText[1]);
                 int min, seg;
 
                 if(TimerText.Length == 2 && 
@@ -344,7 +343,12 @@ namespace NewScripts.PTCShare
                 {
                     return min*60+seg;
                 }
+                else
+                {
+                    return 3600;
+                }
             }
+            
 
             return base.GetFaucetWaitTime( );
         }
