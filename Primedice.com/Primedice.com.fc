@@ -2,7 +2,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 26/05/2019 04:00PM
-//Last Update: 17/07/2020 03:00PM - Version 7
+//Last Update: 17/07/2020 12:20AM - Version 7
 //==================//
 
 using System;
@@ -147,6 +147,11 @@ public class stake : FaucetScript
 
 		Wait(2);
 		
+        var ButtonLog = ElementByXPath("//button[contains(@type,'submit')]");
+        Click(ButtonLog);
+		Wait();	
+
+		Wait(3);
         var RecaptchaOpen_Iframe = ElementByXPath ("//iframe[contains(@src,'recaptcha/api2/anchor')]"); 
         if (IsVisible(RecaptchaOpen_Iframe))
         {
@@ -154,22 +159,17 @@ public class stake : FaucetScript
           var result = base.DoSolveCaptcha();
           if (result > 0)
           {
-          
-              return result;
+              return Fail("Fail solving captcha");
+							
           }
           RecaptchaUtility utility = new RecaptchaUtility(this);
           utility.DoSolve();
         }
-		
-		Wait(2);
-		
-        var ButtonLog = ElementByXPath("//button[contains(@type,'submit')]");
-        Click(ButtonLog);
 
+        Click(ButtonLog); //click again
 		Wait();	
 		
 	 } // end ExitButton
-
         
        return base.DoLogin();
     }
@@ -417,36 +417,43 @@ public class stake : FaucetScript
 
 	      Wait(2);
 		  
-          var BalanceNeedToBeZero = ElementByXPath("//span[contains(text(),'Next claim available')] | //span[contains(text(),'None yet')]"); 
-          if (!IsVisible(BalanceNeedToBeZero)) //if is not visible - BalanceNeedToBeZero - DoSolveCaptcha 
+          var CheckAvailableGeneral = ElementByXPath("//span[contains(text(),'Next claim available')] | //span[contains(text(),'None yet')]"); 
+          if (!IsVisible(CheckAvailableGeneral)) 
           {	
 		    Log("faucet visible - do stuff");
+
+            var CheckClaim = ElementByXPath("//div[contains(@class,'styles__Buttons')]//button[contains(@class,'Button__StyledButton') and (@disabled) ]"); 
+            if (!IsVisible(CheckClaim))
+            {	
+
+              var Claim1VAR = ElementByXPath("//div[contains(@class,'styles__Buttons')]//button[contains(@class,'Button__StyledButton') and @type='submit']"); //click on the claim 1
+              Click(Claim1VAR);
+              Log("claim 1 - try");
+			  
+              var ReCaptchaIframe = ElementByXPath("//iframe[contains(@src,'recaptcha/api2/anchor')]"); 
+              if (IsVisible(ReCaptchaIframe))
+              {	
+		        Log("Reload - call to solve captch");
+                var result = DoSolveCaptcha(); //call to solve captch		 
+				
+                var Claim2VAR = ElementByXPath("//div[contains(@class,'styles__Buttons')]//button[contains(@class,'Button__StyledButton') and @type='submit']"); //click on the claim 2
+                Click(Claim2VAR);
+                Log("claim 2 - Success"); // click again  
+				
+		        ClaimSuccess(); //Marks the claim as a success
+		      }
+			  
+              if (!IsVisible(ReCaptchaIframe))
+              {	
+		        Log("RakeBack - Success"); 
+		        ClaimSuccess(); //Marks the claim as a success
+		      }
+			  
+	          Wait(2);
+
+            } //CheckClaim
 		  
-            var ReCaptchaIframe = ElementByXPath("//iframe[contains(@src,'recaptcha/api2/anchor')]"); 
-            if (IsVisible(ReCaptchaIframe))
-            {	
-		      Log("Reload - call to solve captch");
-              var result = DoSolveCaptcha(); //call to solve captch		 
-		      ClaimSuccess(); //Marks the claim as a success
-			  Log("Success");
-		    }
-            if (!IsVisible(ReCaptchaIframe))
-            {	
-		      Log("RakeBack - Success"); 
-		      ClaimSuccess(); //Marks the claim as a success
-		    }
-
-		  }
-
-	      Wait(2);
-
-          var CheckClaim = ElementByXPath("//div[contains(@class,'styles__Buttons')]//button[contains(@class,'Button__StyledButton') and (@disabled) ]"); 
-          if (!IsVisible(CheckClaim))
-          {	
-            Log("Claim_Function - claim button available after captch - do click");
-            var ClaimVAR = ElementByXPath("//div[contains(@class,'styles__Buttons')]//button[contains(@class,'Button__StyledButton') and @type='submit']"); 
-            Click(ClaimVAR);
-          }
+		  }//end CheckAvailableGeneral
 
 		}//end All_Function
 		//=========//
