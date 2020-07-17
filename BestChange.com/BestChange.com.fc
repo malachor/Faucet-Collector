@@ -2,7 +2,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 13/09/2019 22:09PM - Version 1
-//Last Update: 11/01/2020 15:40PM - Version 7
+//Last Update: 17/06/2020 14:10AM - Version 8
 //==================//
 
 using System;
@@ -11,7 +11,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 //css_inc recaptchaUtilities
 
-public class firebitcoinfaucettech : FaucetScript
+public class BestChange : FaucetScript
 {
     /// <summary>
     /// List of Settings that will be shown in the bot when selecting this Faucet in the bot.
@@ -140,8 +140,6 @@ public class firebitcoinfaucettech : FaucetScript
 		Log("NewsTab");
 		}
 
-		
-		
         var box_user = ElementByXPath("//input[@id='partner_login']");
         SetText(box_user, GetSetting("Email"));
 		
@@ -214,19 +212,8 @@ public class firebitcoinfaucettech : FaucetScript
 
         if (ad)
         {
-			
 		 ad=false;
-
-         //=======//
-	     //Timer
-	     //=======//
-           var TimeVAR = Time_Function();
-           if (TimeVAR > 0) 
-           {
-               return TimeVAR;
-           }
-	     //=======//
-			
+		 return GetWaitSetting();
         }
 		
 
@@ -281,13 +268,12 @@ public class firebitcoinfaucettech : FaucetScript
         Click(BtcTab);
 		Log("BtcTab");
 		}
-		
-		
+
         var ClaimButton = ElementByXPath("//input[contains(@onclick,'get_bonus')]");
 		
 	    if (!IsVisible(ClaimButton)) //not visible
 	    { 
-	      Time_Function();//call to time options
+	      return Time_Function();//call to time options
 		  Log("ClaimButton - not visible - return to time");
 		}
 		
@@ -312,7 +298,7 @@ public class firebitcoinfaucettech : FaucetScript
 		   var ReCaptchaButtonStart = ElementByXPath("//div[@class='rc-anchor-logo-portrait']");  //different
 	       if (IsVisible(ReCaptchaButtonStart))
 	       { 
-           Click(ReCaptchaButtonStart);
+           //Click(ReCaptchaButtonStart);
 		   Log("ReCaptchaButtonStart - faucet");
 		   	   
              var SuccessMessageExist = ElementByXPath("//div[@id='bonus_captcha_title' and contains(text(),'successfully')]");
@@ -327,6 +313,7 @@ public class firebitcoinfaucettech : FaucetScript
                 SolveCaptcha_Function(); //call to SolveCaptcha_Function
 		        Wait(3);
                 GetBonus_Function(); //call	
+		        ClaimSuccess(); //Marks the claim as a success
              } 
 		   }
   
@@ -352,11 +339,8 @@ public class firebitcoinfaucettech : FaucetScript
 		   
 	    } // end ClaimButton - visible
 
-		
-		ad = true;    // success
-        //return GetWaitSetting();	
-	
-	
+	      return Time_Function();//call to time options
+
         //We are good to continue
         return base.DoSolveFaucet();
  }
