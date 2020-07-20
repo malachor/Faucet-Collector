@@ -1,7 +1,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 30/04/2019 21:09PM - Version 1
-//Last Update: 10/05/2020 21:15AM - Version 31
+//Last Update: 20/07/2020 13:20PM - Version 32
 //==================//
 
 using System;
@@ -298,38 +298,56 @@ public class bcgame : FaucetScript
 	
 		GoToUrl("https://bc.game/");
 		Wait();		
-		Wait(2);
+		Wait(5);
 
-		var Timer_Counter = ElementByXPath("//div[@class='count-down-wrap']");
-		if (!IsVisible(Timer_Counter))
+		//var Timer_Counter = ElementByXPath("//div[@class='countdown' and @style]/div[@class='count-down-wrap']");
+
+		var Timer_hour = ElementByXPath("//div[1 and @class='num' and contains(text(),'00')]");
+		var Timer_min = ElementByXPath("//div[3 and @class='num' and contains(text(),'00')]");
+		var Timer_sec = ElementByXPath("//div[5 and @class='num' and contains(text(),'00')]");
+
+		if (!IsVisible(Timer_hour) && !IsVisible(Timer_min) && !IsVisible(Timer_sec) )
 		{
-
+		  Log("FaucetClaim - not visible");
+		}
+		
+		if (IsVisible(Timer_hour) && IsVisible(Timer_min) && IsVisible(Timer_sec) )
+		{
 		  Log("FaucetClaim - Timer not visible - go to LuckySpin");
 
-		  var OpenLuckySpin_Button = ElementByXPath("//div[@id='spin-enter']");
-		  if (IsVisible(OpenLuckySpin_Button))
-		  {
-		   Log("FaucetClaim - OpenLuckySpin_Button");
-           Click(OpenLuckySpin_Button);
-		   Wait(4);
-          }
-		  
-          // mouse position click switch - good for "canvas" TagName flash/Games
-          var canvas_VAR = Driver.FindElement(By.ClassName("spin-canvas")); //ctx - was             
-          var size = canvas_VAR.Size;
-          new Actions(Driver).MoveToElement(canvas_VAR, 800, 246).Click().MoveByOffset(size.Width / 800, size.Height / 246).Release().Perform(); //800 - was
-          //=======//
-		  
-		  Wait(6);
+		  var OpenLuckySpin_Button_Check = ElementByXPath("//div[@id='spin-enter' and contains(@style,'none')]");
 
-		  Log("FaucetClaim - LuckySpin - Success");
-          Notification("FaucetClaim - LuckySpin - Success");
-          ClaimSuccess(); //Marks the claim as a success
+		  if (IsVisible(OpenLuckySpin_Button_Check))
+		  {
+		     Log("FaucetClaim - OpenLuckySpin - not visible");
+		  }	
+		  
+		  if (!IsVisible(OpenLuckySpin_Button_Check))
+		  {
+		    Log("FaucetClaim - OpenLuckySpin - here do stuff");
+		    var OpenLuckySpin_Button = ElementByXPath("//div[@id='spin-enter']");
+            Click(OpenLuckySpin_Button);
+		    Wait(4);
+		    
+            // mouse position click switch - good for "canvas" TagName flash/Games
+            var canvas_VAR = Driver.FindElement(By.ClassName("spin-canvas")); //ctx - was             
+            var size = canvas_VAR.Size;
+            new Actions(Driver).MoveToElement(canvas_VAR, 800, 246).Click().MoveByOffset(size.Width / 800, size.Height / 246).Release().Perform(); //800 - was
+            //=======//
+		    
+		    Wait(6);
+		    
+		    Log("FaucetClaim - LuckySpin - Success");
+            Notification("FaucetClaim - LuckySpin - Success");
+            ClaimSuccess(); //Marks the claim as a success
+		  
+          }	//end OpenLuckySpin_Button_Check - if the display not "none"
 		  
 		}//end Timer_Counter
 		
      } //end FaucetClaim
      //=============//
+
 	 
 
           //=======================//
