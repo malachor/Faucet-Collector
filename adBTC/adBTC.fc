@@ -27,6 +27,7 @@ namespace Adbtc
                     new FaucetSetting(){Name="D",Display="Disable After Finish",Type=EditorType.CheckBox,Default=false},
                     new FaucetSetting(){Name="SA",Display="Surf in active window",Type=EditorType.CheckBox,Default=true},
                     new FaucetSetting(){Name="AS",Display="Auto Surfing",Type=EditorType.CheckBox,Default=true},
+                    new FaucetSetting(){Name="Faucet",Display="Try claim the faucet",Type=EditorType.CheckBox,Default=true}
 
                 };
             }
@@ -383,6 +384,47 @@ namespace Adbtc
                 }
             } while (!Finished);
 
+            if ( GetBoolSetting("Faucet") )
+            {
+                // If the user like to claim the faucet  we see if the button to go to the faucet is visible
+                var GotoFaucetBtn=ElementByXPath("//a[@href='https://adbtc.top/faucet']//li[contains(@class,'collection-item')]");
+                if ( IsVisible(GotoFaucetBtn) )
+                {
+                    Click(GotoFaucetBtn);
+                }
+                else
+                {
+                    //We go to the url if the button is not visible
+                    GoToUrl("https://adbtc.top/faucet");
+                }
+
+                Wait(2);
+
+                // We see if the button to claim the faucet is visible
+                var ClaimFaucetBtn=ElementByXPath("//a[@class='btn green']");
+                if ( !IsVisible(ClaimFaucetBtn) )
+                {
+                    Log("Faucet is not ready yet");
+                }
+                else {
+
+                    // We init shortlink
+                    FaucetCollector.Utilities.ShortLinkBypasser  bypasser=new FaucetCollector.Utilities.ShortLinkBypasser(this);
+                    Click(ClaimFaucetBtn);
+
+                        bool claimed=bypasser.DoShortLink( );
+                        if ( claimed )
+                        {
+                            var headerClaim=ElementByXPath("//h5[@class='header']");
+                            if ( IsVisible(headerClaim) )
+                            {
+                                Log(headerClaim.Text);
+                            }
+                        }
+
+
+                  }
+            }
 
             if (GetBoolSetting("SA"))
             {
