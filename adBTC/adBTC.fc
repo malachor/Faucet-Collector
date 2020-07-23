@@ -258,7 +258,7 @@ namespace Adbtc
         }
         public override int BeforeSolveFaucet()
         {
-            var surf = ElementByXPath("//a[@href='https://adbtc.top/surf/rotator']//li[contains(@class,'collection-item')]");
+            var surf = ElementByXPath("//a[contains(@href,'https://adbtc.top/surf/browse')]//li[contains(@class,'collection-item')]");
             if (!IsVisible(surf))
             {
                 return Fail("Go to ad area button is not visible");
