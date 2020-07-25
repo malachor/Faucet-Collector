@@ -73,6 +73,12 @@ class Coinfaucets : FaucetScript
         {
             Url="https://freebinancecoin.com/",
             MinWithdraw=1
+        }
+        },
+        {"Ethereum",new Coinfaucet
+        {
+            Url="https://freeethereum.com/",
+            MinWithdraw=0.1
         } 
         }
 
@@ -91,7 +97,7 @@ class Coinfaucets : FaucetScript
 
                 return Faucets[Key].Url;
             }
-
+           
             return Faucets.Values.FirstOrDefault( ).Url;
 
         }
