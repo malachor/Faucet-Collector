@@ -1,13 +1,24 @@
-﻿//==================//
+//==================//
 //script Written by: ••AviramDayan•• 05/12/2018 06:00AM 
-//Last Update: 11/05/2019 00:23PM - Version 11
+//Last Update: 26/07/2019 17:00PM - Version 13
 //==================//
 
 using System;
+using System.IO;
 using FaucetCollector.Script;
-using System.Text.RegularExpressions;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
+using System.Drawing;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+
+//css_inc ShortLinkUtilities
+//css_ref FaucetCollector.Utilities
+//css_inc RecaptchaUtilities
+//css_inc AntiBotLinksUtility
+//css_ref ImageProcessing
+//css_ref ProcessingImagesUsingLockBits
+//css_inc GetestCaptcha
 
 
 public class stakecube : FaucetScript
@@ -24,13 +35,14 @@ public class stakecube : FaucetScript
             return new FaucetSettings("https://stakecube.net/")
             {
 				
-                new FaucetSetting(){Name="Email",Display="Your UserName",Type=EditorType.TextBox,Required=true},
+                new FaucetSetting(){Name="Email",Display="Your Email",Type=EditorType.TextBox,Required=true},
                 new FaucetSetting(){Name="Password",Display="Your Password",Type=EditorType.TextBox,Required=true},
+				
 			
-                new FaucetSetting() { Name = "AutoOpenFaucetWallet", Display = "AutoOpenFaucetWallet - (BWS,MMO,ESBC,WAGE,APR,TRBO,XBRC)", Type = EditorType.CheckBox, Default = true},	
-                new FaucetSetting() { Name = "AlreadyOpenFaucetWallet", Display = "AlreadyOpenFaucetWallet - if it check ON - so we'll skip the action to OpenFaucetWallet", Type = EditorType.CheckBox, Default = false},	
-                new FaucetSetting() { Name = "FaucetCollect", Display = "FaucetCollect - Auto Collect all coins every 24 hour (BWS,MMO,ESBC,WAGE,APR,TRBO,XBRC)", Type = EditorType.CheckBox, Default = true},	
-                new FaucetSetting() { Name = "AutoVote", Display = "AutoVote - When your account is verified", Type = EditorType.CheckBox, Default = true},	
+                new FaucetSetting() { Name = "FaucetCollect", Display = "FaucetCollect - Auto Collect all coins every 24h", Type = EditorType.CheckBox, Default = true},	
+                new FaucetSetting() { Name = "Label_1", Display = "PREMIUM FAUCETS - FREE - every 24h - SCC,SPE,MMO,ESBC,APR,TRBO,VSX,ASAFE,ABET,CTSC,KYDC,PRIV,GPKR", Type = EditorType.Label, Default = false},	
+                new FaucetSetting() { Name = "Label_2", Display = "COMMUNITY FAUCETS - Updated seldom - BTC,LTC,DOGE,DASH,DC,BLOCK,DGB,PIVX", Type = EditorType.Label, Default = false},	
+                //new FaucetSetting() { Name = "AutoVote", Display = "AutoVote - When your account is verified - 1 vote costs 1 SCC", Type = EditorType.CheckBox, Default = true},	
  
                 /*			
                 new FaucetSetting() { Name = "AutoWithdraw", Display = "AutoWithdraw - Withdraw (when you got 7600 satoshi)", Type = EditorType.CheckBox, Default = true},	
@@ -60,13 +72,13 @@ public class stakecube : FaucetScript
         ad = false;
 		
         //Title that shows in the browser. Is used to identify and close popup windows
-        Title = "stakecube.net";
+        Title = "StakeCube";
 
         //After we did try to claim on the faucet we search for these elements to determine if it was a success or a fail
         SuccessXPath ="//*";
         FailXPath = "//*";  //*[text()='']
 		
-        TimerIsCountingUp = true;
+        //TimerIsCountingUp = true;
 
         //Let Faucet Collector start up everything
         base.Start();
@@ -76,23 +88,17 @@ public class stakecube : FaucetScript
 //============================================================//
 
 
-
     bool ad; //custom bool
 
-	
-	
     public override int DoInit()
     {
 
 
-	   
         //Let Faucet Collector continue.
         return base.DoInit();
     }
 
-	
-	
-	
+
 
 //==================//
 //save Login Cookies 
@@ -101,7 +107,7 @@ public class stakecube : FaucetScript
     {
 
         //if the Logout apper
-        return ElementByXPath("//a[@href='logout.php']") != null;
+        return ElementByXPath("//div[contains(@class,'dropdown dropdown-c')]") != null;
 
         //return base.IsLoggedIn();
     }
@@ -111,23 +117,13 @@ public class stakecube : FaucetScript
 	
 
 	
-	
 //=============//
 //BeforeLogin 
 //=============//
  public override int BeforeLogin()
  {
  
-	 var LogoutVar = ElementByXPath("//a[@href='logout.php']"); //Logout
-		
-     if (IsVisible(LogoutVar))
-     {
-	    //go to dashboard page
-	    Log("Login: go to dashboard page");
-	    GoToUrl("https://stakecube.net/dashboard.php");	
-     }
-
-	 
+ 
    //This faucet has nothing to do here. We will let Faucet Collector handle it.
    return base.BeforeLogin();
  }
@@ -143,59 +139,41 @@ public class stakecube : FaucetScript
  public override int DoLogin()
  {
 
-	 var LoginVar = ElementByXPath("//a[@href='login.php']"); //Login
+	 var LoginVar = ElementByXPath("//div[contains(@class,'dropdown dropdown-c')]"); //Login
 
-     if (IsVisible(LoginVar))
+     if (!IsVisible(LoginVar))
      {	
  	    // go to login page
 	    Log("Login: go to login page");
-	    GoToUrl("https://stakecube.net/login.php");	
-		
+	    GoToUrl("https://stakecube.net/app/account/login");	
+	    Wait();		
 	    Wait(5);
 				
-	    var UserNameVar = ElementByXPath("//input[@id='username']");
-        Log("Login: set UserNameVar");
+	    var UserNameVar = ElementByXPath("//input[contains(@class,'email')]");
+        Log("Login: set Email");
         SetText(UserNameVar, GetSetting("Email"));
 		
 	    Wait(2);
 				
-	    var PasswordVar = ElementByXPath("//input[@name='password']");
+	    var PasswordVar = ElementByXPath("//input[contains(@class,'password')]");
         Log("Login: set Password");
         SetText(PasswordVar, GetSetting("Password"));
 		
-		Wait(3);			
+		Wait(2);			
 		
-		//SolveCaptcha if apper
-        var result = SolveCaptcha();
-        if (result > 0)
-        {
-            //SolveCaptcha returned there was something wrong - we also need to return that .
-            return result;
-        }
-
+        Recaptcha_Function(); // call to solve
 		
-	    Wait(5);
+	    Wait(2);
 
 		//login button
-        var LoginButton1 = ElementByXPath("//button[@class='btn btn-lg btn-primary btn-block btn-signin']");
+        var LoginButton1 = ElementByXPath("//button[contains(@class,'btn-login')]");
         Log("Login: Login Button 1");	
         Click(LoginButton1);
-
 		
-        var LoginFailMessage = ElementByXPath ("//span[@class='error-password' and contains( text(),'Recaptcha' | 'error' | 'password' ) ] ");
-        if (IsVisible(LoginFailMessage))
-        {
-            Log("LoginFailMessage - Appear - we return after 1 min ");
-			Driver.Close();  // Close specific chrome window
-            Driver.Quit();  // also Close the console app, that was used to kick off the chrome window
-            Driver.Dispose();  // Close the chromedriver.exe
-            return 1*60;
-        }	
-		
+	    Wait();	
 		
      }//end LoginVar
-	 
-	 
+ 
         //This faucet has nothing to do here. We will let Faucet Collector handle it.
         return base.DoLogin();
  }
@@ -204,10 +182,7 @@ public class stakecube : FaucetScript
 //start DoLogin
 //==============//
 	
-	
-	
-	
-	
+
 	
 //==============//
 //start AfterLogin
@@ -224,10 +199,7 @@ public class stakecube : FaucetScript
 //start AfterLogin
 //==============//	
 	
-	
-	
-	
-	
+
 	
 //=============//
 //GetFaucetWaitTime
@@ -237,9 +209,6 @@ public class stakecube : FaucetScript
 
         if (ad)
         {
-        Driver.Close();  // Close specific chrome window
-        Driver.Quit();  // also Close the console app, that was used to kick off the chrome window
-        Driver.Dispose();  // Close the chromedriver.exe
 		ad=false; //solve the problem in start - after he return to script again
         return GetWaitSetting();	
         }
@@ -250,8 +219,6 @@ public class stakecube : FaucetScript
 //=============//
 //GetFaucetWaitTime
 //=============//
-	
-	
 	
 	
     public override int BeforeSolveCaptcha()
@@ -275,119 +242,45 @@ public class stakecube : FaucetScript
         return base.AfterSolveCaptcha();
     }
 	
-	
 
-	
-	
 //================//	
 //BeforeSolveCaptcha
 //================//	
     public override int BeforeSolveFaucet()
     {
 		
+
 		
-   //===================//
-   //AutoOpenFaucetWallet
-   //===================//
-	 
-   if (GetBoolSetting("AutoOpenFaucetWallet") && !GetBoolSetting("AlreadyOpenFaucetWallet"))
-   { 
+        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+        return base.BeforeSolveCaptcha();
+    }
+//================//	
+//BeforeSolveCaptcha
+//================//	
 
-     Log("AutoOpenFaucetWallet");	
 
-     //go to dashboard
-     GoToUrl("https://stakecube.net/dashboard.php");
-	 Wait();	
-	 Wait(3);	 
- 
-	 // we need to open "wallet" to collect all (BWS,MMO,ESBC,WAGE,APR,TRBO,XBRC)
-	 var BWS = ElementByXPath("//*[@id='BWS']");
-	 var MMO = ElementByXPath("//*[@id='MMO']");
-	 var ESBC = ElementByXPath("//*[@id='ESBC']");	  
-	 var WAGE = ElementByXPath("//*[@id='WAGE']");	 
-	 var APR = ElementByXPath("//*[@id='APR']");
-	 var TRBO = ElementByXPath("//*[@id='TRBO']");
-	 var XBRC = ElementByXPath("//*[@id='XBRC']");
- 
-     Log("OpenWallet: BWS");	
-     Click(BWS);
-	 
-	 Wait(3);
-	 
-     Log("OpenWallet: MMO");	
-     Click(MMO); 
-	 
-	 Wait(3);
+//=============//	
+//DoSolveFaucet
+//=============//
+ public override int DoSolveFaucet()
+ {
 
-     Log("OpenWallet: ESBC");	
-     Click(ESBC); 	
-	 
-	 Wait(3);
-	 
-     Log("OpenWallet: WAGE");	
-     Click(WAGE); 
-	 
-	 Wait(3);
-
-     Log("OpenWallet: APR");	
-     Click(APR);	 
-	 
-	 Wait(3);
-	 
-     Log("OpenWallet: TRBO");	
-     Click(TRBO);
-	 
-	 Wait(3);
-	 
-     Log("OpenWallet: XBRC");	
-     Click(XBRC); 
-	 
-   } 
-   
-   
-   if (GetBoolSetting("AlreadyOpenFaucetWallet"))
-   { 
-     Log("AlreadyOpenFaucetWallet - no need to OpenFaucetWallet");	
-   }
-
-   //===================//
- 
- 
-  
- 
     //=======//
-    //AutoVote
+    //AutoVote - need to wait for the next updates improvements
     //========//
 	
+     /*  
     if (GetBoolSetting("AutoVote"))
     { 
 
-        //first go to verified page to check
-        GoToUrl("https://stakecube.net/verify.php");
-		Log("AutoVote: go to verified page to check" );
-
-
-      var Alert_Message = ElementByXPath ("//div[@class='alert alert-warning' and contains(text(),'closed' | 'Soon') ] ");
-
-	
-	  if (IsVisible(Alert_Message))
-      {
-        Log("Alert_Message - Appear - we skip on vote");
-		DoSolveFaucet(); // skip and call to DoSolveFaucet
-      }
-		
-		
-	  if (!IsVisible(Alert_Message))
-      {
-			
 		//var check
         var verifiedVotePageUnlock = ElementByXPath("//div[@style='background-color: red;']"); 
 		
-		
+	
 		//if Unlock	visible - so skip
         if (IsVisible(verifiedVotePageUnlock))
         {
-		 //do not do anything
+		 Log("Vote Page is Unlock");
 		}
 
 		
@@ -395,7 +288,7 @@ public class stakecube : FaucetScript
         if (!IsVisible(verifiedVotePageUnlock))
         {
 			
-        GoToUrl("https://stakecube.net/vote.php");
+        GoToUrl("https://stakecube.net/app/community");
 		Log("AutoVote: go to verified page to check" );
 				
 		//table/tbody/tr[2]/td[1]/button
@@ -451,28 +344,12 @@ public class stakecube : FaucetScript
         Click(Coin_10_Vote);		
 	    }
 
-      } // end Alert_Message not apper
+       } // end Alert_Message not apper
 		
-		
-    } // end AutoVote
-     //============//
-		
-        //This faucet has nothing to do here. We will let Faucet Collector handle it.
-        return base.BeforeSolveCaptcha();
-    }
-//================//	
-//BeforeSolveCaptcha
-//================//	
-	
 
-	
-	
-	
-//=============//	
-//DoSolveFaucet
-//=============//
- public override int DoSolveFaucet()
- {
+    } // end AutoVote
+	*/		
+     //============//
 
 
      //============//
@@ -482,121 +359,65 @@ public class stakecube : FaucetScript
     { 
 
 		//go to faucet
-        GoToUrl("https://stakecube.net/faucet.php");
+        GoToUrl("https://stakecube.net/app/community/faucets");
+		Log("FaucetCollect: Collect All" );
+	    Wait();		
+	    Wait(5);	
 		
-	    Wait(2);	
-		
-        //Error_Message
-		var Error_Message = ElementByXPath("//div[@data-notify='container']/span[starts-with(text(),'You already claimed today')]");  //div[@class='col-xs-11 col-sm-4 alert alert-danger animated fadeInDown']
-			
-        //vars claims all  (BWS,MMO,ESBC,WAGE,APR,TRBO,XBRC)
-        var Claim_BWS = ElementByXPath("//div[5]/div/div[1]/p[4]/button"); //button[@onclick='claim('BWS')']
-        var Claim_MMO = ElementByXPath("//div[5]/div/div[2]/p[4]/button"); //button[@onclick='claim('MMO')']
-        var Claim_ESBC = ElementByXPath("//div[5]/div/div[3]/p[4]/button"); //button[@onclick='claim('ESBC')']
-        var Claim_WAGE = ElementByXPath("//div[5]/div/div[4]/p[4]/button"); //button[@onclick='claim('WAGE')']
-        var Claim_APR = ElementByXPath("//div[5]/div/div[5]/p[4]/button"); //button[@onclick='claim('APR')']
-        var Claim_TRBO = ElementByXPath("//div[5]/div/div[6]/p[4]/button"); //button[@onclick='claim('TRBO')']
-        var Claim_XBRC = ElementByXPath("//div[5]/div/div[7]/p[4]/button"); //button[@onclick='claim('XBRC')']
-
-		
-       //=====//		
-		//BWS
-       //=====//
-	    Wait(7);	
-		Log("FaucetCollect: Collect BWS" );
-	    Click(Claim_BWS);
-		
-        //first - if the Error_Message appear - so we skip on all different claims - we return after 6 hours (360*60)
-        if (IsVisible(Error_Message))
-        {	
-	
-		Log("FaucetCollect: Error_Message | we return after 6 hours (360*60)");
-		
-        Driver.Close();  // Close specific chrome window
-        Driver.Quit();  // also Close the console app, that was used to kick off the chrome window
-        Driver.Dispose();  // Close the chromedriver.exe
-        return GetWaitSetting();
-		
-		}	
-        //==========//		
-		
-		
-       //=====//		
-		//MMO
-       //=====//
-	    Wait(7);	
-        Log("FaucetCollect: Collect MMO");	
-        Click(Claim_MMO);
-       //==========//	
-
-		
-       //=====//		
-		//ESBC
-       //=====//
-	    Wait(7);	   
-        Log("FaucetCollect: Collect ESBC");	
-        Click(Claim_ESBC);
-        //==========//		
-
-		
-       //=====//		
-		//WAGE
-       //=====//
-	    Wait(7);	   
-        Log("FaucetCollect: Collect WAGE");	
-        Click(Claim_WAGE);
-        //==========//		
-	
-		
-       //=====//		
-		//APR
-       //=====//
-	    Wait(7);	   
-        Log("FaucetCollect: Collect APR");	
-        Click(Claim_APR);
-        //==========//		
-	
-		
-       //=====//		
-		//TRBO
-       //=====//
-	    Wait(7);	   
-        Log("FaucetCollect: Collect TRBO");	
-        Click(Claim_TRBO);
-        //==========//		
-	
-		
-       //=====//		
-		//XBRC
-       //=====//
-	    Wait(7);	   
-        Log("FaucetCollect: Collect XBRC");	
-        Click(Claim_XBRC);
-        //==========//	
-
-
-	   //general info Message
-	   //var General_Info_Messages = ElementByXPath("//div[@data-notify='container']");
-	   //Log(General_Info_Messages.Text);	
-
-	   
-	   //we return after 6 hours
-		//Log("FaucetCollect: done - we return after your time");
-
+        var TimeToWaitForBreak = DateTime.Now.AddSeconds(360);
+        while (true)
+        {
+        
+          var FaucetCheck = ElementByXPath("//button[contains(@onclick,'claim')]");
+          if (IsVisible(FaucetCheck))
+          {
+        
+            Wait(5);
+        
+            var FaucetButton = ElementByXPath("//button[contains(@onclick,'claim')]");
+            Click(FaucetButton);
+            Log("FaucetClaim - click");
+        
+            Wait(2);
+        
+            var SuccessMessage = ElementByXPath("//div[contains(@class,'jq-toast-single jq-has-icon jq-icon-success')]");
+            if (IsVisible(SuccessMessage))
+            {
+            Log(SuccessMessage.Text);
+            ClaimSuccess(); //Success
+            }
+        
+            Wait(2);
+        
+          }// end FaucetCheck
+        
+          if (!IsVisible(FaucetCheck))
+          {
+          Log("FaucetClaim - break - not Available");
+          break;
+          }
+        
+          if (DateTime.Now > TimeToWaitForBreak) //if the time above 65 sec 
+          {
+          Log("FaucetClaim - break - TimeToWaitForBreak");
+          break; //break the wait loop
+          }
+        
+        } //end while true	
 	
     } // end FaucetCollect
+    //=============//
 
-		
-/*
 
      //============//
     //AutoWithdraw
     //=============//
+	/*
     if (GetBoolSetting("AutoWithdraw"))
     { 
 
 		//first go to page to check
-	    GoToUrl("");
+	    GoToUrl("https://stakecube.net/app/coin/");
 		
 		Wait(2);
 		
@@ -611,43 +432,29 @@ public class stakecube : FaucetScript
         {		
 		Log(SuccessMessageVar.Text);
         }
+		
         Wait(2);	
 	
-	   Log("we return after 60 min");	
-    Driver.Close();  // Close specific chrome window
-    Driver.Quit();  // also Close the console app, that was used to kick off the chrome window
-    Driver.Dispose();  // Close the chromedriver.exe
-    return GetWaitSetting();
-	   
+	    Log("we return after 60 min");	  
 
     } //end AutoWithdraw
-	
-*/
-
+    */	
+    //=============//
 		
-        Wait();
-		//CheckFaucetResult(); //skip all actions - and call to --> CheckFaucetResult - to make sure That FC mark as "Payout" before
-		//ad = true;    // if i do true - it report as succeed // only one time no multi and also required -> return GetWaitSetting();	
-
+    Wait();
 		
-        Driver.Close();  // Close specific chrome window
-        Driver.Quit();  // also Close the console app, that was used to kick off the chrome window
-        Driver.Dispose();  // Close the chromedriver.exe
-        return GetWaitSetting();	
-      
+    //ad = true;    // if i do true - it report as succeed // only one time no multi and also required -> return GetWaitSetting();	
+    //return GetWaitSetting();	
+    return Time_Function();
+
    
-        //We are good to continue
-        return base.DoSolveFaucet();
+   //We are good to continue
+   return base.DoSolveFaucet();
  }
  
 //=============//	
 //DoSolveFaucet
 //=============//
- 
- 
- 
- 
- 
  
 	
 //===============//
@@ -665,9 +472,6 @@ public class stakecube : FaucetScript
 //===============//
 
 
-	
-
-
     /// <summary>
     /// This method gets called in the end after the BeforeSolveFaucet/DoSolveFaucet and AfterSolveFaucet methods were done.
     /// The base.CheckFaucetResult will try to find a visible element on the page using the XPath from SuccessXPath and FailXPath (see the Start method)
@@ -682,6 +486,68 @@ public class stakecube : FaucetScript
     }
  
 
+        //=================//
+       //Time_Function
+        //=================//
+        public int Time_Function()
+        {
+			
+           var MinVar = ElementByXPath("//article[contains(@class,'maincontent')]//span[2]/span[1]") ;
+		   var SecVar = ElementByXPath("//article[contains(@class,'maincontent')]//span[3]/span[1]") ;
+
+           if (IsVisible(MinVar))
+           {
+	         Log("ClaimBTC - WaitTimerText apper - return to site time"); 
+             int min,sec;
+             min = Convert.ToInt32(MinVar.Text.Trim().Replace("m.", "").Replace("s.", "").Split(' ')[0])*60;
+             sec = Convert.ToInt32(SecVar.Text.Trim().Replace("m.", "").Replace("s.", "").Split(' ')[1]);
+             return min+sec;
+           } 
+
+           if (!IsVisible(MinVar))
+           {
+	            Log("ClaimBTC - return to your time"); 
+		        return GetWaitSetting();
+           }
+
+           return 0;		
+        }//end Time_Function
+        //=================//	
+		
+	
+        //=================//
+       //Recaptcha_Function
+        //=================//
+
+        public int Recaptcha_Function()
+        {
+			
+          //DoSolveImageCaptcha
+          var SolveMedia = ElementByXPath ("//img[contains(@id,'adcopy-puzzle-image-image')]"); 
+          if (IsVisible(SolveMedia))
+		  {  
+            Log("DO SolveMedia");	  
+	        var result_2 = DoSolveImageCaptcha(ElementByXPath("//img[contains(@id,'adcopy-puzzle-image-image')]"),ElementByXPath("//input[@name='adcopy_response']")); 
+		  }
+		  
+	     //for recaptcha popup after click on button - ("//button[contains(@class,'reload')] | //button[contains(@id,'reload')] ")
+          var RecaptchaOpen_Iframe = ElementByXPath ("//iframe[contains(@src,'recaptcha/api2/anchor')]"); 
+          if (IsVisible(RecaptchaOpen_Iframe))
+		  {
+            //SolveCaptcha if apper
+            Log("DO Recaptcha");	  
+            var result = base.DoSolveCaptcha();
+            if (result > 0)
+            {
+                return Fail("Fail solving captcha");
+            }
+            RecaptchaUtility utility = new RecaptchaUtility(this);
+            utility.DoSolve();
+		  }
+
+		return 0;
+        }//end Recaptcha_Function
+        //=================//	
  
  
 } //END public class 
