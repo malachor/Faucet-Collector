@@ -1,8 +1,8 @@
 
 
 //==================//
-//script Written by: ••AviramDayan•• 28/07/2020 22:00PM - Version 1
-//Last Update: 28/07/2020 22:00PM - Version 1
+//script Written by: ••AviramDayan•• 29/07/2020 06:00PM - Version 1
+//Last Update: 29/07/2020 06:00PM - Version 1
 //==================//
 
 using System;
@@ -39,10 +39,11 @@ public class addoge : FaucetScript
                 new FaucetSetting(){Name="Email",Display="UserName",Type=EditorType.TextBox,Required=true},
                 new FaucetSetting(){Name="Password",Display="Password",Type=EditorType.Password,Required=true},
 				
-                new FaucetSetting(){Name="YouTubeClaim",Display="YouTubeClaim - claim unlimited - without captcha",Type=EditorType.CheckBox,Default=true},	
-                new FaucetSetting(){Name="VideoClaim",Display="VideoClaim - claim unlimited - without captcha",Type=EditorType.CheckBox,Default=true},	
+                new FaucetSetting(){Name="YouTubeClaim",Display="YouTubeClaim - wait 30sec between each video - claim unlimited - without captcha",Type=EditorType.CheckBox,Default=true},	
+                new FaucetSetting(){Name="VideoClaim",Display="VideoClaim - wait 30sec between each video - claim unlimited - without captcha",Type=EditorType.CheckBox,Default=true},	
+                new FaucetSetting(){Name="PTC_AutoSurf",Display="PTC_AutoSurf - wait 10sec between each AD - captcha available",Type=EditorType.CheckBox,Default=false},	
                 new FaucetSetting(){Name="DailyBonus",Display="DailyBonus - after 10/15 actions - in each section (PTC ADS, OFFERWALLS, VIDEOS, SHORTLINKS, FAUCET, HCAPTCHA)",Type=EditorType.CheckBox,Default=true},	
-			              		
+		              		
                 //insert user settings here
                 //new FaucetSetting { 
                 //    Name = "Name of your setting", 
@@ -269,66 +270,91 @@ public class addoge : FaucetScript
     public override int DoSolveFaucet()
     {
 
-
-
      //=============//
      //YouTubeClaim
      //=============//
      if (GetBoolSetting("YouTubeClaim"))
      {		
-     		
-        var TimeToWaitForBreak = DateTime.Now.AddSeconds(360);
-        while (true)
-        {
-        
-          GoToUrl("https://ad-doge.com/user/earn/youtube.aspx");
+
+          GoToUrl("https://ad-doge.com/user/upgrade.aspx"); //to only open the menu in "Earn" section
           Wait(); 
           Wait(3); 
-        	
-          var VideoCheck = ElementByXPath("//div[contains(@class,'video-main')]");
-          if (IsVisible(VideoCheck))
-          {
-            Log("YouTubeClaim - here");
-        	
-            var Video_Click = ElementByXPath("//div[contains(@class,'video-main')]");
-            Click(Video_Click);
-        
-            Wait(6);
-            var iframeMainTag = ElementByXPath("//iframe[contains(@id,'player')]") ;	
-            Driver.SwitchTo().Frame(iframeMainTag); //after active & switch to "iframe"
-        
-            var Video_inside_Click = ElementByXPath("//div[@class='ytp-cued-thumbnail-overlay']//button");
-            Click(Video_inside_Click);
-        	
-            Wait(2);
-        
-            Driver.SwitchTo().DefaultContent(); //go back to default content in <html>
-        
-            Wait(35);
-            Log("YouTubeClaim - wait");  
-       
-            var SuccessCheck = ElementByXPath("//div[contains(@class,'alert alert-success')]");
-            if (IsVisible(SuccessCheck))
+		  	
+          var balance = ElementByXPath("//a[contains(text(),'YouTube')]/span[contains(@class,'badge pull-right bg-green')]");
+          string BalanceSTRING = balance.Text;
+          int BalanceINT = Convert.ToInt32(BalanceSTRING);
+			
+          if (BalanceINT > 2) 
+		  {
+
+            var TimeToWaitForBreak_1 = DateTime.Now.AddSeconds(360);	//main	  
+            var TimeToWaitForBreak_2 = DateTime.Now.AddSeconds(65);  //short
+            while (true)
             {
-            Log(SuccessCheck.Text);
-            ClaimSuccess();
-            }
-        
-          }// end VideoCheck
-        
-          if (!IsVisible(VideoCheck))
-          {
-          Log("YouTubeClaim - break - not Available");
-          break;
-          }
-        
-          if (DateTime.Now > TimeToWaitForBreak) 
-          {
-          Log("YouTubeClaim - break - TimeToWaitForBreak");
-          break; //break the wait loop
-          }
-     
-        } //end while true	
+              Title = "Ad-DOGE";            
+              GoToUrl("https://ad-doge.com/user/earn/youtube.aspx");
+              Wait(); 
+              Wait(3); 
+              Log("YouTubeClaim - go to page");	
+		      
+              var VideoCheck = ElementByXPath("//div[contains(@class,'video-main')]");
+              if (IsVisible(VideoCheck))
+              {
+                Log("YouTubeClaim - here");
+            	
+                var Video_Click = ElementByXPath("//div[contains(@class,'video-main')]");
+                Click(Video_Click);
+            
+                Wait(6);
+                var iframeMainTag = ElementByXPath("//iframe[contains(@id,'player')]") ;	
+                Driver.SwitchTo().Frame(iframeMainTag); //after active & switch to "iframe"
+            
+                var Video_inside_Click = ElementByXPath("//div[@class='ytp-cued-thumbnail-overlay']//button");
+                Click(Video_inside_Click);
+                Wait(1);
+                Click(Video_inside_Click);  //click again     	
+                Wait(3);
+            
+                Driver.SwitchTo().DefaultContent(); //go back to default content in <html>
+		    	
+                while (!IsVisible(ElementByXPath ("//div[contains(@class,'alert alert-success')]") )) 
+		    	{
+
+                  Log("VideoClaim - wait");  
+                  Wait();
+		    
+                  if (DateTime.Now > TimeToWaitForBreak_2) 
+                  {
+                  Log("VideoClaim - break - TimeToWaitForBreak_2");
+                  break; //break the wait loop
+                  }
+		    
+		    	} //end while
+
+                if (IsVisible(ElementByXPath ("//div[contains(@class,'alert alert-success')]") )) 
+                {
+                  var SuccessCheck = ElementByXPath("//div[contains(@class,'alert alert-success')]");
+                  Log(SuccessCheck.Text);
+                  ClaimSuccess();
+                }	
+		        
+              }// end VideoCheck
+            
+              if (!IsVisible(VideoCheck))
+              {
+              Log("YouTubeClaim - break - not Available");
+              break;
+              }
+            
+              if (DateTime.Now > TimeToWaitForBreak_1) 
+              {
+              Log("YouTubeClaim - break - TimeToWaitForBreak_1");
+              break; //break the wait loop
+              }
+		    
+            } //end while true	
+
+		} // end BalanceINT - above 2
      
      } //end YouTubeClaim	
      //=============//
@@ -341,61 +367,193 @@ public class addoge : FaucetScript
      if (GetBoolSetting("VideoClaim"))
      {		
 
-        var TimeToWaitForBreak = DateTime.Now.AddSeconds(360);
-        while (true)
-        {
-        
-          GoToUrl("https://ad-doge.com/user/earn/video.aspx");
+          GoToUrl("https://ad-doge.com/user/upgrade.aspx"); //to only open the menu in "Earn" section
           Wait(); 
           Wait(3); 
-        	
-          var VideoCheck = ElementByXPath("//a[text()='Video ']/span[contains(@class,'badge pull-right bg-green')] | //a[text()='Video']/span[contains(@class,'badge pull-right bg-green')]") ;
-          if (IsVisible(VideoCheck))
-          {
-            Log("VideoClaim - here");
-        	
-            var Video_Click = ElementByXPath("//div[contains(@class,'row')]//div[contains(@class,'col-md-3 image')] ");
-            Click(Video_Click);
-        
-            Wait(6);
+		  	
+          var balance = ElementByXPath("//a[text()='Video ']/span[contains(@class,'badge pull-right bg-green')] | //a[text()='Video']/span[contains(@class,'badge pull-right bg-green')]");
+          string BalanceSTRING = balance.Text;
+          int BalanceINT = Convert.ToInt32(BalanceSTRING);
 			
-            var iframeMainTag = ElementByXPath("//iframe[contains(@id,'player')]") ;	
-            Driver.SwitchTo().Frame(iframeMainTag); //after active & switch to "iframe"
-        
-            var Video_inside_Click = ElementByXPath("//button[contains(@class,'ButtonPlayback')]");
-            Click(Video_inside_Click);
-        	
-            Wait(2);
-        
-            Driver.SwitchTo().DefaultContent(); //go back to default content in <html>
-     
-            Wait(35);
-            Log("VideoClaim - wait");  
-			
-            var SuccessCheck = ElementByXPath("//div[contains(@class,'alert alert-success')]");
-            if (IsVisible(SuccessCheck))
+          if (BalanceINT > 2) 
+		  {
+
+            var TimeToWaitForBreak_1 = DateTime.Now.AddSeconds(360);	//main	  
+            var TimeToWaitForBreak_2 = DateTime.Now.AddSeconds(65);  //short
+            while (true)
             {
-            Log(SuccessCheck.Text);
-            ClaimSuccess();
-            }
-        
-          }// end VideoCheck
-        
-          if (!IsVisible(VideoCheck))
-          {
-          Log("VideoClaim - break - not Available");
-          break;
-          }
-        
-          if (DateTime.Now > TimeToWaitForBreak) 
-          {
-          Log("VideoClaim - break - TimeToWaitForBreak");
-          break; //break the wait loop
-          }
-     
-        } //end while true	
+              Title = "Ad-DOGE";             
+              GoToUrl("https://ad-doge.com/user/earn/video.aspx");
+              Wait(); 
+              Wait(3); 
+              Log("VideoClaim - go to page");	
+       	    
+              var VideoCheck = ElementByXPath("//a[text()='Video ']/span[contains(@class,'badge pull-right bg-green')] | //a[text()='Video']/span[contains(@class,'badge pull-right bg-green')]") ;
+              if (IsVisible(VideoCheck))
+              {
+                Log("VideoClaim - here");
+            	
+                var Video_Click = ElementByXPath("//div[contains(@class,'row')]//div[contains(@class,'col-md-3 image')] ");
+                //Click(Video_Click);
+
+                GoToUrl("https://ad-doge.com/user/earn/video.aspx?v=x7oivch"); //go to some random video ID
+                Wait(5);
+		    	
+                var iframeMainTag = ElementByXPath("//iframe[contains(@id,'player')]") ;	
+                Driver.SwitchTo().Frame(iframeMainTag); //after active & switch to "iframe"
+            
+                var Video_inside_Click = ElementByXPath("//button[contains(@class,'ButtonPlayback')]");
+                Click(Video_inside_Click);//click only one     
+                Wait(2);
+            
+                Driver.SwitchTo().DefaultContent(); //go back to default content in <html>
+		    
+                while (!IsVisible(ElementByXPath ("//div[contains(@class,'alert alert-success')]") )) 
+		    	{
+	    	  
+                  Log("VideoClaim - wait");  
+                  Wait();
+		    
+                  if (DateTime.Now > TimeToWaitForBreak_2) 
+                  {
+                  Log("VideoClaim - break - TimeToWaitForBreak_2");
+                  break; //break the wait loop
+                  }
+		    
+		    	} //end while
+
+                if (IsVisible(ElementByXPath ("//div[contains(@class,'alert alert-success')]") )) 
+                {
+                  var SuccessCheck = ElementByXPath("//div[contains(@class,'alert alert-success')]");
+                  Log(SuccessCheck.Text);
+                  ClaimSuccess();
+                }	
+		        
+              }// end VideoCheck
+            
+              if (!IsVisible(VideoCheck))
+              {
+              Log("VideoClaim - break - not Available");
+              break;
+              }
+            
+              if (DateTime.Now > TimeToWaitForBreak_1) 
+              {
+              Log("VideoClaim - break - TimeToWaitForBreak_1");
+              break; //break the wait loop
+              }
+		    
+            } //end while true	
+
+		} // end BalanceINT - above 2
      
      } //end VideoClaim	
+     //=============//
+
+
+
+     //=============//
+     //PTC_AutoSurf
+     //=============//
+     if (GetBoolSetting("PTC_AutoSurf"))
+     {		
+
+         var TimeToWaitForBreak_1 = DateTime.Now.AddSeconds(360);	//main	  
+         var TimeToWaitForBreak_2 = DateTime.Now.AddSeconds(25);  //short
+         while (true)
+         {
+           Title = "Earn";             
+           GoToUrl("https://ad-doge.com/user/earn/ads.aspx");
+           Wait(); 
+           Wait(3); 
+           Log("PTC_AutoSurf - go to page");	
+       	 
+           var ADCheck = ElementByXPath("//div[contains(@class,'AboxActive Ad image')]");
+           if (IsVisible(ADCheck))
+           {
+             Log("PTC_AutoSurf - here");
+             CheckForPopups();    //call
+             CheckForPopupsEnabled = false;    //disable	
+			 
+             Title = "Advertisement";  
+             var AD_Click = ElementByXPath("//div[contains(@class,'AboxActive Ad image')]");
+             Click(AD_Click);
+			 
+             Wait(2);
+			 
+             Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+
+             Wait(2);
+			 
+             Title = "Advertisement";  
+             var Watch_Button = ElementByXPath("//input[contains(@value,'Watch')]");
+             Click(Watch_Button);//click only one  
+			 
+             Wait();
+  
+             Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+
+             Wait();
+  
+             while (!IsVisible(ElementByXPath ("//div[contains(@id,'AfterCounterPanel')]") )) 
+		 	 {
+
+               VisualCaptcha_Function(); //call to solve     
+			   
+               if (!IsVisible(ElementByXPath ("//div[contains(@id,'AfterCounterPanel')]") )) 
+               {
+		       Log("PTC_AutoSurf - wait");  
+               Wait();				      
+			   }
+			     
+               if (DateTime.Now > TimeToWaitForBreak_2) 
+               {
+                 Log("PTC_AutoSurf - break - TimeToWaitForBreak_2");
+                 Wait(4);				 
+                 break; //break the wait loop
+               }
+
+		 	 } //end while
+
+             var Send_Button = ElementByXPath("//input[contains(@value,'Send')]");
+			 if (IsVisible(ADCheck))
+             {
+             Wait(2);					   
+             Click(Send_Button);//click only one  
+             Log("PTC_AutoSurf - click Send");  
+			 }	
+
+             if (IsVisible(ElementByXPath ("//div[contains(@id,'AfterCounterPanel')]") )) 
+             {
+
+               var SuccessCheck = ElementByXPath("//div[contains(@id,'AfterCounterPanel')]");
+               Log(SuccessCheck.Text);
+               ClaimSuccess();
+
+               Wait(4);	
+			   
+               Title = "Earn"; 
+               Driver.SwitchTo().Window(Driver.WindowHandles[0]);
+               CheckForPopupsEnabled = true;     //enable
+             }	
+		     
+           }// end ADCheck
+         
+           if (!IsVisible(ADCheck))
+           {
+           Log("PTC_AutoSurf - break - not Available");
+           break;
+           }
+         
+           if (DateTime.Now > TimeToWaitForBreak_1) 
+           {
+           Log("PTC_AutoSurf - break - TimeToWaitForBreak_1");
+           break; //break the wait loop
+           }
+		 
+         } //end while true	
+     
+     } //end PTC_AutoSurf	
      //=============//
 
 
@@ -404,6 +562,11 @@ public class addoge : FaucetScript
       //=============//
       if (GetBoolSetting("DailyBonus"))
       {
+
+        GoToUrl("https://ad-doge.com/user/earn/dailybonus.aspx");
+        Wait(); 
+        Wait(3); 
+        Log("DailyBonus - go to page");	
 
         var DailyBonus_Check = ElementByXPath("//button[contains(@id,'DailyBonus') and @disabled]");  
 
@@ -526,29 +689,38 @@ public class addoge : FaucetScript
       //=================//
      //VisualCaptcha_Function
       //=================//
-
       public int VisualCaptcha_Function()
       {
 		
         if(IsVisible(ElementByXPath("//p[@class='visualCaptcha-explanation']//strong")) )
         {
-            bool captcha_solved = false;
-            while ( !captcha_solved )
-            {
-                var name_ = ElementByXPath("//p[@class='visualCaptcha-explanation']//strong");
-                captcha_solved=SolveVisualCaptcha(name_.Text);
-				Log("SolveVisualCaptcha - solve");
-                Wait(2);
-				
-                if ( !captcha_solved )
-                {
-					Log("SolveVisualCaptcha - refresh");
-                    var refresh = ElementByXPath("//div[@class='visualCaptcha-refresh-button']");
-                    Click(refresh);
-                    Wait(2 , 3);
-                }
-            }
-        }
+			
+           bool captcha_solved = false;
+           var TimeToWaitForBreak = DateTime.Now.AddSeconds(60);  //short
+           while ( !captcha_solved )
+           {
+              var name_ = ElementByXPath("//p[@class='visualCaptcha-explanation']//strong");
+              captcha_solved=SolveVisualCaptcha(name_.Text);
+			  Log("SolveVisualCaptcha - solve");
+              Wait(2);
+			
+              if ( !captcha_solved )
+              {
+			      Log("SolveVisualCaptcha - refresh");
+                  var refresh = ElementByXPath("//div[@class='visualCaptcha-refresh-button']");
+                  //Click(refresh);
+                  Wait(2 , 3);
+              }
+			
+              if (DateTime.Now > TimeToWaitForBreak) 
+              {
+              Log("SolveVisualCaptcha - break - TimeToWaitForBreak");
+              break; //break the wait loop
+              }	
+					
+           } //end while
+		   
+        }// end IsVisible
 
 	   return 0;
       }//end VisualCaptcha_Function
