@@ -1,8 +1,8 @@
 
 
 //==================//
-//script Written by: ••AviramDayan•• 29/07/2020 06:00PM - Version 1
-//Last Update: 29/07/2020 06:00PM - Version 1
+//script Written by: ••AviramDayan•• 30/07/2020 0047:00PM - Version 1
+//Last Update: 30/07/2020 0047:00PM - Version 1
 //==================//
 
 using System;
@@ -281,10 +281,15 @@ public class addoge : FaucetScript
           Wait(3); 
 		  	
           var balance = ElementByXPath("//a[contains(text(),'YouTube')]/span[contains(@class,'badge pull-right bg-green')]");
-          string BalanceSTRING = balance.Text;
+		  string BalanceSTRING = balance.Text;
           int BalanceINT = Convert.ToInt32(BalanceSTRING);
-			
-          if (BalanceINT > 2) 
+ 
+          if (!IsVisible(balance)) 
+		  {
+			Log("YouTubeClaim - element not here");	
+		  } 
+		  
+          if (IsVisible(balance) && BalanceINT > 2) 
 		  {
 
             var TimeToWaitForBreak_1 = DateTime.Now.AddSeconds(360);	//main	  
@@ -375,7 +380,12 @@ public class addoge : FaucetScript
           string BalanceSTRING = balance.Text;
           int BalanceINT = Convert.ToInt32(BalanceSTRING);
 			
-          if (BalanceINT > 2) 
+          if (!IsVisible(balance)) 
+		  {
+			Log("VideoClaim - element not here");	
+		  } 
+		  
+          if (IsVisible(balance) && BalanceINT > 2) 
 		  {
 
             var TimeToWaitForBreak_1 = DateTime.Now.AddSeconds(360);	//main	  
@@ -805,4 +815,4 @@ public class addoge : FaucetScript
 
 
 	
-} //public class dogeto
+} //public class 
