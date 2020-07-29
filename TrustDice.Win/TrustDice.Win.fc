@@ -1,7 +1,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 13/11/2019 09:00AM - Version 1
-//Last Update: 15/07/2020 13:20PM - Version 7
+//Last Update: 29/07/2020 07:00PM - Version 8
 //==================//
 
 using System;
@@ -49,6 +49,7 @@ public class TrustDice : FaucetScript
 
 				new FaucetSetting() { Name = "Rain_AirDrop_Chat", Display = "Rain_AirDrop_Chat - ON/OFF", Type = EditorType.CheckBox, Default = false},		
                 new FaucetSetting(){Name="MessageChat",Display="Your Message In Chat - only need to be active to get any rain",Default = ".",Type=EditorType.TextBox,Required=false},
+                new FaucetSetting() { Name = "AffiliateClaim", Display = "AffiliateClaim", Type = EditorType.CheckBox, Default =false},
 
             };
         }
@@ -264,6 +265,36 @@ public class TrustDice : FaucetScript
  public override int DoSolveFaucet()
   {
 	
+
+		//======//
+		//AffiliateClaim//
+		//======//
+        if (GetBoolSetting("AffiliateClaim"))
+        {	
+          GoToUrl("https://trustdice.win/faucet?modal=refer");
+		  Wait();
+		  Wait(5);	
+
+          var CommissionTab = ElementByXPath ("//span[contains(@class,'MuiBadge-root') and contains(text(),'Commission')]");  
+          if (IsVisible(CommissionTab)) //if this class "MuiBadge-invisible" - NOT Visible - do stuff
+	      {		
+		  Log("AffiliateClaim - CommissionTab");
+	      Click(CommissionTab);
+		  }
+
+		  Wait(12);	
+
+          var Affiliate_Check = ElementByXPath ("//button[contains(@class,'MuiButton-containedSecondary')]/span[contains(text(),'Claim')]");  
+          if (IsVisible(Affiliate_Check)) //if this class "MuiBadge-invisible" - NOT Visible - do stuff
+	      {		
+		  Log("AffiliateClaim - claim");
+	      Click(Affiliate_Check);
+		  }
+		  
+	      Wait();
+
+		}
+        //=====//	
 
 		
 		//==============//
