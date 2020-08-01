@@ -742,7 +742,7 @@ public class addoge : FaucetScript
     private bool SolveVisualCaptcha(string name)
     {
         var dir = AssetDir("Other");
-        dir += "\\Images_Swiss\\" + name + ".png";
+        dir += "\\VisualCaptchaPictures\\" + name + ".png";
         try
         {
 
