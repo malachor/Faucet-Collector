@@ -2,7 +2,7 @@
 
 //==================//
 //script Written by: ••AviramDayan•• 30/07/2020 01:00PM - Version 1
-//Last Update: 30/07/2020 01:00PM - Version 1
+//Last Update: 001/08/2020 15:15PM - Version 2
 //==================//
 
 using System;
@@ -39,8 +39,8 @@ public class addoge : FaucetScript
                 new FaucetSetting(){Name="Email",Display="UserName",Type=EditorType.TextBox,Required=true},
                 new FaucetSetting(){Name="Password",Display="Password",Type=EditorType.Password,Required=true},
 				
-                new FaucetSetting(){Name="YouTubeClaim",Display="YouTubeClaim - wait 30sec between each video - claim unlimited - without captcha",Type=EditorType.CheckBox,Default=true},	
-                new FaucetSetting(){Name="VideoClaim",Display="VideoClaim - wait 30sec between each video - claim unlimited - without captcha",Type=EditorType.CheckBox,Default=true},	
+                new FaucetSetting(){Name="YouTubeClaim",Display="YouTubeClaim - wait 30sec between each video - claim unlimited - without captcha - note: the owner not give allways",Type=EditorType.CheckBox,Default=false},	
+                new FaucetSetting(){Name="VimeoClaim",Display="VimeoClaim - wait 30sec between each video - claim unlimited - without captcha",Type=EditorType.CheckBox,Default=true},	
                 new FaucetSetting(){Name="PTC_AutoSurf",Display="PTC_AutoSurf - wait 10sec between each AD - captcha available",Type=EditorType.CheckBox,Default=false},	
                 new FaucetSetting(){Name="DailyBonus",Display="DailyBonus - after 10/15 actions - in each section (PTC ADS, OFFERWALLS, VIDEOS, SHORTLINKS, FAUCET, HCAPTCHA)",Type=EditorType.CheckBox,Default=true},	
 		              		
@@ -321,12 +321,12 @@ public class addoge : FaucetScript
                   while (!IsVisible(ElementByXPath ("//div[contains(@class,'alert alert-success')]") )) 
 		      	  {
 		    
-                    Log("VideoClaim - wait");  
+                    Log("YouTubeClaim - wait");  
                     Wait();
 		      
                     if (DateTime.Now > TimeToWaitForBreak_2) 
                     {
-                    Log("VideoClaim - break - TimeToWaitForBreak_2");
+                    Log("YouTubeClaim - break - TimeToWaitForBreak_2");
                     break; //break the wait loop
                     }
 		      
@@ -365,9 +365,9 @@ public class addoge : FaucetScript
 
 
      //=============//
-     //VideoClaim
+     //VimeoClaim
      //=============//
-     if (GetBoolSetting("VideoClaim"))
+     if (GetBoolSetting("VimeoClaim"))
      {		
 
           GoToUrl("https://ad-doge.com/user/upgrade.aspx"); //to only open the menu in "Earn" section
@@ -384,19 +384,19 @@ public class addoge : FaucetScript
 		    {
 				
               var TimeToWaitForBreak_1 = DateTime.Now.AddSeconds(360);	//main	  
-              var TimeToWaitForBreak_2 = DateTime.Now.AddSeconds(65);  //short
+              var TimeToWaitForBreak_2 = DateTime.Now.AddSeconds(70);  //short
               while (true)
               {
                 Title = "Ad-DOGE";             
                 GoToUrl("https://ad-doge.com/user/earn/video.aspx");
                 Wait(); 
                 Wait(3); 
-                Log("VideoClaim - go to page");	
+                Log("VimeoClaim - go to page");	
        	      
                 var VideoCheck = ElementByXPath("//a[text()='Video ']/span[contains(@class,'badge pull-right bg-green')] | //a[text()='Video']/span[contains(@class,'badge pull-right bg-green')]") ;
                 if (IsVisible(VideoCheck))
                 {
-                  Log("VideoClaim - here");
+                  Log("VimeoClaim - here");
               	
                   var Video_Click = ElementByXPath("//div[contains(@class,'row')]//div[contains(@class,'col-md-3 image')] ");
                   //Click(Video_Click);
@@ -416,12 +416,12 @@ public class addoge : FaucetScript
                   while (!IsVisible(ElementByXPath ("//div[contains(@class,'alert alert-success')]") )) 
 		      	  {
 	    	    
-                    Log("VideoClaim - wait");  
+                    Log("VimeoClaim - wait");  
                     Wait();
 		      
                     if (DateTime.Now > TimeToWaitForBreak_2) 
                     {
-                    Log("VideoClaim - break - TimeToWaitForBreak_2");
+                    Log("VimeoClaim - break - TimeToWaitForBreak_2");
                     break; //break the wait loop
                     }
 		      
@@ -438,13 +438,13 @@ public class addoge : FaucetScript
               
                 if (!IsVisible(VideoCheck))
                 {
-                Log("VideoClaim - break - not Available");
+                Log("VimeoClaim - break - not Available");
                 break;
                 }
               
                 if (DateTime.Now > TimeToWaitForBreak_1) 
                 {
-                Log("VideoClaim - break - TimeToWaitForBreak_1");
+                Log("VimeoClaim - break - TimeToWaitForBreak_1");
                 break; //break the wait loop
                 }
 		      
@@ -454,7 +454,7 @@ public class addoge : FaucetScript
 
 		  } //end balance
 	  
-     } //end VideoClaim	
+     } //end VimeoClaim	
      //=============//
 
 
