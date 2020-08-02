@@ -22,7 +22,7 @@ namespace NewScripts.PTCShare
                                 Display="Username",
                                 Type=EditorType.TextBox,
                                 Required=true
-                            
+
                             },
                             new FaucetSetting( )
                             {
@@ -37,7 +37,7 @@ namespace NewScripts.PTCShare
                                Type=EditorType.CheckBox,
                                Default=true,
                                Display="Check Ads"
-                              
+
                             }
                         };
 
@@ -64,7 +64,7 @@ namespace NewScripts.PTCShare
                 {
                     Directory.Delete(Path , true);
                 }
-                catch(Exception ex )
+                catch ( Exception ex )
                 {
                     Log("Fail to delete the data  "+ex.Message);
                 }
@@ -83,8 +83,10 @@ namespace NewScripts.PTCShare
         {
             GoToUrl("https://litecoinads.com/login.aspx");
 
-            Wait(2);
-            var CookiesBtn=ElementByXPath("//button[@class='qc-cmp-button']");
+            Wait(4 , 5);
+
+
+            var CookiesBtn=ElementByXPath("//button[@mode='primary' and contains(text(),'Agree')]");
             if ( IsVisible(CookiesBtn) )
             {
 
@@ -140,7 +142,7 @@ namespace NewScripts.PTCShare
             }
 
 
-            return base.DoLogin( ); 
+            return base.DoLogin( );
         }
         public override int DoSolveCaptcha( )
         {
@@ -149,9 +151,9 @@ namespace NewScripts.PTCShare
             {
                 SelectOptionByValue(CaptchaSelector , "Solvemedia");
                 // Site need to load again so we wait 4 - 6 seconds
-                Wait(2,3);
+                Wait(2 , 3);
                 DateTime Timeout=DateTime.Now.AddSeconds(20);
-                while ( ElementByXPath("//input[@id='adcopy_response']")==null && DateTime.Now<Timeout )
+                while ( ElementByXPath("//input[@id='adcopy_response']")==null&&DateTime.Now<Timeout )
                 {
 
                     Wait( );
@@ -163,8 +165,8 @@ namespace NewScripts.PTCShare
                     return DoSolveMediaCaptcha(ElementByXPath("//input[@id='adcopy_response']"));
                 }
             }
-           
-            else if( IsVisible(ElementByXPath("//p[@class='visualCaptcha-explanation']//strong")) )
+
+            else if ( IsVisible(ElementByXPath("//p[@class='visualCaptcha-explanation']//strong")) )
             {
                 bool captcha_solved = false;
                 while ( !captcha_solved )
@@ -181,7 +183,7 @@ namespace NewScripts.PTCShare
                 }
             }
 
-            
+
 
             return base.DoSolveCaptcha( );
         }
@@ -192,7 +194,7 @@ namespace NewScripts.PTCShare
                 GoToUrl("https://litecoinads.com/user/default.aspx");
                 Wait(2);
             }
-            
+
 
             return ElementByXPath("//a[@href='/logout.aspx']")!=null;
         }
@@ -208,6 +210,13 @@ namespace NewScripts.PTCShare
                 string AdsXpath="//div[contains(@class,'AboxActive Ad')]";
 
                 var ads=ElementsByXPath(AdsXpath).ToList();
+                // sometimes cloudflare appear so we wait for it
+                DateTime timeout=DateTime.Now.AddSeconds(20);
+                while ( ads.Count==0&&DateTime.Now<timeout )
+                {
+                    Wait(2 , 3);
+                    ads=ElementsByXPath(AdsXpath).ToList( );
+                }
                 int n=0;
                 int NAds = ads.Count;
                 while ( ads.Count>n )
@@ -296,9 +305,9 @@ namespace NewScripts.PTCShare
             //Go to faucet url
             GoToUrl("https://litecoinads.com/user/earn/faucet.aspx");
 
-            Wait(2,3);
+            Wait(2 , 3);
             DateTime Timeout=DateTime.Now.AddSeconds(20);
-            while( ElementByXPath("//select[@id='ctl00_PageMainContent_CaptchaList']")==null  && DateTime.Now<Timeout)
+            while ( ElementByXPath("//select[@id='ctl00_PageMainContent_CaptchaList']")==null&&DateTime.Now<Timeout )
             {
 
                 Wait( );
@@ -309,7 +318,7 @@ namespace NewScripts.PTCShare
             var res=DoSolveCaptcha( );
             if ( res>0 )
             {
-               
+
                 return res;
             }
 
@@ -319,27 +328,27 @@ namespace NewScripts.PTCShare
                 return Fail("Btn claim faucet not visible");
             }
             Click(btnClaim);
-           
+
             return base.DoSolveFaucet( );
         }
 
         public override int GetFaucetWaitTime( )
         {
-            if(!Driver.Url.Contains("https://litecoinads.com/user/earn/faucet.aspx") )
+            if ( !Driver.Url.Contains("https://litecoinads.com/user/earn/faucet.aspx") )
             {
                 GoToUrl("https://litecoinads.com/user/earn/faucet.aspx");
                 Wait(2);
             }
 
             var Timer=ElementByXPath("//span[@id='countdown']");
-            if (Timer!=null )
+            if ( Timer!=null )
             {
                 var TimerText=ExecuteScript("return arguments[0].textContent;",Timer).ToString().
                     Replace("minutes","").Replace("and","").Replace("seconds","").Trim().Split(' ');
                 int min, seg;
 
-                if(TimerText.Length == 2 && 
-                    int.TryParse(TimerText[0],out min) && int.TryParse(TimerText[1],out seg) )
+                if ( TimerText.Length==2&&
+                    int.TryParse(TimerText[0] , out min)&&int.TryParse(TimerText[1] , out seg) )
                 {
                     return min*60+seg;
                 }
@@ -348,7 +357,7 @@ namespace NewScripts.PTCShare
                     return 3600;
                 }
             }
-            
+
 
             return base.GetFaucetWaitTime( );
         }
@@ -368,14 +377,14 @@ namespace NewScripts.PTCShare
 
 
                         var PosibleSolutions=ElementsByXPath("//img[contains(@id,'visual')]");
-                      
+
 
                         var PosibleSolutionsPixels=PosibleSolutions.Select(x=>GetDifferentPixels(SolutionTemplate,TakeScreenshot(Base.Captcha.CaptchaService.Manual, x))).ToList();
-                        
+
                         Wait( );
-                       
-                        int solution= PosibleSolutionsPixels.IndexOf(PosibleSolutionsPixels.Min());    
-                        
+
+                        int solution= PosibleSolutionsPixels.IndexOf(PosibleSolutionsPixels.Min());
+
                         var CaptchaSolution = ElementByXPath("//img[@id='visualCaptcha-img-" + solution.ToString() + "']");
                         if ( IsVisible(CaptchaSolution) )
                         {
@@ -388,7 +397,7 @@ namespace NewScripts.PTCShare
             }
             catch ( Exception ex )
             {
-                Log("Problem solving VisualCaptcha: " + ex.Message);
+                Log("Problem solving VisualCaptcha: "+ex.Message);
                 Log("Trying again....");
             }
 
@@ -402,7 +411,7 @@ namespace NewScripts.PTCShare
             int cont = 0;
             using ( target )
             {
-              
+
                 for ( int i = 0 ; i<source.Height ; i++ )
                 {
                     for ( int j = 0 ; j<source.Width ; j++ )
