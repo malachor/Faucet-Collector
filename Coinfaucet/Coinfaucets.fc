@@ -79,7 +79,13 @@ class Coinfaucets : FaucetScript
         {
             Url="https://freeethereum.com/",
             MinWithdraw=0.1
-        } 
+        }
+        },
+        {"TRON",new Coinfaucet
+        {
+            Url="https://free-tron.com/",
+            MinWithdraw=1
+        }
         }
 
 
