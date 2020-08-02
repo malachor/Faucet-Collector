@@ -1,0 +1,830 @@
+
+//============================================//
+//script Written first by: cgerabit 21/08/2018
+//last update with *Advanced features* by: AviramDayan 02/08/2020 15:30PM - Version: 14
+//============================================//
+
+using System;
+using FaucetCollector.Script;
+//css_inc RecaptchaUtilities
+
+public class Mellowads : FaucetScript
+{
+    /// <summary>
+    /// List of Settings that will be shown in the bot when selecting this Faucet in the bot.
+    /// You can get the value the user entered with the methods: GetSetting("[Name of the FaucetSetting]"), GetBoolSetting and GetDateTimeSetting
+    /// You can also create a new setting value using SetSetting("[Name you want to use]", "value")
+    /// </summary>
+    public override FaucetSettings Settings
+    {
+        get
+        {
+            return new FaucetSettings("https://mellowads.com/faucet")
+            {
+                new FaucetSetting(){Name="User",Display="Email",Type=EditorType.TextBox,Required=true},
+                new FaucetSetting(){Name="Pass",Display="Password",Type=EditorType.Password,Required=true},
+	
+				new FaucetSetting(){Name="FaucetClaim",Display="FaucetClaim - ON/OFF",Type=EditorType.CheckBox,Default=false},
+				
+				new FaucetSetting(){Name="AutoApproveADS",Display="AutoApproveADS - ON/OFF",Type=EditorType.CheckBox,Default=true},
+				
+				new FaucetSetting(){Name="UpdateAds",Display="UpdateAds - ON/OFF",Type=EditorType.CheckBox,Default=true},
+				new FaucetSetting(){Name="UpdateAds_Way",Display="UpdateAds_Way - Select Favorite way to choose to update your ADS ",Type=EditorType.ComboBox,Default="By_Row_Random_Way",Items=new System.Collections.Generic.List<string>{"By_Row_Random_Way","By_Title_Way"}},
+                new FaucetSetting(){Name="ExistAd_Title_1",Display="ExistAd_Title_1 - Your AD Title here - put some text that contains some of your text Title - to recognize",Default="AdTitle",Type=EditorType.TextBox,Required=true},		
+                new FaucetSetting(){Name="ExistAd_Title_2",Display="ExistAd_Title_2 - Your AD Title here - put some text that contains some of your text Title - to recognize",Default="AdTitle",Type=EditorType.TextBox,Required=false},		
+                new FaucetSetting(){Name="ExistAd_Title_3",Display="ExistAd_Title_3 - Your AD Title here - put some text that contains some of your text Title - to recognize",Default="AdTitle",Type=EditorType.TextBox,Required=false},
+                new FaucetSetting(){Name="ExistAd_Title_4",Display="ExistAd_Title_4 - Your AD Title here - put some text that contains some of your text Title - to recognize",Default="AdTitle",Type=EditorType.TextBox,Required=false},
+
+				new FaucetSetting(){Name="CreateAd",Display="CreateAd - ON/OFF",Type=EditorType.CheckBox,Default=false},
+                new FaucetSetting(){Name="CreateAds_Title",Display="CreateAds_Title - Your AD Title here",Type=EditorType.TextBox,Required=false},	
+                new FaucetSetting(){Name="CreateAds_Description",Display="CreateAds_Description - Your AD Description here - max 50 characters",Type=EditorType.TextBox,Required=false},	
+                new FaucetSetting(){Name="CreateAds_URL",Display="CreateAds_URL - Your AD URL here",Type=EditorType.TextBox,Required=false},	
+				new FaucetSetting(){Name="CreateAds_Type",Display="CreateAds_Type - Select Favorite way to choose AD Type ",Type=EditorType.ComboBox,Default="Banner",Items=new System.Collections.Generic.List<string>{"Banner","PopUnder"}},
+				new FaucetSetting(){Name="CreateAds_Categories",Display="CreateAds_Categories - Select Favorite way to choose AD Categorie ",Type=EditorType.ComboBox,Default="Gambling",Items=new System.Collections.Generic.List<string>{"NSFW","Gambling","Drugs","Investment"}},
+
+				new FaucetSetting(){Name="StartCampaign",Display="StartCampaign - ON/OFF",Type=EditorType.CheckBox,Default=true},
+				new FaucetSetting(){Name="StartCampaign_Categories",Display="StartCampaign_Categories - Select Favorite way to choose Campaign ",Type=EditorType.ComboBox,Default="Start_Daily_Campaign",Items=new System.Collections.Generic.List<string>{"Start_Daily_Campaign","Start_CPM_Campaign","Start_CPC_Campaign"}},  
+                new FaucetSetting(){Name="Campaign_Name",Display="Campaign_Name - Your Campaign Name here - max 100 characters",Default="TestCampaign",Type=EditorType.TextBox,Required=false},	
+
+				new FaucetSetting(){Name="Campaign_AmountPerDays_Way",Display="Campaign_AmountPerDays_Way - ON/OFF - if ON - set the all Exist Balance - if OFF - set Custom balance  ",Type=EditorType.CheckBox,Default=true},
+ 				new FaucetSetting(){Name="Campaign_AmountPerDays_Custom",Display="Campaign_AmountPerDays_Custom - Your Campaign_AmountPerDays_Custom here - min 0.000001 BTC max 1 BTC ",Default="0.00001",Type=EditorType.TextBox,Required=false},	
+       
+				new FaucetSetting(){Name="Campaign_Days",Display="Campaign_Days - Your Campaign_Days here - min 1 max 365",Default="1",Type=EditorType.TextBox,Required=false},	
+				new FaucetSetting(){Name="Campaign_UniqueViews",Display="Campaign_UniqueViews - Your Campaign_UniqueViews here - min 1000 max 1000000",Default="10000",Type=EditorType.TextBox,Required=false},	
+                new FaucetSetting(){Name="Campaign_UniqueClicks",Display="Campaign_UniqueClicks - Your Campaign_UniqueClicks here - min 10 max 10000",Default="100",Type=EditorType.TextBox,Required=false},	
+                new FaucetSetting(){Name="Campaign_CPM",Display="Campaign_CPM - Your Campaign_CPM here - min 0.00001 BTC max 0.1 BTC ",Default="0.00001",Type=EditorType.TextBox,Required=false},	
+                new FaucetSetting(){Name="Campaign_CPC",Display="Campaign_CPC - Your Campaign_CPC here - min 0.00001 BTC max 0.1 BTC ",Default="0.00001",Type=EditorType.TextBox,Required=false},	
+				
+                //insert user settings here
+                //new FaucetSetting { 
+                //    Name = "Name of your setting", 
+                //    Display = "Display shown in Faucet Collector", 
+                //    Type = EditorType.TextBox | EditorType.Password | EditorType.CheckBox | EditorType.Wallet | EditorType.Numeric | EditorType.ComboBox | EditorType.CheckComboBox, 
+                //    Required = true | false, 
+                //    Default = "Optionally a default value" | true | false | null.
+                //    Items = new List<string> { "item1", "item2" } (only valid for ComboBox or CheckComboBox)
+                //} 
+            };
+        }
+    }
+
+
+
+//============================================================//
+//the number of "successes" in the script - when are finished  
+//============================================================//
+    public override void Start()
+    {
+        ad = false;	
+		
+        //Title that shows in the browser. Is used to identify and close popup windows
+        Title = "Mellow";
+
+        //After we did try to claim on the faucet we search for these elements to determine if it was a success or a fail
+        SuccessXPath = "//div[@class='modal-body text-success']|//*[contains(@class,'suc')]";
+        FailXPath = "//div[@class='modal-body text-failed']";
+
+        //Let Faucet Collector start up everything
+        base.Start();
+    }
+//============================================================//
+//the number of "successes" in the script - when are finished  
+//============================================================//
+
+
+
+    bool ad;
+
+    public override int DoInit()
+    {
+        //Let Faucet Collector continue.
+        return base.DoInit();
+    }
+
+
+
+//==================//
+//save Login Cookies 
+//==================//
+    public override bool IsLoggedIn()
+    {
+        if (!Driver.Url.Contains("https://mellowads.com/dashboard"))
+        {
+            GoToUrl("https://mellowads.com/dashboard");
+        }
+        //In here we can check for the presence of an element that is only present when you are logged in.
+        //In this case we check for en element with the class "loggedIn"
+        Wait(2, 3);
+        if (Driver.Url.Contains("dashboard"))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+//==================//
+//save Login Cookies 
+//==================//
+
+
+
+    /// <summary>
+    /// This method gets called if IsLoggedIn returned false, right before the DoLogin method is called.
+    /// </summary>
+    public override int BeforeLogin()
+    {
+		
+        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+        return base.BeforeLogin();
+    }
+	
+
+
+//=======//
+//DoLogin//
+//=======//
+
+    public override int DoLogin()
+    {
+        if (!Driver.Url.Contains("https://mellowads.com/home/signin"))
+        {
+            GoToUrl("https://mellowads.com/home/signin");
+        }
+
+        var email_Box = ElementByXPath("//input[@id='SignInEmailInput']");
+		/*
+        if (!IsVisible(email_Box))
+        {
+            return Fail("Email box not found");
+        }
+		*/
+        Wait();
+        SetText(email_Box, GetSetting("User"));
+        Wait();
+        var pass_box = ElementByXPath("//input[@id='SignInPasswordInput']");
+		/*
+        if (!IsVisible(pass_box))
+        {
+            return Fail("Pass box not visible");
+        }
+		*/
+        SetText(pass_box, GetPassword("Pass"));
+
+        Wait(2);
+
+        Recaptcha_Function(); //call
+		
+        Wait();
+		
+        var button = ElementByXPath("//button[@type='submit'][contains(text(),'Sign In')]");
+		/*
+        if (!IsVisible(button))
+        {
+            return Fail("Button not visible");
+        }
+		*/
+        Click(button);
+
+        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+        return base.DoLogin();
+    }
+//=======//
+//DoLogin//
+//=======//
+
+
+
+    public override int AfterLogin()
+    {
+        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+        return base.AfterLogin();
+    }
+
+
+
+//=============//
+//GetFaucetWaitTime
+//=============//
+ public override int GetFaucetWaitTime()
+ {
+
+    if(ad)
+	{
+        ad=false; //solve the problem in start - after he return to script again
+        return GetWaitSetting();  
+    }	//end ad
+		
+   //let Faucet Collector continue.
+   return base.GetFaucetWaitTime();
+ }
+//=============//
+//GetFaucetWaitTime
+//=============//
+
+
+
+    public override int BeforeSolveCaptcha()
+    {
+        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+        return base.BeforeSolveCaptcha();
+    }
+
+
+    public override int DoSolveCaptcha()
+    {
+ 
+        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+        return base.DoSolveCaptcha();
+    }
+
+
+    public override int AfterSolveCaptcha()
+    {
+        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+        return base.AfterSolveCaptcha();
+    }
+
+    public override int BeforeSolveFaucet()
+    {
+      
+        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+        return base.BeforeSolveCaptcha();
+    }
+
+
+
+//=============//
+//DoSolveFaucet
+//=============//
+ public override int DoSolveFaucet()
+ {
+
+
+    //=============================//
+    //ADS - Update/Create/StartCampaign
+    //============================//
+
+    //CreateAds
+	if (GetBoolSetting("CreateAds"))
+    {
+	   GoToUrl("https://mellowads.com/adverts/createadvert");
+       Wait();
+       Wait(2);
+       Log("CreateAds - go to Check "); 
+	   
+       var CreateAds_Title_var = ElementByXPath("//input[@name='TitleInput'] ");
+       SetText(CreateAds_Title_var, GetSetting("CreateAds_Title"));
+       Log("CreateAds_Title_var"); 
+	   
+       Wait(2);
+	   
+       var CreateAds_Description_var = ElementByXPath("//input[@name='TextInput'] ");
+       SetText(CreateAds_Description_var, GetSetting("CreateAds_Description"));
+       Log("CreateAds_Description_var"); 
+	   
+       Wait(2);
+
+       var CreateAds_URL_var = ElementByXPath("//input[@name='LinkURLInput'] ");
+       SetText(CreateAds_URL_var, GetSetting("CreateAds_URL"));
+       Log("CreateAds_URL_var"); 
+	   
+       Wait(2);
+	   
+	   //Type
+       var CreateAds_Type_Var = GetSetting("CreateAds_Type"); 
+       if(CreateAds_Type_Var=="Banner") 
+       {
+         var AdType_1_var = ElementByXPath("//select[@id='AdvertTypeIdDropdown']/option[1]");
+         Click(AdType_1_var);
+         Log("CreateAds_Type - Banner"); 
+	   }
+	   
+       if(CreateAds_Type_Var=="PopUnder") 
+       {
+         var AdType_2_var = ElementByXPath("//select[@id='AdvertTypeIdDropdown']/option[2]");
+         Click(AdType_2_var);
+         Log("CreateAds_Type - PopUnder"); 
+	   }
+	   
+       Wait(2);
+	   
+	   //Categories
+       var CreateAds_Categories_Var = GetSetting("CreateAds_Categories"); 
+       if(CreateAds_Categories_Var=="NSFW") 
+       {
+         var NSFW_var = ElementByXPath("//input[@id='NSFWCheckbox']");
+         Click(NSFW_var);  
+         Log("CreateAds_Categories - NSFW"); 
+	   }
+	   
+       if(CreateAds_Categories_Var=="Gambling") 
+       {
+         var Gambling_var = ElementByXPath("//input[@id='GamblingCheckbox']");
+         Click(Gambling_var);  
+         Log("CreateAds_Categories - Gambling"); 
+	   }
+	   
+       if(CreateAds_Categories_Var=="Drugs") 
+       {
+         var Drugs_var = ElementByXPath("//input[@id='DrugsCheckbox']");
+         Click(Drugs_var);
+         Log("CreateAds_Categories - Drugs");
+	   }
+	   
+       if(CreateAds_Categories_Var=="Investment") 
+       {
+         var Investment_var = ElementByXPath("//input[@id='OtherCheckbox']");
+         Click(Investment_var);  
+         Log("CreateAds_Categories - Investment");
+	   }	   
+	   
+       Wait(2);		
+
+       var CreateEnd_var = ElementByXPath("//button[contains(@data-bind,'create')]");
+       Click(CreateEnd_var);  
+       Log("CreateEnd - button - end ");
+	   
+	}//end CreateAds
+	
+	
+    //AutoApproveADS
+	if (GetBoolSetting("AutoApproveADS"))
+    {
+		GoToUrl("https://mellowads.com/adverts");
+        Wait();
+        Wait(2);
+		Log("AutoApproveADS - go to Check "); 
+		
+        var TimeToWaitForBreak = DateTime.Now.AddSeconds(90);
+	    while (true)
+		{	 
+		  Log("AutoApproveADS - while - Check"); 
+          var ApproveAdsCheck = ElementByXPath("//tbody//tr[* and @role='row']//a[contains(@onclick,'javascript:submitForApproval')] ");  
+          if (IsVisible(ApproveAdsCheck))
+		  {
+		   Log("ApproveAdsCheck - Visible - we do auto approve for exist ADS "); 
+		   Click(ApproveAdsCheck);
+           Wait(4);
+		  }
+
+          if (!IsVisible(ApproveAdsCheck))
+		  {
+		   Log("break - all Approve");
+		   break;
+		  }
+		
+          var SubmitVAR = ElementByXPath("//a[@data-apply='confirmation']");  
+          if (IsVisible(SubmitVAR))
+		  {
+		  Log("SubmitVAR - Submit to approve"); 
+          Click(SubmitVAR);		 
+          Wait(2);
+		  }
+
+          if (DateTime.Now > TimeToWaitForBreak)
+          {
+          Log("AutoApproveADS - break - TimeToWaitForBreak");
+          break; //break the wait loop
+          }	
+		 
+		}// end while
+
+	 }// end AutoApproveADS
+	 
+	 
+	 
+    //UpdateAds
+	if (GetBoolSetting("UpdateAds"))
+    {
+
+	   GoToUrl("https://mellowads.com/adverts");
+       Wait();
+       Wait(2);
+	   Log("UpdateAds - go to Check "); 
+
+       //UpdateAds_Way
+       var UpdateAds_Way_Var = GetSetting("UpdateAds_Way"); 
+	    
+       if(UpdateAds_Way_Var=="By_Row_Random_Way") 
+       {
+		  Log("UpdateAds_Way - By_Row_Random_Way");
+	    
+          var RowRandom = ElementByXPath("//tr[* and @role='row']//a[contains(text(),'View ad')]");
+          if (IsVisible(RowRandom))
+          {
+			Click(RowRandom);
+			Wait(2);
+			StartCampaign_Function(); //call
+          }
+		  
+       }//end By_Row_Random_Way
+	    
+	    
+       if(UpdateAds_Way_Var=="By_Title_Way") 
+       {
+		  Log("UpdateAds_Way - By_Title_Way");
+		  
+          var AdTitle_1 = ElementByXPath("//tr[1 and @role='row']//b[contains(text(),'"+GetSetting("ExistAd_Title_1")+"')] ");
+          if (IsVisible(AdTitle_1))
+          {
+	        Log("UpdateAds - AdTitle_1"); 
+            var RowRandom_1 = ElementByXPath("//tr[1 and @role='row']//a[contains(text(),'View ad')]");
+            if (IsVisible(RowRandom_1))
+            {
+			  Click(RowRandom_1);
+			  Wait(2);
+			  StartCampaign_Function(); //call
+            }		
+          }
+		  
+          var AdTitle_2 = ElementByXPath("//tr[2 and @role='row']//b[contains(text(),'"+GetSetting("ExistAd_Title_2")+"')] ");
+          if (IsVisible(AdTitle_2))
+          {
+	        Log("UpdateAds - AdTitle_2"); 
+            var RowRandom_2 = ElementByXPath("//tr[2 and @role='row']//a[contains(text(),'View ad')]");
+            if (IsVisible(RowRandom_2))
+            {
+			  Click(RowRandom_2);
+			  Wait(2);
+			  StartCampaign_Function(); //call
+            }		
+          }
+
+          var AdTitle_3 = ElementByXPath("//tr[3 and @role='row']//b[contains(text(),'"+GetSetting("ExistAd_Title_3")+"')] ");
+          if (IsVisible(AdTitle_3))
+          {
+	        Log("UpdateAds - AdTitle_3"); 
+            var RowRandom_3 = ElementByXPath("//tr[3 and @role='row']//a[contains(text(),'View ad')]");
+            if (IsVisible(RowRandom_3))
+            {
+			  Click(RowRandom_3);
+			  Wait(3);
+			  StartCampaign_Function(); //call
+            }		
+          }
+		  
+          var AdTitle_4 = ElementByXPath("//tr[4 and @role='row']//b[contains(text(),'"+GetSetting("ExistAd_Title_4")+"')] ");
+          if (IsVisible(AdTitle_4))
+          {
+	        Log("UpdateAds - AdTitle_4"); 
+            var RowRandom_4 = ElementByXPath("//tr[4 and @role='row']//a[contains(text(),'View ad')]");
+            if (IsVisible(RowRandom_4))
+            {
+			  Click(RowRandom_4);
+			  Wait(4);
+			  StartCampaign_Function(); //call
+            }		
+          }
+		  
+       }//end By_Title_Way
+
+
+    }//end UpdateAds
+	 
+	 
+    //============================//
+
+
+
+     //=========//
+    //FaucetClaim
+     //=========//
+	if (GetBoolSetting("FaucetClaim"))
+    {
+        //first go to account details - to cahck if was claim in "hours ago"		
+        GoToUrl("https://mellowads.com/accountdetails");
+        Wait();
+        Wait(2);
+	    Log("FaucetClaim - check"); 
+
+        var NowAgoVAR = ElementByXPath("//*[@id='LatestTransactionsPanel']/dl/dt[contains(text(),'now')]");
+        var HoursAgoVAR = ElementByXPath("//*[@id='LatestTransactionsPanel']/dl/dt[contains(text(),'hours')]");
+        var MinutesAgoVAR = ElementByXPath("//*[@id='LatestTransactionsPanel']/dl/dt[contains(text(),'minute')]");
+		
+        if (IsVisible(NowAgoVAR) || IsVisible(HoursAgoVAR) || IsVisible(MinutesAgoVAR))
+        {
+		 Log("hours ago - visible - so we return after your time");
+         return Time_Function();	 
+        }
+
+		
+        if (!IsVisible(NowAgoVAR) || !IsVisible(HoursAgoVAR) || !IsVisible(MinutesAgoVAR)) //if "hours ago" not visible - do all stuff
+        {
+		Log("hours ago - NOT visible - we go to claim");	
+			
+        GoToUrl("https://mellowads.com/faucet");		
+        Wait();			
+
+        var claim_b = ElementByXPath("//button[@id='PageContent_ClaimButton']");
+        if (!IsVisible(claim_b))
+        {
+            return Fail("claim button not visible");
+        }
+        Click(claim_b);
+		
+        Wait(2);
+		
+        Recaptcha_Function(); //call
+
+        Wait(2);
+		
+        var claim_b_ = ElementByXPath("//div[@class='modal-footer']//button[@type='button'][contains(text(),'Claim')]");
+        if (!IsVisible(claim_b_))
+        {
+            return Fail("Fail , Claim button 2 not visible");
+        }
+        Click(claim_b_);
+
+        ClaimSuccess(); //Marks the claim as a success
+		
+        } // end hours ago" not visible
+		
+    } // end FaucetClaim
+
+	
+    return Time_Function();
+	
+	
+  //This faucet has nothing to do here. We will let Faucet Collector handle it.
+  return base.DoSolveFaucet();
+ }
+//=============//
+//DoSolveFaucet
+//=============//
+
+
+
+    public override int AfterSolveFaucet()
+    {
+        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+        return base.AfterSolveFaucet();
+    }
+	
+	
+    /// <summary>
+    /// This method gets called in the end after the BeforeSolveFaucet/DoSolveFaucet and AfterSolveFaucet methods were done.
+    /// The base.CheckFaucetResult will try to find a visible element on the page using the XPath from SuccessXPath and FailXPath (see the Start method)
+    /// These properties should contain XPath expressions to find certain elements on the page.
+    /// For example if it finds one of the elements from the SuccessXPath, and it is visible, then it will flag the claim attempt as a success.
+    /// Or if it finds one of the elements from the FailXPath, and it is visible, then it will flag the claim attempt as a failure.
+    /// </summary>
+    public override int CheckFaucetResult()
+    {
+        //This faucet has nothing to do here. We will let Faucet Collector handle it.
+        return base.CheckFaucetResult();
+    }
+	
+
+	
+      //=================//
+      //StartCampaign_Function
+      //=================//
+
+      public int StartCampaign_Function()
+      {
+	      Log("StartCampaign_Function");
+	
+          //StartCampaign
+	      if (GetBoolSetting("StartCampaign"))
+          {
+			  		  
+             var Button_NetworkCampaign = ElementByXPath("//button[contains(text(),'network campaign')] ");
+             if (IsVisible(Button_NetworkCampaign))
+             {
+	          Log("Button_NetworkCampaign");
+	          Click(Button_NetworkCampaign);
+	          Wait(2);
+             }
+
+             var StartCampaign_Categories_Var = GetSetting("StartCampaign_Categories"); 
+	   
+             var Daily_var = ElementByXPath("//button[contains(text(),'Start daily campaign')] ");
+			 if (IsVisible(Daily_var))
+             {
+
+		 	   if(StartCampaign_Categories_Var=="Start_Daily_Campaign")
+               {
+	             Log("Start_Daily_Campaign");
+                 Click(Daily_var);
+			     Wait();
+			     Wait(2);
+			     StartCampaign_All_Actions_Function(); //call
+			   }
+			   
+			 }
+
+             var CPM_var = ElementByXPath("//button[contains(text(),'Start CPM campaign')] ");
+			 if (IsVisible(CPM_var))
+             {
+				 
+		 	   if(StartCampaign_Categories_Var=="Start_CPM_Campaign")
+               {
+                 Log("Start_CPM_Campaign");
+                 Click(CPM_var);
+			     Wait();
+			     Wait(2);
+			     StartCampaign_All_Actions_Function(); //call
+			   }
+			   
+			 }
+	           
+             var CPC_var = ElementByXPath("//button[contains(text(),'Start CPC campaign')] ");
+			 if (IsVisible(CPC_var))
+             {
+				 
+		 	   if(StartCampaign_Categories_Var=="Start_CPC_Campaign")
+               {
+                 Log("Start_CPC_Campaign");
+			     Click(CPC_var);
+			     Wait();
+			     Wait(2);
+			     StartCampaign_All_Actions_Function(); //call
+			   }
+			   
+			 }
+
+	      } //end StartCampaign
+	
+	   return 0;
+	   
+	  } //end StartCampaign_Function
+	  
+	  
+	  
+      //=================//
+      //StartCampaign_All_Actions_Function
+      //=================//
+
+      public int StartCampaign_All_Actions_Function()
+      {
+		  
+		Log("StartCampaign_All_Actions_Function");
+	    Wait(6);
+		
+		var Campaign_Name_VAR = ElementByXPath("//input[@name='NetworkCPMCampaignNameInput']");
+        //if (IsVisible(Campaign_Name_VAR))
+        //{
+        Log("Campaign_Name_VAR");
+        SetText(Campaign_Name_VAR, GetSetting("Campaign_Name"));
+		Wait(2);
+		//}
+
+        //Campaign_AmountPerDays_Way
+	    if (GetBoolSetting("Campaign_AmountPerDays_Way")) //set the all Exist Balance
+        {
+		  var PreGetToken = ElementByXPath("//div[contains(@class,'form-group col-md-8 amountPicker has-feedback')]//span[contains(@data-bind,'accountBalance')] "); 
+          SetSetting("StoreAmount", PreGetToken.Text); //Store/save - the iframe that was in first Domain
+	
+	      var Campaign_AmountPerDays_2_VAR = ElementByXPath("//input[@name='AmountInput']");
+          if (IsVisible(Campaign_AmountPerDays_2_VAR))
+          {
+          Log("Campaign_AmountPerDays - all Exist Balance");
+          SetText(Campaign_AmountPerDays_2_VAR, GetSetting("StoreAmount"));
+		  Wait(2);
+		  }
+			
+        }
+		
+	    if (!GetBoolSetting("Campaign_AmountPerDays_Way")) //set Custom balance
+        {
+
+	      var Campaign_AmountPerDays_1_VAR = ElementByXPath("//input[@name='AmountInput']");
+          if (IsVisible(Campaign_AmountPerDays_1_VAR))
+          {
+          Log("Campaign_AmountPerDays - Custom balance");
+          SetText(Campaign_AmountPerDays_1_VAR, GetSetting("Campaign_AmountPerDays_Custom"));
+		  Wait(2);
+		  }
+
+        }		
+		
+	    var Campaign_Days_VAR = ElementByXPath("//input[@name='DaysInput']");
+        if (IsVisible(Campaign_Days_VAR))
+        {
+        Log("Campaign_Days");
+        SetText(Campaign_Days_VAR, GetSetting("Campaign_Days"));
+		Wait(2);
+		}
+		  
+	    var Campaign_UniqueViews_VAR = ElementByXPath("//input[@name='NetworkCPMViewsInput']");
+        if (IsVisible(Campaign_UniqueViews_VAR))
+        {
+        Log("Campaign_UniqueViews");
+        SetText(Campaign_UniqueViews_VAR, GetSetting("Campaign_UniqueViews"));
+		Wait(2);
+		}
+
+	    var Campaign_UniqueClicks_VAR = ElementByXPath("//input[@name='NetworkCPCViewsInput']");
+        if (IsVisible(Campaign_UniqueClicks_VAR))
+        {
+        Log("Campaign_UniqueClicks");
+        SetText(Campaign_UniqueClicks_VAR, GetSetting("Campaign_UniqueClicks"));
+		Wait(2);
+		}
+		
+	    var Campaign_CPM_VAR = ElementByXPath("//input[@name='CPMInput']");
+        if (IsVisible(Campaign_CPM_VAR))
+        {			
+        Log("Campaign_CPM");
+        SetText(Campaign_CPM_VAR, GetSetting("Campaign_CPM"));
+		Wait(2);
+		}
+
+	    var Campaign_CPC_VAR = ElementByXPath("//input[@name='CPCInput']");
+        if (IsVisible(Campaign_CPC_VAR))
+        {
+        Log("Campaign_CPC");
+        SetText(Campaign_CPC_VAR, GetSetting("Campaign_CPC"));
+		Wait(2);
+		}	
+			
+		//StartCampaign_End 
+	    var StartCampaign_End_Button = ElementByXPath("//button[contains(text(),'Start campaign')]");
+        if (IsVisible(StartCampaign_End_Button))
+        {
+        Log("StartCampaign_End_Button");
+        Click(StartCampaign_End_Button);
+		Wait(4);
+		}	
+		
+        var Submit_2_VAR = ElementByXPath("//a[@data-apply='confirmation']");  
+        if (IsVisible(Submit_2_VAR))
+		{
+		Log("Submit_2_VAR - End - Submit to approve"); 
+        Click(Submit_2_VAR);		 
+        Wait(2);
+		}
+		
+	   return 0;
+	   
+	  } //end StartCampaign_All_Actions_Function
+
+
+
+        //=================//
+       //Time_Function
+        //=================//
+        public int Time_Function()
+        {
+			
+           var MinVar = ElementByXPath("//article[contains(@class,'maincontent')]//span[2]/span[1]") ;
+		   var SecVar = ElementByXPath("//article[contains(@class,'maincontent')]//span[3]/span[1]") ;
+
+           if (IsVisible(MinVar))
+           {
+	         Log("Time_Function - WaitTimerText apper - return to site time"); 
+             int min,sec;
+             min = Convert.ToInt32(MinVar.Text.Trim().Replace("m.", "").Replace("s.", "").Split(' ')[0])*60;
+             sec = Convert.ToInt32(SecVar.Text.Trim().Replace("m.", "").Replace("s.", "").Split(' ')[1]);
+             return min+sec;
+           } 
+
+           if (!IsVisible(MinVar))
+           {
+	            Log("Time_Function - return to your time"); 
+		        return GetWaitSetting();
+           }
+
+           return 0;		
+        }//end Time_Function
+        //=================//	
+		
+	
+        //=================//
+       //Recaptcha_Function
+        //=================//
+
+        public int Recaptcha_Function()
+        {
+			
+          //DoSolveImageCaptcha
+          var SolveMedia = ElementByXPath ("//img[contains(@id,'adcopy-puzzle-image-image')]"); 
+          if (IsVisible(SolveMedia))
+		  {  
+            Log("DO SolveMedia");	  
+	        var result_2 = DoSolveImageCaptcha(ElementByXPath("//img[contains(@id,'adcopy-puzzle-image-image')]"),ElementByXPath("//input[@name='adcopy_response']")); 
+		  }
+		  
+	     //for recaptcha popup after click on button - ("//button[contains(@class,'reload')] | //button[contains(@id,'reload')] ")
+          var RecaptchaOpen_Iframe = ElementByXPath ("//iframe[contains(@src,'recaptcha/api2/anchor')]"); 
+          if (IsVisible(RecaptchaOpen_Iframe))
+		  {
+            //SolveCaptcha if apper
+            Log("DO Recaptcha");	  
+            var result = base.DoSolveCaptcha();
+            if (result > 0)
+            {
+                return Fail("Fail solving captcha");
+            }
+            RecaptchaUtility utility = new RecaptchaUtility(this);
+            utility.DoSolve();
+		  }
+
+		return 0;
+        }//end Recaptcha_Function
+        //=================//	
+	
+	
+}//end class
