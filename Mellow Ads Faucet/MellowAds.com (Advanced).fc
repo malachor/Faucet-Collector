@@ -24,11 +24,11 @@ public class Mellowads : FaucetScript
                 new FaucetSetting(){Name="User",Display="Email",Type=EditorType.TextBox,Required=true},
                 new FaucetSetting(){Name="Pass",Display="Password",Type=EditorType.Password,Required=true},
 	
-				new FaucetSetting(){Name="FaucetClaim",Display="FaucetClaim - ON/OFF",Type=EditorType.CheckBox,Default=false},
+				new FaucetSetting(){Name="FaucetClaim",Display="FaucetClaim - ON/OFF",Type=EditorType.CheckBox,Default=true},
 				
 				new FaucetSetting(){Name="AutoApproveADS",Display="AutoApproveADS - ON/OFF",Type=EditorType.CheckBox,Default=true},
 				
-				new FaucetSetting(){Name="UpdateAds",Display="UpdateAds - ON/OFF",Type=EditorType.CheckBox,Default=true},
+				new FaucetSetting(){Name="UpdateAds",Display="UpdateAds - ON/OFF",Type=EditorType.CheckBox,Default=false},
 				new FaucetSetting(){Name="UpdateAds_Way",Display="UpdateAds_Way - Select Favorite way to choose to update your ADS ",Type=EditorType.ComboBox,Default="By_Row_Random_Way",Items=new System.Collections.Generic.List<string>{"By_Row_Random_Way","By_Title_Way"}},
                 new FaucetSetting(){Name="ExistAd_Title_1",Display="ExistAd_Title_1 - Your AD Title here - put some text that contains some of your text Title - to recognize",Default="AdTitle",Type=EditorType.TextBox,Required=true},		
                 new FaucetSetting(){Name="ExistAd_Title_2",Display="ExistAd_Title_2 - Your AD Title here - put some text that contains some of your text Title - to recognize",Default="AdTitle",Type=EditorType.TextBox,Required=false},		
@@ -42,11 +42,11 @@ public class Mellowads : FaucetScript
 				new FaucetSetting(){Name="CreateAds_Type",Display="CreateAds_Type - Select Favorite way to choose AD Type ",Type=EditorType.ComboBox,Default="Banner",Items=new System.Collections.Generic.List<string>{"Banner","PopUnder"}},
 				new FaucetSetting(){Name="CreateAds_Categories",Display="CreateAds_Categories - Select Favorite way to choose AD Categorie ",Type=EditorType.ComboBox,Default="Gambling",Items=new System.Collections.Generic.List<string>{"NSFW","Gambling","Drugs","Investment"}},
 
-				new FaucetSetting(){Name="StartCampaign",Display="StartCampaign - ON/OFF",Type=EditorType.CheckBox,Default=true},
+				new FaucetSetting(){Name="StartCampaign",Display="StartCampaign - ON/OFF",Type=EditorType.CheckBox,Default=false},
 				new FaucetSetting(){Name="StartCampaign_Categories",Display="StartCampaign_Categories - Select Favorite way to choose Campaign ",Type=EditorType.ComboBox,Default="Start_Daily_Campaign",Items=new System.Collections.Generic.List<string>{"Start_Daily_Campaign","Start_CPM_Campaign","Start_CPC_Campaign"}},  
                 new FaucetSetting(){Name="Campaign_Name",Display="Campaign_Name - Your Campaign Name here - max 100 characters",Default="TestCampaign",Type=EditorType.TextBox,Required=false},	
 
-				new FaucetSetting(){Name="Campaign_AmountPerDays_Way",Display="Campaign_AmountPerDays_Way - ON/OFF - if ON - set the all Exist Balance - if OFF - set Custom balance  ",Type=EditorType.CheckBox,Default=true},
+				new FaucetSetting(){Name="Campaign_AmountPerDays_Way",Display="Campaign_AmountPerDays_Way - ON/OFF - if ON - set the all Exist Balance - if OFF - set Custom balance  ",Type=EditorType.CheckBox,Default=false},
  				new FaucetSetting(){Name="Campaign_AmountPerDays_Custom",Display="Campaign_AmountPerDays_Custom - Your Campaign_AmountPerDays_Custom here - min 0.000001 BTC max 1 BTC ",Default="0.00001",Type=EditorType.TextBox,Required=false},	
        
 				new FaucetSetting(){Name="Campaign_Days",Display="Campaign_Days - Your Campaign_Days here - min 1 max 365",Default="1",Type=EditorType.TextBox,Required=false},	
